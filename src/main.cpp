@@ -1,5 +1,8 @@
 #include <iostream>
+#include <vector>
+#include "include/token.h"
 #include "include/file.h"
+#include "include/lexer.h"
 
 int main(int argc, char* argv[])
 {
@@ -9,14 +12,9 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	File file(argv[1], FILE_READ);
+	std::vector<Token> tokens = tokenize_file(argv[1]);
+	
+	for (Token t : tokens) std::cout << t.value << " " << t.loc.line_number << std::endl;
 
-	if (!file.exists())
-	{
-		std::cerr << "Error: file '" << argv[1] << "' does not exist" << std::endl;
-		return 1;
-	}
-
-	std::cout << file.read();
 	return 0;
 }
