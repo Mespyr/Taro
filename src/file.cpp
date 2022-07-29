@@ -12,6 +12,11 @@ File::~File()
 	file.close();
 }
 
+bool File::operator==(bool t)
+{
+	return (bool) file == t;
+}
+
 void File::writeln(std::string buf)
 {
 	buf.push_back('\n');
@@ -25,6 +30,17 @@ std::string File::read()
 	while (file) contents.push_back(file.get());
 
 	return contents;
+}
+
+std::string File::readline()
+{
+	if (file)
+	{
+		std::string line;
+		std::getline(file, line);
+		return line;
+	}
+	else return "";
 }
 
 bool File::exists()

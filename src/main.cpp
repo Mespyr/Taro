@@ -3,6 +3,8 @@
 #include "include/token.h"
 #include "include/file.h"
 #include "include/lexer.h"
+#include "include/program.h"
+#include "include/parser.h"
 
 int main(int argc, char* argv[])
 {
@@ -13,8 +15,19 @@ int main(int argc, char* argv[])
 	}
 
 	std::vector<Token> tokens = tokenize_file(argv[1]);
-	
-	for (Token t : tokens) std::cout << t.value << " " << t.loc.line_number << std::endl;
+	Program program = parse_tokens(tokens);
+
+	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++)
+	{
+		Function function = fn_key->second;
+		std::cout << "#####################" << std::endl;
+
+		for (Op op : function.ops)
+		{
+			std::cout << op.type << " " << op.loc.line_number << op.loc.line << std::endl;
+		}
+
+	}
 
 	return 0;
 }

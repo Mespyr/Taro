@@ -1,12 +1,13 @@
 #ifndef _LCP_LEXER_H_
 #define _LCP_LEXER_H_
 
-#include "token.h"
-#include "error.h"
 #include <fstream>
 #include <vector>
 #include <string>
 #include <cstring>
+#include "token.h"
+#include "error.h"
+#include "file.h"
 
 bool is_number(std::string n);
 long unsigned int find_next_token_start_col(long unsigned int column_number, std::string line);

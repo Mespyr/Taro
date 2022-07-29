@@ -1,0 +1,7 @@
+sec func
+	12 13 +
+end
+
+sec main
+	 func dump
+end

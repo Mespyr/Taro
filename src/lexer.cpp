@@ -48,6 +48,8 @@ long unsigned int find_string_end_col(long unsigned int column_number, std::stri
 
 std::vector<Token> tokenize_line(std::string line, std::string file_location, long unsigned int line_number)
 {
+	static_assert(TOKEN_TYPE_COUNT == 3, "unhandled token types in tokenize_line()");
+
 	std::vector<Token> tokens;
 
 	// get starting position of first token
@@ -110,11 +112,10 @@ std::vector<Token> tokenize_line(std::string line, std::string file_location, lo
 std::vector<Token> tokenize_file(std::string file_location)
 {
 	// open file
-	std::ifstream file;
-	file.open(file_location, std::ios::in);
+	File file(file_location, FILE_READ);
 
 	// exit if file doesn't exist
-	if (!file)
+	if (!file.exists())
 	{
 		print_error("couldn't open file '" + file_location + "': " + strerror(errno));
 		exit(1);
@@ -122,12 +123,11 @@ std::vector<Token> tokenize_file(std::string file_location)
 
 	std::vector<Token> tokens;
 	long unsigned int line_number = 0;
-	std::string line;
 
-	while (file)
+	while (file == true)
 	{
 		// read next line from file
-		std::getline(file, line);
+		std::string line = file.readline();
 		line_number++;
 
 		// get tokens on line
