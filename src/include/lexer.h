@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <cstring>
+#include <assert.h>
 #include "token.h"
 #include "error.h"
 #include "file.h"

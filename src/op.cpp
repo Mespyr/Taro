@@ -6,7 +6,7 @@ bool is_builtin_word(std::string word)
 	std::vector<std::string> builtin_words = {
 		"dump",
 		"+", "-", "*", "/",
-		"sec", "end"
+		"fun", "end"
 	};
 
 	for (std::string w : builtin_words)

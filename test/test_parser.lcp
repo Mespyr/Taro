@@ -1,7 +1,10 @@
-sec func
+fun func
 	12 13 +
 end
 
-sec main
+fun main
 	 func dump
+
+	# illegal word
+	qwekdjqwklejqklwe
 end

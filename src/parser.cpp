@@ -18,8 +18,8 @@ Op convert_token_to_op(Token tok, Program program)
 		else if (tok.value == "/")
 			return Op(tok.loc, OP_DIV);
 		// keywords
-		else if (tok.value == "sec")
-			return Op(tok.loc, OP_SEC);
+		else if (tok.value == "fun")
+			return Op(tok.loc, OP_FUN);
 		else if (tok.value == "end")
 			return Op(tok.loc, OP_END);
 		// other
@@ -46,12 +46,13 @@ Program parse_tokens(std::vector<Token> tokens)
 
 	Program program;
 	long unsigned int i = 0;
+	int function_addr = 0;
 
 	while (i < tokens.size())
 	{
 		Op current_op = convert_token_to_op(tokens.at(i), program);
 		
-		if (current_op.type == OP_SEC)
+		if (current_op.type == OP_FUN)
 		{
 			i++;
 			if (i > tokens.size() - 2)
@@ -96,8 +97,9 @@ Program parse_tokens(std::vector<Token> tokens)
 			}
 
 			program.functions.insert({function_name, Function(
-				name_token.loc
+				name_token.loc, function_addr
 			)});
+			function_addr++;
 
 			std::vector<Op> function_ops;
 			bool found_function_end = false;
@@ -106,7 +108,7 @@ Program parse_tokens(std::vector<Token> tokens)
 			{
 				Op f_op = convert_token_to_op(tokens.at(i), program);
 				
-				if (f_op.type == OP_SEC)
+				if (f_op.type == OP_FUN)
 				{
 					print_error_at_loc(f_op.loc, "unexpected 'sec' keyword found while parsing. functions cannot be defined inside other functions");
 					exit(1);

@@ -11,12 +11,13 @@
 class Function
 {
 public:
-	Function(Location loc) :
-		loc(loc)
+	Function(Location loc, int addr) :
+		loc(loc), addr(addr)
 	{}
 
 	Location loc;
 	std::vector<Op> ops;
+	int addr;
 };
 
 class Program

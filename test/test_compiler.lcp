@@ -1,0 +1,14 @@
+fun print2
+	dump dump
+end
+
+
+fun main
+	12 13 + dump
+
+	2 3 * dump
+
+	4 2 / print2
+
+	5 2 - dump
+end

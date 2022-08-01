@@ -1,10 +1,11 @@
 #ifndef _LCP_OP_H_
 #define _LCP_OP_H_
 
-#include "location.h"
-#include "token.h"
 #include <string>
 #include <vector>
+#include <assert.h>
+#include "location.h"
+#include "token.h"
 
 enum OpType
 {
@@ -16,7 +17,7 @@ enum OpType
 	OP_MUL,
 	OP_DIV,
 	// keywords
-	OP_SEC,
+	OP_FUN,
 	OP_END,
 	// other
 	OP_PUSH_INT,

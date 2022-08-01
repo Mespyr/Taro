@@ -2,6 +2,7 @@
 #define _LCP_PARSER_H_
 
 #include <vector>
+#include <assert.h>
 #include "token.h"
 #include "op.h"
 #include "program.h"
