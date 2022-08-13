@@ -2,7 +2,7 @@
 
 void compile_to_asm(Program program, std::string output_filename)
 {
-	static_assert(OP_COUNT == 9, "unhandled op types in compile_to_asm()");
+	static_assert(OP_COUNT == 12, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
 
@@ -101,10 +101,25 @@ void compile_to_asm(Program program, std::string output_filename)
 				outfile.writeln("\tpush rax");
 				outfile.writeln("\tpush rdx");
 			}
+			
+			// keywords
+			else if (op.type == OP_JMP)
+			{
+				outfile.writeln("\t; OP_JMP");
+				outfile.writeln("\tjmp addr_" + std::to_string(function.addr) + "_" + std::to_string(op.int_operand));
+			}
+			else if (op.type == OP_CJMP)
+			{
+				outfile.writeln("\t; OP_CJMP");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\ttest rax, rax");
+				outfile.writeln("\tjnz addr_" + std::to_string(function.addr) + "_" + std::to_string(op.int_operand));
+			}
 
 			// other
 			else if (op.type == OP_PUSH_INT)
 			{
+                outfile.writeln("\t; OP_PUSH_INT");
 				outfile.writeln("\tmov rax, " + std::to_string(op.int_operand));
 				outfile.writeln("\tpush rax");
 			}
@@ -117,6 +132,12 @@ void compile_to_asm(Program program, std::string output_filename)
                 outfile.writeln("\tmov [ret_stack_rsp], rsp");
                 outfile.writeln("\tmov rsp, rax");
             }
+			else if (op.type == OP_LABEL)
+			{
+				outfile.writeln("\t; OP_LABEL");
+				// addr_(function_addr)_(index_in_code):
+				outfile.writeln("\taddr_" + std::to_string(function.addr) + "_" + std::to_string(op.int_operand) + ":");
+			}
 		}
 
 		// end function

@@ -1,0 +1,22 @@
+fun main
+	# if statement kinda
+
+	1 cjmp label1    # if true jump to label1
+		12 13 + dump
+		jmp label2     # go to end at end of 'if' block
+	label1:          # else
+		10 10 + dump	
+	label2:          # end
+
+	34 35 + dump
+
+	# should cause seg fault (because cjmp consumes item on stack when jumping
+	10 loop:
+		1 -
+		cjmp loop
+	
+	dump
+	
+
+
+end

@@ -19,9 +19,12 @@ enum OpType
 	// keywords
 	OP_FUN,
 	OP_END,
+	OP_JMP,
+	OP_CJMP,
 	// other
 	OP_PUSH_INT,
 	OP_FUNCTION_CALL,
+	OP_LABEL,
 	// count | must always be last
 	OP_COUNT
 };
