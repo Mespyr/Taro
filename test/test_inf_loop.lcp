@@ -1,0 +1,5 @@
+fun main 
+	loop:
+		34 35 + dump
+		jmp loop
+end
