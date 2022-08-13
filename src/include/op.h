@@ -20,7 +20,8 @@ enum OpType
 	OP_FUN,
 	OP_END,
 	OP_JMP,
-	OP_CJMP,
+	OP_JMPCT,
+	OP_JMPCF,
 	// other
 	OP_PUSH_INT,
 	OP_FUNCTION_CALL,

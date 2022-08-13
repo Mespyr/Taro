@@ -2,7 +2,7 @@
 
 Op convert_token_to_op(Token tok, Program program)
 {
-	static_assert(OP_COUNT == 12, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 13, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -24,8 +24,10 @@ Op convert_token_to_op(Token tok, Program program)
 			return Op(tok.loc, OP_END);
 		else if (tok.value == "jmp")
 			return Op(tok.loc, OP_JMP);
-		else if (tok.value == "cjmp")
-			return Op(tok.loc, OP_CJMP);
+		else if (tok.value == "jmpcf")
+			return Op(tok.loc, OP_JMPCF);
+		else if (tok.value == "jmpct")
+			return Op(tok.loc, OP_JMPCT);
 		// other
 		else if (program.functions.count(tok.value))
 			return Op(tok.loc, OP_FUNCTION_CALL, tok.value);
@@ -55,13 +57,13 @@ Op convert_token_to_op(Token tok, Program program)
 
 std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, int> labels)
 {
-	static_assert(OP_COUNT == 12, "unhandled op types in link_ops()");
+	static_assert(OP_COUNT == 13, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++)
 	{
 		Op current_op = ops.at(i);
 
-		if (current_op.type == OP_JMP || current_op.type == OP_CJMP)
+		if (current_op.type == OP_JMP || current_op.type == OP_JMPCF || current_op.type == OP_JMPCT)
 		{
 			if (labels.count(current_op.str_operand))
 			{
@@ -81,7 +83,7 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, int> labels)
 
 Program parse_tokens(std::vector<Token> tokens)
 {
-	static_assert(OP_COUNT == 12, "unhandled op types in parse_tokens()");
+	static_assert(OP_COUNT == 13, "unhandled op types in parse_tokens()");
 
 	Program program;
 	long unsigned int i = 0;
@@ -171,7 +173,7 @@ Program parse_tokens(std::vector<Token> tokens)
 					f_op.int_operand = i;
 					function_ops.push_back(f_op);
 				}
-				else if (f_op.type == OP_JMP || f_op.type == OP_CJMP)
+				else if (f_op.type == OP_JMP || f_op.type == OP_JMPCT || f_op.type == OP_JMPCF)
 				{
 					i++;
 					if (i >= tokens.size()) break;
