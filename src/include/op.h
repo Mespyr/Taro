@@ -16,6 +16,16 @@ enum OpType
 	OP_MINUS,
 	OP_MUL,
 	OP_DIV,
+	// comparisons
+	OP_EQUAL,
+	OP_GREATER,
+	OP_LESS,
+	OP_GREATER_EQ,
+	OP_LESS_EQ,
+	OP_NOT_EQ,
+	OP_NOT,
+	OP_AND,
+	OP_OR,
 	// keywords
 	OP_FUN,
 	OP_END,

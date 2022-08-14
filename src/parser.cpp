@@ -2,7 +2,7 @@
 
 Op convert_token_to_op(Token tok, Program program)
 {
-	static_assert(OP_COUNT == 13, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 22, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -17,6 +17,25 @@ Op convert_token_to_op(Token tok, Program program)
 			return Op(tok.loc, OP_MUL);
 		else if (tok.value == "/")
 			return Op(tok.loc, OP_DIV);
+		// comparisons
+		else if (tok.value == "=")
+			return Op(tok.loc, OP_EQUAL);
+		else if (tok.value == ">")
+			return Op(tok.loc, OP_GREATER);
+		else if (tok.value == "<")
+			return Op(tok.loc, OP_LESS);
+		else if (tok.value == ">=")
+			return Op(tok.loc, OP_GREATER_EQ);
+		else if (tok.value == "<=")
+			return Op(tok.loc, OP_LESS_EQ);
+		else if (tok.value == "!=")
+			return Op(tok.loc, OP_NOT_EQ);
+		else if (tok.value == "not")
+			return Op(tok.loc, OP_NOT);
+		else if (tok.value == "and")
+			return Op(tok.loc, OP_AND);
+		else if (tok.value == "or")
+			return Op(tok.loc, OP_OR);
 		// keywords
 		else if (tok.value == "fun")
 			return Op(tok.loc, OP_FUN);
@@ -57,7 +76,7 @@ Op convert_token_to_op(Token tok, Program program)
 
 std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, int> labels)
 {
-	static_assert(OP_COUNT == 13, "unhandled op types in link_ops()");
+	static_assert(OP_COUNT == 22, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++)
 	{
@@ -83,7 +102,7 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, int> labels)
 
 Program parse_tokens(std::vector<Token> tokens)
 {
-	static_assert(OP_COUNT == 13, "unhandled op types in parse_tokens()");
+	static_assert(OP_COUNT == 22, "unhandled op types in parse_tokens()");
 
 	Program program;
 	long unsigned int i = 0;

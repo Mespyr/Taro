@@ -2,7 +2,7 @@
 
 void compile_to_asm(Program program, std::string output_filename)
 {
-	static_assert(OP_COUNT == 13, "unhandled op types in compile_to_asm()");
+	static_assert(OP_COUNT == 22, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
 
@@ -101,7 +101,98 @@ void compile_to_asm(Program program, std::string output_filename)
 				outfile.writeln("\tpush rax");
 				outfile.writeln("\tpush rdx");
 			}
-			
+		
+			// comparisons
+			else if (op.type == OP_EQUAL)
+			{
+				outfile.writeln("\t; OP_EQUAL");
+				outfile.writeln("\tmov rcx, 0");
+				outfile.writeln("\tmov rdx, 1");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpop rbx");
+				outfile.writeln("\tcmp rax, rbx");
+				outfile.writeln("\tcmove rcx, rdx");
+				outfile.writeln("\tpush rcx");
+			}
+			else if (op.type == OP_GREATER)
+			{
+				outfile.writeln("\t; OP_GREATER");
+				outfile.writeln("\tmov rcx, 0");
+				outfile.writeln("\tmov rdx, 1");
+				outfile.writeln("\tpop rbx");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tcmp rax, rbx");
+				outfile.writeln("\tcmovg rcx, rdx");
+				outfile.writeln("\tpush rcx");
+			}
+			else if (op.type == OP_LESS)
+			{
+				outfile.writeln("\t; OP_LESS");
+				outfile.writeln("\tmov rcx, 0");
+				outfile.writeln("\tmov rdx, 1");
+				outfile.writeln("\tpop rbx");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tcmp rax, rbx");
+				outfile.writeln("\tcmovl rcx, rdx");
+				outfile.writeln("\tpush rcx");
+			}
+			else if (op.type == OP_GREATER_EQ)
+			{
+				outfile.writeln("\t; OP_GREATER_EQ");
+				outfile.writeln("\tmov rcx, 0");
+				outfile.writeln("\tmov rdx, 1");
+				outfile.writeln("\tpop rbx");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tcmp rax, rbx");
+				outfile.writeln("\tcmovge rcx, rdx");
+				outfile.writeln("\tpush rcx");
+			}
+			else if (op.type == OP_LESS_EQ)
+			{
+				outfile.writeln("\t; OP_LESS_EQ");
+				outfile.writeln("\tmov rcx, 0");
+				outfile.writeln("\tmov rdx, 1");
+				outfile.writeln("\tpop rbx");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tcmp rax, rbx");
+				outfile.writeln("\tcmovle rcx, rdx");
+				outfile.writeln("\tpush rcx");
+			}
+			else if (op.type == OP_NOT_EQ)
+			{
+				outfile.writeln("\t; OP_NOT_EQ");
+				outfile.writeln("\tmov rcx, 0");
+				outfile.writeln("\tmov rdx, 1");
+				outfile.writeln("\tpop rbx");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tcmp rax, rbx");
+				outfile.writeln("\tcmovne rcx, rdx");
+				outfile.writeln("\tpush rcx");
+			}
+			else if (op.type == OP_NOT)
+			{
+				outfile.writeln("\t; OP_NOT");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tnot rax");
+				outfile.writeln("\tpush rax");
+			}
+			else if (op.type == OP_AND)
+			{
+				outfile.writeln("\t; OP_AND");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpop rbx");
+				outfile.writeln("\tand rbx, rax");
+				outfile.writeln("\tpush rbx");
+			}
+			else if (op.type == OP_OR)
+			{
+				outfile.writeln("\t; OP_OR");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpop rbx");
+				outfile.writeln("\tor rbx, rax");
+				outfile.writeln("\tpush rbx");
+			}
+
 			// keywords
 			else if (op.type == OP_JMP)
 			{
