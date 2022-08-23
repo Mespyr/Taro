@@ -1,8 +1,48 @@
 #include "include/parser.h"
 
+std::string add_escapes_to_string(std::string str)
+{
+	std::string buf;
+	std::string ret;
+	long unsigned int i = 0;
+
+	// can't get 2 chars if string is 1 or 0 chars
+	if (str.length() < 2) return str;
+
+	while (i < str.length())
+	{
+		buf = str.substr(i, 2);
+
+		if (buf == "\\a")       ret.push_back('\a');
+		else if (buf == "\\b")  ret.push_back('\b');
+		else if (buf == "\\f")  ret.push_back('\f');
+		else if (buf == "\\n")  ret.push_back('\n');
+		else if (buf == "\\r")  ret.push_back('\r');
+		else if (buf == "\\t")  ret.push_back('\t');
+		else if (buf == "\\v")  ret.push_back('\v');
+		else if (buf == "\\\\") ret.push_back('\\');
+		else if (buf == "\\'")  ret.push_back('\'');
+		else if (buf == "\\\"") ret.push_back('\"');
+		else if (buf == "\\\?") ret.push_back('\?');
+		else if (buf == "\\0")  ret.push_back('\0');
+		else
+		{
+			// if escape sequence not found, shift buffer over by one char to next section
+			ret.push_back(buf.at(0));
+			i++;
+			continue;
+		}
+
+		// skip both chars if escape sequence found in buffer
+		i+=2;
+	}
+
+	return ret;
+}
+
 Op convert_token_to_op(Token tok, Program program)
 {
-	static_assert(OP_COUNT == 22, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 23, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -64,11 +104,7 @@ Op convert_token_to_op(Token tok, Program program)
 	else if (tok.type == TOKEN_INT)
 		return Op(tok.loc, OP_PUSH_INT, atol(tok.value.c_str())); // TODO: check this
 	else if (tok.type == TOKEN_STRING)
-	{
-		// TODO: implement strings
-		print_error_at_loc(tok.loc, "strings are not supported yet");
-		exit(1);
-	}
+		return Op(tok.loc, OP_PUSH_STR, add_escapes_to_string(tok.value.substr(1, tok.value.length() - 2)));
 
 	print_error_at_loc(tok.loc, "unknown word '" + tok.value + "'");
 	exit(1);
@@ -76,7 +112,7 @@ Op convert_token_to_op(Token tok, Program program)
 
 std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, int> labels)
 {
-	static_assert(OP_COUNT == 22, "unhandled op types in link_ops()");
+	static_assert(OP_COUNT == 23, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++)
 	{
@@ -102,7 +138,7 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, int> labels)
 
 Program parse_tokens(std::vector<Token> tokens)
 {
-	static_assert(OP_COUNT == 22, "unhandled op types in parse_tokens()");
+	static_assert(OP_COUNT == 23, "unhandled op types in parse_tokens()");
 
 	Program program;
 	long unsigned int i = 0;

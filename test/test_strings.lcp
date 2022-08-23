@@ -1,0 +1,5 @@
+fun main
+	# look at assembly file
+	"Hello world!" dump
+	"\"Test escape sequences\"" dump
+end

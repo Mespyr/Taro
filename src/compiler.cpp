@@ -2,7 +2,7 @@
 
 void compile_to_asm(Program program, std::string output_filename)
 {
-	static_assert(OP_COUNT == 22, "unhandled op types in compile_to_asm()");
+	static_assert(OP_COUNT == 23, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
 
@@ -44,6 +44,8 @@ void compile_to_asm(Program program, std::string output_filename)
 	outfile.writeln("\tsyscall");
 	outfile.writeln("\tadd rsp, 40");
 	outfile.writeln("\tret");
+
+	std::vector<std::string> strings;
 
 	// compile functions
     for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++)
@@ -221,6 +223,14 @@ void compile_to_asm(Program program, std::string output_filename)
 				outfile.writeln("\tmov rax, " + std::to_string(op.int_operand));
 				outfile.writeln("\tpush rax");
 			}
+			else if (op.type == OP_PUSH_STR)
+			{
+				strings.push_back(op.str_operand);
+				outfile.writeln("\t; OP_PUSH_STR");
+				outfile.writeln("\tmov rax, " + std::to_string(op.str_operand.length()));
+				outfile.writeln("\tpush rax");
+				outfile.writeln("\tpush str_" + std::to_string(strings.size()-1));
+			}
 			else if (op.type == OP_FUNCTION_CALL)
             {
                 outfile.writeln("\t; OP_FUNCTION_CALL");
@@ -256,6 +266,23 @@ void compile_to_asm(Program program, std::string output_filename)
 
 	// data
 	outfile.writeln("segment readable writable");
+
+	// strings
+	for (long unsigned int i = 0; i < strings.size(); i++)
+	{
+		std::string str = strings.at(i);
+		std::stringstream ss;
+		if (str.size() == 0)
+			ss << "0x0";
+		else
+		{
+			for (long unsigned int a = 0; a < str.size() - 1; a++)
+				ss << "0x" << std::hex << (int) str.at(a) << ",";
+			ss << "0x" << std::hex << (int) str.back();
+		}
+		outfile.writeln("str_" + std::to_string(i) + ": db " + ss.str());
+	}
+
     outfile.writeln("ret_stack_rsp: rq 1");
     outfile.writeln("ret_stack: rb 4096");
     outfile.writeln("ret_stack_end:");

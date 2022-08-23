@@ -34,6 +34,7 @@ enum OpType
 	OP_JMPCF,
 	// other
 	OP_PUSH_INT,
+	OP_PUSH_STR,
 	OP_FUNCTION_CALL,
 	OP_LABEL,
 	// count | must always be last

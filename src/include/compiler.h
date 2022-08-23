@@ -3,6 +3,7 @@
 
 #include <string>
 #include <assert.h>
+#include <sstream>
 #include "program.h"
 #include "op.h"
 #include "file.h"
