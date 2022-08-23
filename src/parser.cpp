@@ -42,7 +42,7 @@ std::string add_escapes_to_string(std::string str)
 
 Op convert_token_to_op(Token tok, Program program)
 {
-	static_assert(OP_COUNT == 23, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 30, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -87,6 +87,21 @@ Op convert_token_to_op(Token tok, Program program)
 			return Op(tok.loc, OP_JMPCF);
 		else if (tok.value == "jmpct")
 			return Op(tok.loc, OP_JMPCT);
+		// syscalls
+		else if (tok.value == "call0")
+			return Op(tok.loc, OP_SYSCALL0);
+		else if (tok.value == "call1")
+			return Op(tok.loc, OP_SYSCALL1);
+		else if (tok.value == "call2")
+			return Op(tok.loc, OP_SYSCALL2);
+		else if (tok.value == "call3")
+			return Op(tok.loc, OP_SYSCALL3);
+		else if (tok.value == "call4")
+			return Op(tok.loc, OP_SYSCALL4);
+		else if (tok.value == "call5")
+			return Op(tok.loc, OP_SYSCALL5);
+		else if (tok.value == "call6")
+			return Op(tok.loc, OP_SYSCALL6);
 		// other
 		else if (program.functions.count(tok.value))
 			return Op(tok.loc, OP_FUNCTION_CALL, tok.value);
@@ -112,7 +127,7 @@ Op convert_token_to_op(Token tok, Program program)
 
 std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, int> labels)
 {
-	static_assert(OP_COUNT == 23, "unhandled op types in link_ops()");
+	static_assert(OP_COUNT == 30, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++)
 	{
@@ -138,7 +153,7 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, int> labels)
 
 Program parse_tokens(std::vector<Token> tokens)
 {
-	static_assert(OP_COUNT == 23, "unhandled op types in parse_tokens()");
+	static_assert(OP_COUNT == 30, "unhandled op types in parse_tokens()");
 
 	Program program;
 	long unsigned int i = 0;

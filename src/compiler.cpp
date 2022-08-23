@@ -2,7 +2,7 @@
 
 void compile_to_asm(Program program, std::string output_filename)
 {
-	static_assert(OP_COUNT == 23, "unhandled op types in compile_to_asm()");
+	static_assert(OP_COUNT == 30, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
 
@@ -214,6 +214,78 @@ void compile_to_asm(Program program, std::string output_filename)
 				outfile.writeln("\tpop rax");
 				outfile.writeln("\ttest rax, rax");
 				outfile.writeln("\tjz addr_" + std::to_string(function.addr) + "_" + std::to_string(op.int_operand));
+			}
+
+			// syscalls
+			else if (op.type == OP_SYSCALL0)
+			{
+				outfile.writeln("\t; OP_SYSCALL0");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tsyscall");
+				outfile.writeln("\tpush rax");
+			}
+			else if (op.type == OP_SYSCALL1)
+			{
+				outfile.writeln("\t; OP_SYSCALL1");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpop rdi");
+				outfile.writeln("\tsyscall");
+				outfile.writeln("\tpush rax");
+			}
+			else if (op.type == OP_SYSCALL2)
+			{
+				outfile.writeln("\t; OP_SYSCALL2");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpop rdi");
+				outfile.writeln("\tpop rsi");
+				outfile.writeln("\tsyscall");
+				outfile.writeln("\tpush rax");
+			}
+			else if (op.type == OP_SYSCALL3)
+			{
+				outfile.writeln("\t; OP_SYSCALL3");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpop rdi");
+				outfile.writeln("\tpop rsi");
+				outfile.writeln("\tpop rdx");
+				outfile.writeln("\tsyscall");
+				outfile.writeln("\tpush rax");
+			}
+			else if (op.type == OP_SYSCALL4)
+			{
+				outfile.writeln("\t; OP_SYSCALL4");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpop rdi");
+				outfile.writeln("\tpop rsi");
+				outfile.writeln("\tpop rdx");
+				outfile.writeln("\tpop r10");
+				outfile.writeln("\tsyscall");
+				outfile.writeln("\tpush rax");
+			}
+			else if (op.type == OP_SYSCALL5)
+			{
+				outfile.writeln("\t; OP_SYSCALL5");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpop rdi");
+				outfile.writeln("\tpop rsi");
+				outfile.writeln("\tpop rdx");
+				outfile.writeln("\tpop r10");
+				outfile.writeln("\tpop r8");
+				outfile.writeln("\tsyscall");
+				outfile.writeln("\tpush rax");
+			}
+			else if (op.type == OP_SYSCALL6)
+			{
+				outfile.writeln("\t; OP_SYSCALL6");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpop rdi");
+				outfile.writeln("\tpop rsi");
+				outfile.writeln("\tpop rdx");
+				outfile.writeln("\tpop r10");
+				outfile.writeln("\tpop r8");
+				outfile.writeln("\tpop r9");
+				outfile.writeln("\tsyscall");
+				outfile.writeln("\tpush rax");
 			}
 
 			// other

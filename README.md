@@ -10,5 +10,5 @@ Most of the lexer uses code from the [Ach programming language](https://github.c
 - [x] LCP will compile programs down to assembly and use the `fasm` assembler to make an executable. This will make the programs many times faster than the interpreter.
 - [x] LCP will have actual string pointers
 - [x] labels will be allowed to jump to from anywhere within a function, making control flow easier
-- [ ] syscalls will be implemented, making the language be able to interact with the operating system
+- [x] syscalls will be implemented, making the language be able to interact with the operating system
 - [ ] keywords and language design will be changed to improve readability
