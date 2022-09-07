@@ -26,6 +26,12 @@ enum OpType
 	OP_NOT,
 	OP_AND,
 	OP_OR,
+	// stack manipulation
+	OP_POP,
+	OP_DUP,  // [a] -> [a, a]
+	OP_SWP,  // [a, b] -> [b, a]
+	OP_ROT,  // [a, b, c] -> [b, c, a]
+	OP_OVER, // [a, b] -> [a, b a]
 	// keywords
 	OP_FUN,
 	OP_END,

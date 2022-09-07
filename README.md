@@ -12,7 +12,7 @@ Most of the lexer uses code from the [Ach programming language](https://github.c
 - [x] labels will be allowed to jump to from anywhere within a function, making control flow easier
 - [x] syscalls will be implemented, making the language be able to interact with the operating system
 - [x] keywords and language design will be changed to improve readability
-- [ ] Basic stack manipulation
+- [x] Basic stack manipulation
 - [ ] Type Checking
 - [ ] Datasets
 make something like structs which will store data into sections kind of like this:

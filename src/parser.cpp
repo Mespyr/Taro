@@ -42,7 +42,7 @@ std::string add_escapes_to_string(std::string str)
 
 Op convert_token_to_op(Token tok, Program program)
 {
-	static_assert(OP_COUNT == 30, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 35, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -76,6 +76,17 @@ Op convert_token_to_op(Token tok, Program program)
 			return Op(tok.loc, OP_AND);
 		else if (tok.value == "or")
 			return Op(tok.loc, OP_OR);
+		// stack manipulation
+		else if (tok.value == "pop")
+			return Op(tok.loc, OP_POP);
+		else if (tok.value == "dup")
+			return Op(tok.loc, OP_DUP);
+		else if (tok.value == "swp")
+			return Op(tok.loc, OP_SWP);
+		else if (tok.value == "rot")
+			return Op(tok.loc, OP_ROT);
+		else if (tok.value == "over")
+			return Op(tok.loc, OP_OVER);
 		// keywords
 		else if (tok.value == "fun")
 			return Op(tok.loc, OP_FUN);
@@ -127,7 +138,7 @@ Op convert_token_to_op(Token tok, Program program)
 
 std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, int> labels)
 {
-	static_assert(OP_COUNT == 30, "unhandled op types in link_ops()");
+	static_assert(OP_COUNT == 35, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++)
 	{
@@ -153,7 +164,7 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, int> labels)
 
 Program parse_tokens(std::vector<Token> tokens)
 {
-	static_assert(OP_COUNT == 30, "unhandled op types in parse_tokens()");
+	static_assert(OP_COUNT == 35, "unhandled op types in parse_tokens()");
 
 	Program program;
 	long unsigned int i = 0;

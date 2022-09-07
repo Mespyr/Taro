@@ -2,7 +2,7 @@
 
 void compile_to_asm(Program program, std::string output_filename)
 {
-	static_assert(OP_COUNT == 30, "unhandled op types in compile_to_asm()");
+	static_assert(OP_COUNT == 35, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
 
@@ -192,6 +192,47 @@ void compile_to_asm(Program program, std::string output_filename)
 				outfile.writeln("\tpop rax");
 				outfile.writeln("\tpop rbx");
 				outfile.writeln("\tor rbx, rax");
+				outfile.writeln("\tpush rbx");
+			}
+
+			// stack manipulation
+			else if (op.type == OP_POP)
+			{
+				outfile.writeln("\t; OP_POP");
+				outfile.writeln("\tpop rax");
+			}
+			else if (op.type == OP_DUP)
+			{
+				outfile.writeln("\t; OP_DUP");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpush rax");
+				outfile.writeln("\tpush rax");
+			}
+			else if (op.type == OP_SWP)
+			{
+				outfile.writeln("\t; OP_SWP");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpop rbx");
+				outfile.writeln("\tpush rax");
+				outfile.writeln("\tpush rbx");
+			}
+			else if (op.type == OP_ROT)
+			{
+				outfile.writeln("\t; OP_ROT");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpop rbx");
+				outfile.writeln("\tpop rcx");
+				outfile.writeln("\tpush rbx");
+				outfile.writeln("\tpush rax");
+				outfile.writeln("\tpush rcx");
+			}
+			else if (op.type == OP_OVER)
+			{
+				outfile.writeln("\t; OP_OVER");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpop rbx");
+				outfile.writeln("\tpush rbx");
+				outfile.writeln("\tpush rax");
 				outfile.writeln("\tpush rbx");
 			}
 
