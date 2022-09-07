@@ -15,6 +15,7 @@ It is still very unreadable though.
 - [x] labels will be allowed to jump to from anywhere within a function, making control flow easier
 - [x] syscalls will be implemented, making the language be able to interact with the operating system
 - [x] Basic stack manipulation
+- [ ] Function arguments and return values
 - [ ] Type Checking
 - [ ] Datasets
 	1. [ ] stage one:
@@ -22,15 +23,15 @@ It is still very unreadable though.
 	```
 	memory EpicMemory 16 end
 	```
-	and access the parts of it using read and write commands to read a certain amount of bytes
+	and access the parts of it using read and write commands
 
 
 	2. [ ] stage two:
 	make something like structs which will store data into sections kind of like this:
 	```
 	dataset EpicDataset
-		num1 int  # 8 bytes as integer
-		num2 8    # 8 bytes
+		num1 8 # 8 bytes
+		num2 8
 	end
 	```
 
@@ -39,14 +40,14 @@ It is still very unreadable though.
 	EpicDataset epic_name_for_dataset
 
 	# set num1 to 12
-	epic_name_for_dataset 12 @EpicDataset.num1
+	12 @epic_name_for_dataset.num1
 	# set num2 to 8
-	epic_name_for_dataset 8 @EpicDataset.num2
+	8 @epic_name_for_dataset.num2
 
 	# grab num1
-	epic_name_for_dataset &EpicDataset.num1
+	&epic_name_for_dataset.num1
 	# grab num2
-	epic_name_for_dataset &EpicDataset.num2
+	&epic_name_for_dataset.num2
 
 	+ dump
 	```

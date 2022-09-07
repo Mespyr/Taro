@@ -1,0 +1,13 @@
+fun main
+	0 1
+	loop:
+		# exit loop if number is greater than 1000
+		dup 1000 > cjmpet loop
+
+		over over + # duplicate and add two numbers
+		dup dump    # print number
+		rot pop     # drop previous number	
+
+		jmp loop
+	end
+end
