@@ -11,4 +11,31 @@ Most of the lexer uses code from the [Ach programming language](https://github.c
 - [x] LCP will have actual string pointers
 - [x] labels will be allowed to jump to from anywhere within a function, making control flow easier
 - [x] syscalls will be implemented, making the language be able to interact with the operating system
-- [ ] keywords and language design will be changed to improve readability
+- [x] keywords and language design will be changed to improve readability
+- [ ] Basic stack manipulation
+- [ ] Type Checking
+- [ ] Datasets
+make something like structs which will store data into sections kind of like this:
+```
+dataset EpicDataset
+	num1 int  # 8 bytes as integer
+	num2 8    # 8 bytes
+end
+```
+
+and would be defined and accessed in the code like this:
+```
+EpicDataset epic_name_for_dataset
+
+# set num1 to 12
+epic_name_for_dataset 12 @EpicDataset.num1
+# set num2 to 8
+epic_name_for_dataset 8 @EpicDataset.num2
+
+# grab num1
+epic_name_for_dataset &EpicDataset.num1
+# grab num2
+epic_name_for_dataset &EpicDataset.num2
+
++ dump
+```
