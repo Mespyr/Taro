@@ -17,27 +17,36 @@ It is still very unreadable though.
 - [x] Basic stack manipulation
 - [ ] Type Checking
 - [ ] Datasets
-make something like structs which will store data into sections kind of like this:
-```
-dataset EpicDataset
-	num1 int  # 8 bytes as integer
-	num2 8    # 8 bytes
-end
-```
+	1. [ ] stage one:
+	make memory block thingies like in Ach where you can define the size of the block like this:
+	```
+	memory EpicMemory 16 end
+	```
+	and access the parts of it using read and write commands to read a certain amount of bytes
 
-and would be defined and accessed in the code like this:
-```
-EpicDataset epic_name_for_dataset
 
-# set num1 to 12
-epic_name_for_dataset 12 @EpicDataset.num1
-# set num2 to 8
-epic_name_for_dataset 8 @EpicDataset.num2
+	2. [ ] stage two:
+	make something like structs which will store data into sections kind of like this:
+	```
+	dataset EpicDataset
+		num1 int  # 8 bytes as integer
+		num2 8    # 8 bytes
+	end
+	```
 
-# grab num1
-epic_name_for_dataset &EpicDataset.num1
-# grab num2
-epic_name_for_dataset &EpicDataset.num2
+	and would be defined and accessed in the code like this:
+	```
+	EpicDataset epic_name_for_dataset
 
-+ dump
-```
+	# set num1 to 12
+	epic_name_for_dataset 12 @EpicDataset.num1
+	# set num2 to 8
+	epic_name_for_dataset 8 @EpicDataset.num2
+
+	# grab num1
+	epic_name_for_dataset &EpicDataset.num1
+	# grab num2
+	epic_name_for_dataset &EpicDataset.num2
+
+	+ dump
+	```
