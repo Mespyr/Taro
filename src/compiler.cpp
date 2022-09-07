@@ -2,7 +2,7 @@
 
 void compile_to_asm(Program program, std::string output_filename)
 {
-	static_assert(OP_COUNT == 35, "unhandled op types in compile_to_asm()");
+	static_assert(OP_COUNT == 39, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
 
@@ -237,19 +237,43 @@ void compile_to_asm(Program program, std::string output_filename)
 			}
 
 			// keywords
+			else if (op.type == OP_LABEL_END)
+			{
+				outfile.writeln("\t; OP_LABEL_END");
+				outfile.writeln("\taddr_" + std::to_string(function.addr) + "_" + std::to_string(op.int_operand) + ":");
+			}
 			else if (op.type == OP_JMP)
 			{
 				outfile.writeln("\t; OP_JMP");
 				outfile.writeln("\tjmp addr_" + std::to_string(function.addr) + "_" + std::to_string(op.int_operand));
 			}
-			else if (op.type == OP_JMPCT)
+			else if (op.type == OP_CJMPT)
 			{
 				outfile.writeln("\t; OP_JMPCT");
 				outfile.writeln("\tpop rax");
 				outfile.writeln("\ttest rax, rax");
 				outfile.writeln("\tjnz addr_" + std::to_string(function.addr) + "_" + std::to_string(op.int_operand));
 			}
-			else if (op.type == OP_JMPCF)
+			else if (op.type == OP_CJMPF)
+			{
+				outfile.writeln("\t; OP_JMPCF");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\ttest rax, rax");
+				outfile.writeln("\tjz addr_" + std::to_string(function.addr) + "_" + std::to_string(op.int_operand));
+			}
+			else if (op.type == OP_JMPE)
+			{
+				outfile.writeln("\t; OP_JMP");
+				outfile.writeln("\tjmp addr_" + std::to_string(function.addr) + "_" + std::to_string(op.int_operand));
+			}
+			else if (op.type == OP_CJMPET)
+			{
+				outfile.writeln("\t; OP_JMPCT");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\ttest rax, rax");
+				outfile.writeln("\tjnz addr_" + std::to_string(function.addr) + "_" + std::to_string(op.int_operand));
+			}
+			else if (op.type == OP_CJMPEF)
 			{
 				outfile.writeln("\t; OP_JMPCF");
 				outfile.writeln("\tpop rax");

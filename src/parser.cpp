@@ -42,7 +42,7 @@ std::string add_escapes_to_string(std::string str)
 
 Op convert_token_to_op(Token tok, Program program)
 {
-	static_assert(OP_COUNT == 35, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 39, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -94,10 +94,16 @@ Op convert_token_to_op(Token tok, Program program)
 			return Op(tok.loc, OP_END);
 		else if (tok.value == "jmp")
 			return Op(tok.loc, OP_JMP);
-		else if (tok.value == "jmpcf")
-			return Op(tok.loc, OP_JMPCF);
-		else if (tok.value == "jmpct")
-			return Op(tok.loc, OP_JMPCT);
+		else if (tok.value == "cjmpf")
+			return Op(tok.loc, OP_CJMPF);
+		else if (tok.value == "cjmpt")
+			return Op(tok.loc, OP_CJMPT);
+		else if (tok.value == "jmpe")
+			return Op(tok.loc, OP_JMPE);
+		else if (tok.value == "cjmpef")
+			return Op(tok.loc, OP_CJMPEF);
+		else if (tok.value == "cjmpet")
+			return Op(tok.loc, OP_CJMPET);
 		// syscalls
 		else if (tok.value == "call0")
 			return Op(tok.loc, OP_SYSCALL0);
@@ -136,19 +142,22 @@ Op convert_token_to_op(Token tok, Program program)
 	exit(1);
 }
 
-std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, int> labels)
+std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels)
 {
-	static_assert(OP_COUNT == 35, "unhandled op types in link_ops()");
+	static_assert(OP_COUNT == 39, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++)
 	{
 		Op current_op = ops.at(i);
 
-		if (current_op.type == OP_JMP || current_op.type == OP_JMPCF || current_op.type == OP_JMPCT)
+		if (current_op.type == OP_JMP || current_op.type == OP_CJMPF || current_op.type == OP_CJMPT || current_op.type == OP_JMPE || current_op.type == OP_CJMPET || current_op.type == OP_CJMPEF)
 		{
 			if (labels.count(current_op.str_operand))
 			{
-				current_op.int_operand = labels.at(current_op.str_operand);
+				if (current_op.type == OP_JMP || current_op.type == OP_CJMPF || current_op.type == OP_CJMPT)
+					current_op.int_operand = labels.at(current_op.str_operand).first;
+				else if (current_op.type == OP_JMPE || current_op.type == OP_CJMPET || current_op.type == OP_CJMPEF)
+					current_op.int_operand = labels.at(current_op.str_operand).second;
 				ops.at(i) = current_op;
 			}
 			else
@@ -164,7 +173,7 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, int> labels)
 
 Program parse_tokens(std::vector<Token> tokens)
 {
-	static_assert(OP_COUNT == 35, "unhandled op types in parse_tokens()");
+	static_assert(OP_COUNT == 39, "unhandled op types in parse_tokens()");
 
 	Program program;
 	long unsigned int i = 0;
@@ -225,8 +234,11 @@ Program parse_tokens(std::vector<Token> tokens)
 			function_addr++;
 
 			std::vector<Op> function_ops;
-			std::map<std::string, int> labels;
+			std::map<std::string, std::pair<int, int>> labels;
 			bool found_function_end = false;
+			// recursion
+			int recursion_level = 0;
+			std::vector<std::string> recursion_stack;
 		
 			// parse tokens in function
 			while (i < tokens.size())
@@ -240,21 +252,48 @@ Program parse_tokens(std::vector<Token> tokens)
 				}
 				else if (f_op.type == OP_END)
 				{
-					found_function_end = true;
-					break;
+					if (recursion_level == 0)
+					{
+						found_function_end = true;
+						break;
+					}
+					else
+					{
+						recursion_level--;
+						std::string ended_label = recursion_stack.back();
+						recursion_stack.pop_back();
+
+						// set second idx to end of label	
+						std::pair<int, int> label_pair = labels.at(ended_label);
+						label_pair.second = i;
+						labels.at(ended_label) = label_pair;
+
+						f_op.type = OP_LABEL_END;
+						f_op.int_operand = label_pair.second;
+						function_ops.push_back(f_op);	
+					}
 				}
 				else if (f_op.type == OP_LABEL)
 				{
+					
 					if (labels.count(f_op.str_operand))
 					{
 						print_error_at_loc(f_op.loc, "redefinition of label '" + f_op.str_operand + "'");
 						exit(1);
 					}
-					labels.insert({f_op.str_operand, i});
+					std::string label_name = f_op.str_operand;
+					std::pair<int, int> start_and_end_idxs;
+					start_and_end_idxs.first = i;
+					labels.insert({f_op.str_operand, start_and_end_idxs});
+
+					// increase recursion
+					recursion_level++;
+					recursion_stack.push_back(f_op.str_operand);
+
 					f_op.int_operand = i;
 					function_ops.push_back(f_op);
 				}
-				else if (f_op.type == OP_JMP || f_op.type == OP_JMPCT || f_op.type == OP_JMPCF)
+				else if (f_op.type == OP_JMP || f_op.type == OP_CJMPT || f_op.type == OP_CJMPF || f_op.type == OP_JMPE || f_op.type == OP_CJMPET || f_op.type == OP_CJMPEF)
 				{
 					i++;
 					if (i >= tokens.size()) break;

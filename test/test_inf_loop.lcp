@@ -1,5 +1,6 @@
 fun main 
 	loop:
-		34 35 + dump
+		69 dump
 		jmp loop
+	end
 end
