@@ -1,4 +1,4 @@
-fun main
+fun main()
 	1 1 = dump
 	1 0 = dump
 

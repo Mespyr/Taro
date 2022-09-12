@@ -1,4 +1,4 @@
-fun main 
+fun main()
 	loop:
 		69 dump
 		jmp loop

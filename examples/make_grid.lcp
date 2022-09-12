@@ -1,0 +1,32 @@
+fun print(int ptr)
+	1 1 call3 pop
+end
+
+fun print_row(int)
+	0 row_loop:
+		over over <= cjmpet row_loop
+		"*" print
+		1 +
+
+		jmp row_loop
+	end pop pop
+
+	"\n" print
+end
+
+fun make_grid(int int) # width, height
+	0 height_loop:
+		over over <= cjmpet height_loop
+
+		rot dup print_row
+		rot rot
+
+		1 +
+
+		jmp height_loop
+	end pop pop pop
+end
+
+fun main()
+	12 12 make_grid
+end

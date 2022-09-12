@@ -22,7 +22,10 @@ long unsigned int find_next_token_start_col(long unsigned int column_number, std
 
 long unsigned int find_token_end_col(long unsigned int column_number, std::string line)
 {
-	while (column_number < line.length() && !std::isspace(line.at(column_number)) && line.at(column_number) != '#')
+	while (column_number < line.length() && !std::isspace(line.at(column_number))
+			&& line.at(column_number) != '#'
+			&& line.at(column_number) != '(' && line.at(column_number) != ')'
+			&& line.at(column_number) != '[' && line.at(column_number) != ']')
 		column_number++;
 
 	return column_number;
@@ -79,13 +82,21 @@ std::vector<Token> tokenize_line(std::string line, std::string file_location, lo
 			}
 			// inc col_end so it points to after '"'
 			column_number_end++;
-			TokenType token_type = TOKEN_STRING;
-
 
 			tokens.push_back(Token(
-				line.substr(column_number_start, column_number_end - column_number_start), token_type,
+				line.substr(column_number_start, column_number_end - column_number_start), TOKEN_STRING,
 				Location(line_number, column_number_start, column_number_end, line, file_location)
 			));
+		}
+		// if token is any of these chars ()[]
+		else if (line.at(column_number_start) == '(' || line.at(column_number_start) == ')' || line.at(column_number_start) == '[' || line.at(column_number_start) == ']')
+		{
+			tokens.push_back(Token(
+				line.substr(column_number_start, 1), TOKEN_WORD,
+				Location(line_number, column_number_start, column_number_start+1, line, file_location)
+			));
+			// one after the char
+			column_number_end = column_number_start + 1;
 		}
 		else
 		{
@@ -103,7 +114,7 @@ std::vector<Token> tokenize_line(std::string line, std::string file_location, lo
 		}
 
 		// get start position of next token
-		column_number_start = find_next_token_start_col(column_number_end + 1, line);
+		column_number_start = find_next_token_start_col(column_number_end, line);
 	}
 
 	return tokens;

@@ -35,6 +35,7 @@ enum OpType
 	// keywords
 	OP_FUN,
 	OP_END,
+	OP_LABEL,
 	OP_LABEL_END,
 	OP_JMP,
 	OP_CJMPT,
@@ -54,7 +55,6 @@ enum OpType
 	OP_PUSH_INT,
 	OP_PUSH_STR,
 	OP_FUNCTION_CALL,
-	OP_LABEL,
 	// count | must always be last
 	OP_COUNT
 };

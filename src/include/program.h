@@ -6,18 +6,21 @@
 #include <map>
 #include "op.h"
 #include "location.h"
+#include "types.h"
 
 // stores ops for a function
 class Function
 {
 public:
-	Function(Location loc, int addr) :
-		loc(loc), addr(addr)
+	Function(Location loc, int addr, std::vector<TypeAtLoc> arg_stack, std::vector<TypeAtLoc> ret_stack) :
+		loc(loc), addr(addr), arg_stack(arg_stack), ret_stack(ret_stack)
 	{}
 
 	Location loc;
-	std::vector<Op> ops;
 	int addr;
+	std::vector<TypeAtLoc> arg_stack;
+	std::vector<TypeAtLoc> ret_stack;
+	std::vector<Op> ops;
 };
 
 class Program

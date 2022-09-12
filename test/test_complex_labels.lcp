@@ -1,7 +1,7 @@
 # print numbers 9-0
 # when reaching 6, print 69 instead
 
-fun main
+fun main()
 	10 loop:
 		1 -
 		

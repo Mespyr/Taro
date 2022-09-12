@@ -1,4 +1,4 @@
-fun main
+fun main()
 	12 13 pop dump
 
 	13 dup dump dump

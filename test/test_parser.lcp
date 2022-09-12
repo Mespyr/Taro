@@ -1,8 +1,8 @@
-fun func
+fun func() [int]
 	12 13 +
 end
 
-fun main
+fun main()
 	 func dump
 
 	# illegal word

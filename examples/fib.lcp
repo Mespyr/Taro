@@ -1,4 +1,4 @@
-fun main
+fun main()
 	0 1
 	loop:
 		# exit loop if number is greater than 1000

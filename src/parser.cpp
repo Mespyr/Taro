@@ -1,5 +1,14 @@
 #include "include/parser.h"
 
+bool is_legal_name(Token token_name)
+{
+	if (token_name.type == TOKEN_INT || token_name.type == TOKEN_STRING) return false;
+	if (is_builtin_word(token_name.value)) return false;
+	if (token_name.value.find('"') != std::string::npos) return false;
+
+	return true;
+}
+
 std::string add_escapes_to_string(std::string str)
 {
 	std::string buf;
@@ -132,6 +141,11 @@ Op convert_token_to_op(Token tok, Program program)
 			tok.value.pop_back();
 			return Op(tok.loc, OP_LABEL, tok.value);
 		}
+		else if (tok.value == "[" || tok.value == "]" || tok.value == "(" || tok.value == ")")
+		{				
+			print_error_at_loc(tok.loc, "unexpected '" + tok.value + "' char found while parsing");
+			exit(1);
+		}
 	}
 	else if (tok.type == TOKEN_INT)
 		return Op(tok.loc, OP_PUSH_INT, atol(tok.value.c_str())); // TODO: check this
@@ -186,7 +200,8 @@ Program parse_tokens(std::vector<Token> tokens)
 		if (current_op.type == OP_FUN)
 		{
 			i++;
-			if (i > tokens.size() - 2)
+			// check if function name is in the tokens
+			if (i >= tokens.size())
 			{
 				print_error_at_loc(current_op.loc, "unexpected EOF found while parsing function definition");
 				exit(1);
@@ -196,40 +211,96 @@ Program parse_tokens(std::vector<Token> tokens)
 			Token name_token = tokens.at(i);
 			std::string function_name = name_token.value;
 
-			if (name_token.type == TOKEN_WORD)
+			if (!is_legal_name(name_token))
 			{
-				if (is_builtin_word(function_name))
-				{
-					print_error_at_loc(name_token.loc, "function name cannot be a built-in word");
-					exit(1);
-				}
-				else if (program.functions.count(function_name))
-				{
-					print_error_at_loc(name_token.loc, "function '" + function_name + "' already exists");
-					exit(1);
-				}
-			}
-			else if (name_token.type == TOKEN_INT)
-			{
-				print_error_at_loc(current_op.loc, "function name cannot be a integer");
+				print_error_at_loc(name_token.loc, "illegal name for function");
 				exit(1);
 			}
-			else if (name_token.type == TOKEN_STRING)
+			else if (program.functions.count(function_name))
 			{
-				print_error_at_loc(current_op.loc, "function name cannot be a string");
+				print_error_at_loc(name_token.loc, "function '" + function_name + "' already exists");
 				exit(1);
 			}
-		
+			i++;
+
+			// check if eof before argument parsing
+			if (i >= tokens.size())
+			{
+				print_error_at_loc(current_op.loc, "unexpected EOF found while parsing function definition");
+				exit(1);
+			}
+
+			if (tokens.at(i).value != "(")
+			{
+				print_error_at_loc(tokens.at(i).loc, "unexpected '" + tokens.at(i).value + "' found while parsing function definition");
+				exit(1);
+			}
+			i++;
+
+			std::vector<TypeAtLoc> arg_stack;
+			std::vector<TypeAtLoc> ret_stack;
+
+			// parse arguments of function
+			while (tokens.at(i).value != ")")
+			{
+				Token tok = tokens.at(i);
+
+				if (tok.value == human_readable_type(DATATYPE_INT))
+					arg_stack.push_back(TypeAtLoc(tok.loc, DATATYPE_INT));
+				else if (tok.value == human_readable_type(DATATYPE_PTR))
+					arg_stack.push_back(TypeAtLoc(tok.loc, DATATYPE_PTR));
+				else
+				{
+					print_error_at_loc(tok.loc, "unknown argument type '" + tok.value + "'");
+					exit(1);
+				}
+
+				i++;
+				if (i > tokens.size() - 1)
+				{
+					print_error_at_loc(tok.loc, "unexpected EOF found while parsing function definition");
+					exit(1);
+				}
+			}
+
 			// check if there is code after function declaration
 			i++;
 			if (i >= tokens.size())
 			{
-				print_error_at_loc(tokens.back().loc, "unexpected EOF found while parsing function definition");
+				print_error_at_loc(tokens.back().loc, "unexpected EOF found while parsing function arguments");
 				exit(1);
+			}
+			
+			if (tokens.at(i).value == "[")
+			{
+				i++;
+				// parse return stack of function
+				while (tokens.at(i).value != "]")
+				{
+					Token tok = tokens.at(i);
+
+					if (tok.value == human_readable_type(DATATYPE_INT))
+						ret_stack.push_back(TypeAtLoc(tok.loc, DATATYPE_INT));
+					else if (tok.value == human_readable_type(DATATYPE_PTR))
+						ret_stack.push_back(TypeAtLoc(tok.loc, DATATYPE_PTR));
+					else
+					{
+						print_error_at_loc(tok.loc, "unknown return type '" + tok.value + "'");
+						exit(1);
+					}
+
+					i++;
+					if (i > tokens.size() - 1)
+					{
+						print_error_at_loc(tok.loc, "unexpected EOF found while parsing function return stack");
+						exit(1);
+					}
+				}
+				i++;
 			}
 
 			program.functions.insert({function_name, Function(
-				name_token.loc, function_addr
+				name_token.loc, function_addr, arg_stack, ret_stack
 			)});
 			function_addr++;
 
@@ -275,7 +346,6 @@ Program parse_tokens(std::vector<Token> tokens)
 				}
 				else if (f_op.type == OP_LABEL)
 				{
-					
 					if (labels.count(f_op.str_operand))
 					{
 						print_error_at_loc(f_op.loc, "redefinition of label '" + f_op.str_operand + "'");

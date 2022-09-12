@@ -1,9 +1,9 @@
-fun print2
+fun print2(int int)
 	dump dump
 end
 
 
-fun main
+fun main()
 	12 13 + dump
 
 	2 3 * dump
