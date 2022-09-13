@@ -591,7 +591,6 @@ void type_check_program(Program program)
 			{
 				// save current stack state
 				label_stack_states.insert({op.str_operand, type_stack});
-				std::cout << op.str_operand << op.int_operand << std::endl;
 			}
 			else if (op.type == OP_LABEL_END)
 			{
@@ -600,7 +599,6 @@ void type_check_program(Program program)
 					print_error_at_loc(op.loc, "different types on stack before and after label definition. types of items on stack must be the same.");
 					exit(1);
 				}
-				std::cout << op.str_operand << op.int_operand << std::endl;
 			}
 			else if (op.type == OP_JMP)
 			{
