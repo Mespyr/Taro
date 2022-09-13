@@ -15,8 +15,8 @@ It is still very unreadable though.
 - [x] labels will be allowed to jump to from anywhere within a function, making control flow easier
 - [x] syscalls will be implemented, making the language be able to interact with the operating system
 - [x] Basic stack manipulation
-- [ ] Function arguments and return values
-- [ ] Type Checking
+- [x] Function arguments and return values
+- [x] Type Checking
 - [ ] Datasets
 	1. [ ] stage one:
 	make memory block thingies like in Ach where you can define the size of the block like this:
