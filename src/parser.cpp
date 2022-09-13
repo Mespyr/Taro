@@ -341,6 +341,7 @@ Program parse_tokens(std::vector<Token> tokens)
 
 						f_op.type = OP_LABEL_END;
 						f_op.int_operand = label_pair.second;
+						f_op.str_operand = ended_label;
 						function_ops.push_back(f_op);	
 					}
 				}

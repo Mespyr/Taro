@@ -28,5 +28,5 @@ fun make_grid(int int) # width, height
 end
 
 fun main()
-	12 12 make_grid
+	12 6 make_grid
 end

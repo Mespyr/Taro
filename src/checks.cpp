@@ -38,6 +38,9 @@ bool compare_type_stacks(std::vector<TypeAtLoc> type_stack_1, std::vector<TypeAt
 	return true;
 }
 
+// TODO: make it so that stack state on jump ops is stored in a map
+// then checked over with the second part of type-checking
+// comparing it to the label_stack_states map
 void type_check_program(Program program)
 {
 	static_assert(OP_COUNT == 39, "unhandled op types in type_check_program()");
@@ -45,19 +48,19 @@ void type_check_program(Program program)
 
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++)
 	{
-		std::vector<TypeAtLoc> type_stack;
-		std::vector<int> label_recursion_stack;
-		std::map<int, std::vector<TypeAtLoc>> label_stack_states;
-
 		Function function = fn_key->second;
 		std::string func_name = fn_key->first;
+		std::map<std::string, std::vector<TypeAtLoc>> label_stack_states;
+		std::vector<std::pair<Op, std::vector<TypeAtLoc>>> jump_op_stack_states;
+
+		// first round of type-checking
+		// get all type_stack snapshots of all label sections
+		std::vector<TypeAtLoc> type_stack;
 
 		for (TypeAtLoc t : function.arg_stack)
 			type_stack.push_back(t);
 
-		// first round of type-checking
-		// get all type_stack snapshots of all label sections
-
+		// type check all ops
 		for (Op op : function.ops)
 		{
 			if (op.type == OP_DUMP)
@@ -439,94 +442,6 @@ void type_check_program(Program program)
 				type_stack.push_back(b);
 			}
 
-			// keywords
-			else if (op.type == OP_LABEL)
-			{
-				// save current stack state
-				label_recursion_stack.push_back(op.int_operand);
-				label_stack_states.insert({op.int_operand, type_stack});
-			}
-			else if (op.type == OP_LABEL_END)
-			{
-				if (label_recursion_stack.size() == 0)
-				{
-					print_error("error found in parser. random OP_LABEL_END op found which isn't connected to an OP_LABEL.");
-					exit(1);
-				}
-				int label_addr = label_recursion_stack.back();
-				label_recursion_stack.pop_back();
-				
-				if (!compare_type_stacks(type_stack, label_stack_states.at(label_addr)))
-				{
-					print_error_at_loc(op.loc, "different types on stack before and after label definition. types of items on stack must be the same.");
-					exit(1);
-				}
-			}
-			else if (op.type == OP_CJMPT)
-			{
-				if (type_stack.size() < 1)
-				{
-					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpt", "conditional jump if true");
-					exit(1);
-				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-
-				if (a.type != DATATYPE_INT)
-				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "cjmpt", "conditional jump if true");
-					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a.type) + ")");
-					exit(1);
-				}
-			}
-			else if (op.type == OP_CJMPF)
-			{
-				if (type_stack.size() < 1)
-				{
-					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpf", "conditional jump if false");
-					exit(1);
-				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-
-				if (a.type != DATATYPE_INT)
-				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "cjmpf", "conditional jump if false");
-					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a.type) + ")");
-					exit(1);
-				}
-			}
-			else if (op.type == OP_CJMPET)
-			{
-				if (type_stack.size() < 1)
-				{
-					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpet", "conditional jump to end if true");
-					exit(1);
-				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-
-				if (a.type != DATATYPE_INT)
-				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "cjmpet", "conditional jump to end if true");
-					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a.type) + ")");
-					exit(1);
-				}
-			}
-			else if (op.type == OP_CJMPEF)
-			{
-				if (type_stack.size() < 1)
-				{
-					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpef", "conditional jump to end if false");
-					exit(1);
-				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-
-				if (a.type != DATATYPE_INT)
-				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "cjmpet", "conditional jump to end if false");
-					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a.type) + ")");
-					exit(1);
-				}
-			}
-
 			// syscalls
 			else if (op.type == OP_SYSCALL0)
 			{
@@ -668,6 +583,102 @@ void type_check_program(Program program)
 				}
 				type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
 			}
+
+			// labels
+			// we do not check OP_JMP and OP_JMPE as they don't consume any data from the stack
+			// and we will compare the type stack to the labels in the second loop
+			else if (op.type == OP_LABEL)
+			{
+				// save current stack state
+				label_stack_states.insert({op.str_operand, type_stack});
+				std::cout << op.str_operand << op.int_operand << std::endl;
+			}
+			else if (op.type == OP_LABEL_END)
+			{
+				if (!compare_type_stacks(type_stack, label_stack_states.at(op.str_operand)))
+				{
+					print_error_at_loc(op.loc, "different types on stack before and after label definition. types of items on stack must be the same.");
+					exit(1);
+				}
+				std::cout << op.str_operand << op.int_operand << std::endl;
+			}
+			else if (op.type == OP_JMP)
+			{
+				jump_op_stack_states.push_back({op, type_stack});
+			}
+			else if (op.type == OP_CJMPT)
+			{
+				if (type_stack.size() < 1)
+				{
+					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpt", "conditional jump if true");
+					exit(1);
+				}
+				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+
+				if (a.type != DATATYPE_INT)
+				{
+					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "cjmpt", "conditional jump if true");
+					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a.type) + ")");
+					exit(1);
+				}
+
+				jump_op_stack_states.push_back({op, type_stack});
+			}
+			else if (op.type == OP_CJMPF)
+			{
+				if (type_stack.size() < 1)
+				{
+					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpf", "conditional jump if false");
+					exit(1);
+				}
+				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+
+				if (a.type != DATATYPE_INT)
+				{
+					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "cjmpf", "conditional jump if false");
+					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a.type) + ")");
+					exit(1);
+				}
+
+				jump_op_stack_states.push_back({op, type_stack});
+			}
+			else if (op.type == OP_CJMPET)
+			{
+				if (type_stack.size() < 1)
+				{
+					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpet", "conditional jump to end if true");
+					exit(1);
+				}
+				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+
+				if (a.type != DATATYPE_INT)
+				{
+					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "cjmpet", "conditional jump to end if true");
+					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a.type) + ")");
+					exit(1);
+				}
+
+				jump_op_stack_states.push_back({op, type_stack});
+			}
+			else if (op.type == OP_CJMPEF)
+			{
+				if (type_stack.size() < 1)
+				{
+					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpef", "conditional jump to end if false");
+					exit(1);
+				}
+				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+
+				if (a.type != DATATYPE_INT)
+				{
+					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "cjmpet", "conditional jump to end if false");
+					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a.type) + ")");
+					exit(1);
+				}
+
+				jump_op_stack_states.push_back({op, type_stack});
+			}
+
 			// other
 			else if (op.type == OP_PUSH_INT)
 			{
@@ -728,8 +739,8 @@ void type_check_program(Program program)
 			}
 		}
 
-		bool return_vals_equal = compare_type_stacks(type_stack, function.ret_stack);
-		if (!return_vals_equal)
+		// make sure return values match up with what is specified in the function definition and throw error if not
+		if (!compare_type_stacks(type_stack, function.ret_stack))
 		{
 			if (function.ret_stack.size() < type_stack.size()) // main cannot have excess data on stack
 			{
@@ -767,6 +778,28 @@ void type_check_program(Program program)
 			}
 
 			exit(1);
+		}
+
+		// second round of type-checking
+		// go through code again and check jmp labels to see if the stack values are the same as the label they are jumping to
+		for (std::pair<Op, std::vector<TypeAtLoc>> op_stack_pair : jump_op_stack_states)
+		{
+			Op op = op_stack_pair.first;
+			std::vector<TypeAtLoc> op_stack_state = op_stack_pair.second;
+
+			if (!label_stack_states.count(op.str_operand))
+			{
+				print_error_at_loc(op.loc, "error found in parser or type-checker. Label '" + op.str_operand + " either doesn't exist or hasn't been found by the parser.");
+				exit(1);
+			}
+
+			// throw error if stack doesn't match up
+			if (!compare_type_stacks(op_stack_state, label_stack_states.at(op.str_operand)))
+			{
+				print_error_at_loc(op.loc, "different types on stack then what was expected at the label.");
+
+				exit(1);
+			}
 		}
 	}
 }

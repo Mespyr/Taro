@@ -9,5 +9,5 @@ fun main()
 		rot pop     # drop previous number	
 
 		jmp loop
-	end
+	end pop pop
 end

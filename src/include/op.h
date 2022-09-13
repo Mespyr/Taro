@@ -35,14 +35,6 @@ enum OpType
 	// keywords
 	OP_FUN,
 	OP_END,
-	OP_LABEL,
-	OP_LABEL_END,
-	OP_JMP,
-	OP_CJMPT,
-	OP_CJMPF,
-	OP_JMPE,
-	OP_CJMPET,
-	OP_CJMPEF,
 	// syscalls
 	OP_SYSCALL0,
 	OP_SYSCALL1,
@@ -51,6 +43,15 @@ enum OpType
 	OP_SYSCALL4,
 	OP_SYSCALL5,
 	OP_SYSCALL6,
+	// labels
+	OP_LABEL,
+	OP_LABEL_END,
+	OP_JMP,
+	OP_CJMPT,
+	OP_CJMPF,
+	OP_JMPE,
+	OP_CJMPET,
+	OP_CJMPEF,
 	// other
 	OP_PUSH_INT,
 	OP_PUSH_STR,
