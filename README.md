@@ -51,3 +51,8 @@ It is still very unreadable though.
 
 	+ dump
 	```
+
+### Things I want to do
+
+- [ ] make datasets a reality
+- [ ] write code to generate a [prime spiral](https://mathimages.swarthmore.edu/index.php/Prime_spiral_(Ulam_spiral)) also known as a Ulam spiral.
