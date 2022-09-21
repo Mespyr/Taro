@@ -34,3 +34,4 @@
 lcp
 *.asm
 obj/
+out

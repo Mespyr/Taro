@@ -52,6 +52,30 @@ It is still very unreadable though.
 	+ dump
 	```
 
+	Datasets themselves cannot be modified on the stack, so to pass them as arguments for functions, you would write it like this:
+	```
+	dataset Point
+		int x
+		int y
+	end
+
+	fun calc_slope(Point:a Point:b)
+		# dataset name + the name you want for the pointer
+		@a.x @a.y
+		@b.x @b.y
+		# rest of code
+	end
+
+	fun main()
+		Point a 5 @a.x 4 @a.y
+		Point b 5 @b.x 0 @b.y
+
+		# push pointers onto stack
+		a b calc_slope
+	end
+	```
+
+
 ### Things I want to do
 
 - [ ] make datasets a reality
