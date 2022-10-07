@@ -278,7 +278,7 @@ Program parse_tokens(std::vector<Token> tokens)
 					Token tok = tokens.at(i);
 
 					std::string tok_base_value = parse_type_str(tok.value).first;
-					if (tok_base_value != "int")
+					if (!is_base_type_int(tok_base_value))
 					{
 						print_error_at_loc(tok.loc, "unknown return type '" + tok.value + "'");
 						exit(1);

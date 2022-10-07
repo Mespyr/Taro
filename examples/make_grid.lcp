@@ -29,4 +29,5 @@ end
 
 fun main()
 	12 6 make_grid
+	20 10 make_grid
 end
