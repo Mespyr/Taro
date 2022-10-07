@@ -17,7 +17,8 @@ It is still very unreadable though.
 - [x] Basic stack manipulation
 - [x] Function arguments and return values
 - [x] Type Checking
-- [x] have more fancy type notation (using '^' to indicate pointers, making custom types possible)
+- [x] have more fancy type notation (using `^` to indicate pointers, making custom types possible)
+- [ ] add two types of integer (i8, i64) instead of just default `int` keyword. good for string as string type is a `^i8`.
 - [ ] Datasets
 - [ ] write code to generate a [prime spiral](https://mathimages.swarthmore.edu/index.php/Prime_spiral_(Ulam_spiral)) also known as a Ulam spiral.
 
@@ -25,27 +26,27 @@ It is still very unreadable though.
 LCP will have something like structs which will store data into sections kind of like this:
 ```python
 dataset EpicDataset
-	num1 int
-	num2 int
+  num1 i64
+  num2 i64
 end
 ```
 
 and would be defined and accessed in the code like this:
 ```python
 fun main()
-	EpicDataset epic_name_for_dataset
+  EpicDataset epic_name_for_dataset
 
-	# set num1 to 12
-	12 @epic_name_for_dataset.num1
-	# set num2 to 8
-	8 @epic_name_for_dataset.num2
+  # set num1 to 12
+  12 @epic_name_for_dataset.num1
+  # set num2 to 8
+  8 @epic_name_for_dataset.num2
 
-	# grab num1
-	&epic_name_for_dataset.num1
-	# grab num2
-	&epic_name_for_dataset.num2
-	
-	+ dump
+  # grab num1
+  &epic_name_for_dataset.num1
+  # grab num2
+  &epic_name_for_dataset.num2
+  
+  + dump
 end
 ```
 
@@ -53,26 +54,26 @@ You could also push datasets onto the stack and then set them as a veriable else
 
 ```python
 dataset String
-	size int
-	data ^int
+  size i64
+  data ^i8
 end
 
-fun set_string(int ^int String)
-	set String str
+fun init_String(i64 ^i8 String)
+  set String str
 
-	@str.data
-	@str.size
+  @str.data
+  @str.size
 end
 
 fun print(String)
-	set String str
-	@str.size @str.data 1 1 call3 pop
+  set String str
+  &str.size &str.data 1 1 call3 pop
 end
 
 
 fun main()
-	String str
-	"Hello, World!" str set_string
-	str print
+  String str
+  "Hello, World!" str init_String
+  str print
 end
 ```

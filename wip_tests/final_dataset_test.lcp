@@ -1,0 +1,21 @@
+dataset String
+	size i64
+	data ^i8
+end
+
+fun init_string(i64 ^i8 String)
+	set String s
+	@s.data
+	@s.size
+end
+
+fun print(String)
+	set String s
+	&s.size &s.data 1 1 call3 pop
+end
+
+fun main()
+	String name
+	"Finn Mcgee" name init_string
+	name print
+end
