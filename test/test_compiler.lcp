@@ -1,4 +1,4 @@
-fun print2(int int)
+fun print2(i64 i64)
 	dump dump
 end
 

@@ -1,4 +1,4 @@
-fun func() [int]
+fun func() [i64]
 	12 13 +
 end
 

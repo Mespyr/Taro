@@ -85,7 +85,7 @@ void type_check_program(Program program)
 				// int + int -> int
 				if (is_base_type_int(a) && is_base_type_int(b))
 					type_stack.push_back(LCPType(
-						op.loc, "int", 0
+						op.loc, get_base_type_name(TYPE_I64), 0
 					));
 				// ptr + int -> ptr
 				else if (is_base_type_int(a) && is_pointer(b))
@@ -121,7 +121,7 @@ void type_check_program(Program program)
 				// int - int -> int
 				if (is_base_type_int(a) && is_base_type_int(b))
 					type_stack.push_back(LCPType(
-						op.loc, "int", 0
+						op.loc, get_base_type_name(TYPE_I64), 0
 					));
 				// ptr - int -> ptr
 				else if (is_base_type_int(a) && is_pointer(b))
@@ -131,7 +131,7 @@ void type_check_program(Program program)
 				// ptr - ptr -> int
 				else if (is_pointer(a) && is_pointer(b))
 					type_stack.push_back(LCPType(
-						op.loc, "int", 0
+						op.loc, get_base_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -157,7 +157,7 @@ void type_check_program(Program program)
 				// int * int -> int
 				if (is_base_type_int(a) && is_base_type_int(b))
 					type_stack.push_back(LCPType(
-						op.loc, "int", 0
+						op.loc, get_base_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -183,8 +183,8 @@ void type_check_program(Program program)
 				// int / int -> int, int
 				if (is_base_type_int(a) && is_base_type_int(b))
 				{
-					type_stack.push_back(LCPType(op.loc, "int", 0));
-					type_stack.push_back(LCPType(op.loc, "int", 0));
+					type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
+					type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
 				}
 				else
 				{
@@ -209,7 +209,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, "int", 0
+						op.loc, get_base_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -232,7 +232,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, "int", 0
+						op.loc, get_base_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -255,7 +255,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, "int", 0
+						op.loc, get_base_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -278,7 +278,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, "int", 0
+						op.loc, get_base_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -301,7 +301,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, "int", 0
+						op.loc, get_base_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -324,7 +324,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, "int", 0
+						op.loc, get_base_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -346,11 +346,11 @@ void type_check_program(Program program)
 
 				if (is_base_type_int(a))
 					type_stack.push_back(LCPType(
-						op.loc, "int", 0
+						op.loc, get_base_type_name(TYPE_I64), 0
 					));
 				else
 				{
-					print_invalid_type_error(op.loc, "int", human_readable_type(a), "not");
+					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "not");
 					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
@@ -368,7 +368,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, "int", 0
+						op.loc, get_base_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -391,7 +391,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, "int", 0
+						op.loc, get_base_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -481,11 +481,11 @@ void type_check_program(Program program)
 
 				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, "int", human_readable_type(a), "syscall0");
+					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "syscall0");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(LCPType(op.loc, "int", 0));
+				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL1)
 			{
@@ -499,11 +499,11 @@ void type_check_program(Program program)
 
 				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, "int", human_readable_type(a), "syscall1");
+					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "syscall1");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(LCPType(op.loc, "int", 0));
+				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL2)
 			{
@@ -518,11 +518,11 @@ void type_check_program(Program program)
 
 				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, "int", human_readable_type(a), "syscall2");
+					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "syscall2");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(LCPType(op.loc, "int", 0));
+				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL3)
 			{
@@ -538,11 +538,11 @@ void type_check_program(Program program)
 
 				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, "int", human_readable_type(a), "syscall3");
+					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "syscall3");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(LCPType(op.loc, "int", 0));
+				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL4)
 			{
@@ -559,11 +559,11 @@ void type_check_program(Program program)
 
 				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, "int", human_readable_type(a), "syscall4");
+					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "syscall4");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(LCPType(op.loc, "int", 0));
+				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL5)
 			{
@@ -581,11 +581,11 @@ void type_check_program(Program program)
 
 				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, "int", human_readable_type(a), "syscall5");
+					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "syscall5");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(LCPType(op.loc, "int", 0));
+				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL6)
 			{
@@ -604,11 +604,11 @@ void type_check_program(Program program)
 
 				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, "int", human_readable_type(a), "syscall6");
+					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "syscall6");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(LCPType(op.loc, "int", 0));
+				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
 			}
 
 			// labels
@@ -642,7 +642,7 @@ void type_check_program(Program program)
 
 				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, "int", human_readable_type(a), "cjmpt", "conditional jump if true");
+					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "cjmpt", "conditional jump if true");
 					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
@@ -660,7 +660,7 @@ void type_check_program(Program program)
 
 				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, "int", human_readable_type(a), "cjmpf", "conditional jump if false");
+					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "cjmpf", "conditional jump if false");
 					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
@@ -678,7 +678,7 @@ void type_check_program(Program program)
 
 				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, "int", human_readable_type(a), "cjmpet", "conditional jump to end if true");
+					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "cjmpet", "conditional jump to end if true");
 					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
@@ -696,7 +696,7 @@ void type_check_program(Program program)
 
 				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, "int", human_readable_type(a), "cjmpet", "conditional jump to end if false");
+					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "cjmpet", "conditional jump to end if false");
 					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
@@ -707,12 +707,12 @@ void type_check_program(Program program)
 			// other
 			else if (op.type == OP_PUSH_INT)
 			{
-				type_stack.push_back(LCPType(op.loc, "int", 0));
+				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_PUSH_STR)
 			{
-				type_stack.push_back(LCPType(op.loc, "int", 0));
-				type_stack.push_back(LCPType(op.loc, "int", 1)); // pointer to array of ints (string)
+				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
+				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I8), 1)); // pointer to array of ints (string)
 			}
 			else if (op.type == OP_FUNCTION_CALL)
 			{

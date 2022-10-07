@@ -6,6 +6,12 @@
 #include <iostream>
 #include "location.h"
 
+enum LCP_Base_Type
+{
+	TYPE_I64,
+	TYPE_I8
+};
+
 class LCPType
 {
 public:
@@ -23,10 +29,12 @@ public:
 	int ptr_to_trace = 0;
 };
 
+std::string get_base_type_name(LCP_Base_Type type);
 std::pair<std::string, int> parse_type_str(std::string str);
 std::string human_readable_type(LCPType t);
 bool types_equal(LCPType a, LCPType b);
 bool is_base_type_int(LCPType t);
+bool is_base_type_int(std::string t);
 bool is_pointer(LCPType t);
 
 #endif

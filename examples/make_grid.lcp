@@ -1,8 +1,8 @@
-fun print(int ^int)
+fun print(i64 ^i8)
 	1 1 call3 pop
 end
 
-fun print_row(int)
+fun print_row(i64)
 	0 row_loop:
 		over over <= cjmpet row_loop
 		"*" print
@@ -14,7 +14,7 @@ fun print_row(int)
 	"\n" print
 end
 
-fun make_grid(int int) # width, height
+fun make_grid(i64 i64) # width, height
 	0 height_loop:
 		over over <= cjmpet height_loop
 

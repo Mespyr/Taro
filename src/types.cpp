@@ -8,6 +8,19 @@ LCPType::LCPType(Location loc, std::string type_str) :
 	base_type = pair.first;
 }
 
+std::string get_base_type_name(LCP_Base_Type type)
+{
+	switch(type)
+	{
+		case TYPE_I64:
+			return "i64";
+			break;
+		case TYPE_I8:
+			return "i8";
+			break;
+	}
+}
+
 std::pair<std::string, int> parse_type_str(std::string str)
 {
 	int i = 0;
@@ -38,7 +51,12 @@ bool types_equal(LCPType a, LCPType b)
 
 bool is_base_type_int(LCPType t)
 {
-	return (t.ptr_to_trace == 0 && t.base_type == "int");
+	return (t.ptr_to_trace == 0 && (t.base_type == get_base_type_name(TYPE_I64) || t.base_type == get_base_type_name(TYPE_I8)));
+}
+
+bool is_base_type_int(std::string t)
+{
+	return (t == get_base_type_name(TYPE_I64) || t == get_base_type_name(TYPE_I8));
 }
 
 bool is_pointer(LCPType t)

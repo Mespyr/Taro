@@ -18,7 +18,7 @@ It is still very unreadable though.
 - [x] Function arguments and return values
 - [x] Type Checking
 - [x] have more fancy type notation (using `^` to indicate pointers, making custom types possible)
-- [ ] add two types of integer (i8, i64) instead of just default `int` keyword. good for string as string type is a `^i8`.
+- [x] add two types of integer (i8, i64) instead of just default `int` keyword. good for string as string type is a `^i8`.
 - [ ] Datasets
 - [ ] write code to generate a [prime spiral](https://mathimages.swarthmore.edu/index.php/Prime_spiral_(Ulam_spiral)) also known as a Ulam spiral.
 

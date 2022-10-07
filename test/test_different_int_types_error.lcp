@@ -1,4 +1,4 @@
-fun print(i64 ^i8)
+fun print(i64 ^i64)
 	1 1 call3 pop
 end
 

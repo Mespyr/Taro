@@ -1,8 +1,8 @@
-fun modulo(int int) [int]
+fun modulo(i64 i64) [i64]
 	/ swp pop
 end
 
-fun ?prime(int) [int]
+fun ?prime(i64) [i64]
 	# stack: is_prime, num, idx
 	1 swp # is_prime
 	2     # idx
