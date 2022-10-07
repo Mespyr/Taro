@@ -12,14 +12,14 @@
 class Function
 {
 public:
-	Function(Location loc, int addr, std::vector<TypeAtLoc> arg_stack, std::vector<TypeAtLoc> ret_stack) :
+	Function(Location loc, int addr, std::vector<LCPType> arg_stack, std::vector<LCPType> ret_stack) :
 		loc(loc), addr(addr), arg_stack(arg_stack), ret_stack(ret_stack)
 	{}
 
 	Location loc;
 	int addr;
-	std::vector<TypeAtLoc> arg_stack;
-	std::vector<TypeAtLoc> ret_stack;
+	std::vector<LCPType> arg_stack;
+	std::vector<LCPType> ret_stack;
 	std::vector<Op> ops;
 };
 

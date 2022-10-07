@@ -62,7 +62,7 @@ void print_not_enough_arguments_error(Location loc, int expected, int actual, st
 			print_error_at_loc(loc, "not enough items on stack for operation '" + name + "' (" + fullname + ") (expected " + std::to_string(expected) + ", got " + std::to_string(actual) + ")");
 }
 
-void print_invalid_combination_of_types_error(Location loc, std::vector<DATATYPE> types, std::string name, std::string fullname, bool is_func)
+void print_invalid_combination_of_types_error(Location loc, std::vector<LCPType> types, std::string name, std::string fullname, bool is_func)
 {
 	// ex: 'int, int, ptr, int'
 	std::string types_str;
@@ -81,15 +81,15 @@ void print_invalid_combination_of_types_error(Location loc, std::vector<DATATYPE
 		print_error_at_loc(loc, "invalid types for operation '" + name + "' (" + fullname + ") (" + types_str + ")");
 }
 
-void print_invalid_type_error(Location loc, DATATYPE expected, DATATYPE actual, std::string name, std::string fullname, bool is_func)
+void print_invalid_type_error(Location loc, std::string expected, std::string actual, std::string name, std::string fullname, bool is_func)
 {
 	if (is_func)
 		// invalid argument type for function 'name' (expected 'expected', got 'actual')
-		print_error_at_loc(loc, "invalid type for function '" + name + "' (expected " + human_readable_type(expected) + ", got " + human_readable_type(actual) + ")");
+		print_error_at_loc(loc, "invalid type for function '" + name + "' (expected " + expected + ", got " + actual + ")");
 	else if (fullname == "")
 		// invalid argument type for operation 'name' (expected 'expected', got 'actual')
-		print_error_at_loc(loc, "invalid type for operation '" + name + "' (expected " + human_readable_type(expected) + ", got " + human_readable_type(actual) + ")");
+		print_error_at_loc(loc, "invalid type for operation '" + name + "' (expected " + expected + ", got " + actual + ")");
 	else
 		// invalid argument type for operation 'name' (fullname) (expected 'expected', got 'actual')
-		print_error_at_loc(loc, "invalid type for operation '" + name + "' (" + fullname + ") (expected " + human_readable_type(expected) + ", got " + human_readable_type(actual) + ")");
+		print_error_at_loc(loc, "invalid type for operation '" + name + "' (" + fullname + ") (expected " + expected + ", got " + actual + ")");
 }

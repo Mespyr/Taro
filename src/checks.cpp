@@ -22,18 +22,14 @@ void verify_program(Program program)
 	}
 }
 
-bool compare_type_stacks(std::vector<TypeAtLoc> type_stack_1, std::vector<TypeAtLoc> type_stack_2)
+bool compare_type_stacks(std::vector<LCPType> type_stack_1, std::vector<LCPType> type_stack_2)
 {
 	if (type_stack_1.size() != type_stack_2.size())
 		return false;
 
 	for (long unsigned int i = 0; i < type_stack_1.size(); i++)
-	{
-		DATATYPE type_1 = type_stack_1.at(i).type;
-		DATATYPE type_2 = type_stack_2.at(i).type;
-		if (type_1 != type_2)
+		if (!types_equal(type_stack_1.at(i), type_stack_2.at(i)))
 			return false;
-	}
 
 	return true;
 }
@@ -44,20 +40,19 @@ bool compare_type_stacks(std::vector<TypeAtLoc> type_stack_1, std::vector<TypeAt
 void type_check_program(Program program)
 {
 	static_assert(OP_COUNT == 39, "unhandled op types in type_check_program()");
-	static_assert(DATATYPE_COUNT == 2, "unhandled datatypes in type_check_program()");
 
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++)
 	{
 		Function function = fn_key->second;
 		std::string func_name = fn_key->first;
-		std::map<std::string, std::vector<TypeAtLoc>> label_stack_states;
-		std::vector<std::pair<Op, std::vector<TypeAtLoc>>> jump_op_stack_states;
+		std::map<std::string, std::vector<LCPType>> label_stack_states;
+		std::vector<std::pair<Op, std::vector<LCPType>>> jump_op_stack_states;
 
 		// first round of type-checking
 		// get all type_stack snapshots of all label sections
-		std::vector<TypeAtLoc> type_stack;
+		std::vector<LCPType> type_stack;
 
-		for (TypeAtLoc t : function.arg_stack)
+		for (LCPType t : function.arg_stack)
 			type_stack.push_back(t);
 
 		// type check all ops
@@ -82,25 +77,31 @@ void type_check_program(Program program)
 					exit(1);
 				}
 
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
 
 				// additions goes in following combinations [b, a] -> [b + a]
 
 				// int + int -> int
-				if (a.type == DATATYPE_INT && b.type == DATATYPE_INT)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				if (is_base_type_int(a) && is_base_type_int(b))
+					type_stack.push_back(LCPType(
+						op.loc, "int", 0
+					));
 				// ptr + int -> ptr
-				else if (a.type == DATATYPE_INT && b.type == DATATYPE_PTR)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_PTR));
+				else if (is_base_type_int(a) && is_pointer(b))
+					type_stack.push_back(LCPType(
+						op.loc, b.base_type, b.ptr_to_trace
+					));
 				// int + ptr -> ptr
-				else if (a.type == DATATYPE_PTR && b.type == DATATYPE_INT)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_PTR));
+				else if (is_pointer(a) && is_base_type_int(b))
+					type_stack.push_back(LCPType(
+						op.loc, a.base_type, a.ptr_to_trace
+					));
 				else
 				{
-					print_invalid_combination_of_types_error(op.loc, {b.type, a.type}, "+", "addition");
-					print_note_at_loc(b.loc, "first value pushed here (" + human_readable_type(b.type) + ")");
-					print_note_at_loc(a.loc, "second value pushed here (" + human_readable_type(a.type) + ")");
+					print_invalid_combination_of_types_error(op.loc, {b, a}, "+", "addition");
+					print_note_at_loc(b.loc, "first value pushed here (" + human_readable_type(b) + ")");
+					print_note_at_loc(a.loc, "second value pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 			}
@@ -112,25 +113,31 @@ void type_check_program(Program program)
 					exit(1);
 				}
 
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
 
 				// subtraction goes in following combinations [b, a] -> [b - a]
 
 				// int - int -> int
-				if (a.type == DATATYPE_INT && b.type == DATATYPE_INT)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				if (is_base_type_int(a) && is_base_type_int(b))
+					type_stack.push_back(LCPType(
+						op.loc, "int", 0
+					));
 				// ptr - int -> ptr
-				else if (a.type == DATATYPE_INT && b.type == DATATYPE_PTR)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_PTR));
+				else if (is_base_type_int(a) && is_pointer(b))
+					type_stack.push_back(LCPType(
+						op.loc, b.base_type, b.ptr_to_trace
+					));
 				// ptr - ptr -> int
-				else if (a.type == DATATYPE_PTR && b.type == DATATYPE_PTR)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				else if (is_pointer(a) && is_pointer(b))
+					type_stack.push_back(LCPType(
+						op.loc, "int", 0
+					));
 				else
 				{
-					print_invalid_combination_of_types_error(op.loc, {b.type, a.type}, "-", "subtraction");
-					print_note_at_loc(b.loc, "first value pushed here (" + human_readable_type(b.type) + ")");
-					print_note_at_loc(a.loc, "second value pushed here (" + human_readable_type(a.type) + ")");
+					print_invalid_combination_of_types_error(op.loc, {b, a}, "-", "subtraction");
+					print_note_at_loc(b.loc, "first value pushed here (" + human_readable_type(b) + ")");
+					print_note_at_loc(a.loc, "second value pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 			}
@@ -142,19 +149,21 @@ void type_check_program(Program program)
 					exit(1);
 				}
 
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
 
 				// multiplication goes in following combinations
 
 				// int * int -> int
-				if (a.type == DATATYPE_INT && b.type == DATATYPE_INT)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				if (is_base_type_int(a) && is_base_type_int(b))
+					type_stack.push_back(LCPType(
+						op.loc, "int", 0
+					));
 				else
 				{
-					print_invalid_combination_of_types_error(op.loc, {b.type, a.type}, "*", "multiplication");
-					print_note_at_loc(b.loc, "first value pushed here (" + human_readable_type(b.type) + ")");
-					print_note_at_loc(a.loc, "second value pushed here (" + human_readable_type(a.type) + ")");
+					print_invalid_combination_of_types_error(op.loc, {b, a}, "*", "multiplication");
+					print_note_at_loc(b.loc, "first value pushed here (" + human_readable_type(b) + ")");
+					print_note_at_loc(a.loc, "second value pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 			}
@@ -166,22 +175,22 @@ void type_check_program(Program program)
 					exit(1);
 				}
 
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
 
 				// division goes in following combinations
 
 				// int / int -> int, int
-				if (a.type == DATATYPE_INT && b.type == DATATYPE_INT)
+				if (is_base_type_int(a) && is_base_type_int(b))
 				{
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+					type_stack.push_back(LCPType(op.loc, "int", 0));
+					type_stack.push_back(LCPType(op.loc, "int", 0));
 				}
 				else
 				{
-					print_invalid_combination_of_types_error(op.loc, {b.type, a.type}, "/", "division");
-					print_note_at_loc(b.loc, "first value pushed here (" + human_readable_type(b.type) + ")");
-					print_note_at_loc(a.loc, "second value pushed here (" + human_readable_type(a.type) + ")");
+					print_invalid_combination_of_types_error(op.loc, {b, a}, "/", "division");
+					print_note_at_loc(b.loc, "first value pushed here (" + human_readable_type(b) + ")");
+					print_note_at_loc(a.loc, "second value pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 			}
@@ -195,16 +204,18 @@ void type_check_program(Program program)
 					exit(1);
 				}
 				
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
 
-				if (a.type == b.type)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				if (types_equal(a, b))
+					type_stack.push_back(LCPType(
+						op.loc, "int", 0
+					));
 				else
 				{
-					print_invalid_combination_of_types_error(op.loc, {b.type, a.type}, "=", "equal to");
-					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b.type) + ")");
-					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a.type) + ")");
+					print_invalid_combination_of_types_error(op.loc, {b, a}, "=", "equal to");
+					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
+					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 			}
@@ -216,16 +227,18 @@ void type_check_program(Program program)
 					exit(1);
 				}
 				
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
 
-				if (a.type == b.type)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				if (types_equal(a, b))
+					type_stack.push_back(LCPType(
+						op.loc, "int", 0
+					));
 				else
 				{
-					print_invalid_combination_of_types_error(op.loc, {b.type, a.type}, ">", "greater than");
-					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b.type) + ")");
-					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a.type) + ")");
+					print_invalid_combination_of_types_error(op.loc, {b, a}, ">", "greater than");
+					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
+					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 			}
@@ -237,16 +250,18 @@ void type_check_program(Program program)
 					exit(1);
 				}
 				
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
 
-				if (a.type == b.type)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				if (types_equal(a, b))
+					type_stack.push_back(LCPType(
+						op.loc, "int", 0
+					));
 				else
 				{
-					print_invalid_combination_of_types_error(op.loc, {b.type, a.type}, "<", "less than");
-					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b.type) + ")");
-					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a.type) + ")");
+					print_invalid_combination_of_types_error(op.loc, {b, a}, "<", "less than");
+					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
+					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 			}
@@ -258,16 +273,18 @@ void type_check_program(Program program)
 					exit(1);
 				}
 				
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
 
-				if (a.type == b.type)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				if (types_equal(a, b))
+					type_stack.push_back(LCPType(
+						op.loc, "int", 0
+					));
 				else
 				{
-					print_invalid_combination_of_types_error(op.loc, {b.type, a.type}, ">=", "greater than or equal to");
-					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b.type) + ")");
-					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a.type) + ")");
+					print_invalid_combination_of_types_error(op.loc, {b, a}, ">=", "greater than or equal to");
+					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
+					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 			}
@@ -279,16 +296,18 @@ void type_check_program(Program program)
 					exit(1);
 				}
 				
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
 
-				if (a.type == b.type)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				if (types_equal(a, b))
+					type_stack.push_back(LCPType(
+						op.loc, "int", 0
+					));
 				else
 				{
-					print_invalid_combination_of_types_error(op.loc, {b.type, a.type}, ">=", "less than or equal to");
-					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b.type) + ")");
-					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a.type) + ")");
+					print_invalid_combination_of_types_error(op.loc, {b, a}, ">=", "less than or equal to");
+					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
+					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 			}
@@ -300,16 +319,18 @@ void type_check_program(Program program)
 					exit(1);
 				}
 				
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
 
-				if (a.type == b.type)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				if (types_equal(a, b))
+					type_stack.push_back(LCPType(
+						op.loc, "int", 0
+					));
 				else
 				{
-					print_invalid_combination_of_types_error(op.loc, {b.type, a.type}, "!=", "not equal to");
-					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b.type) + ")");
-					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a.type) + ")");
+					print_invalid_combination_of_types_error(op.loc, {b, a}, "!=", "not equal to");
+					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
+					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 			}
@@ -321,14 +342,16 @@ void type_check_program(Program program)
 					exit(1);
 				}
 				
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
 
-				if (a.type == DATATYPE_INT)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				if (is_base_type_int(a))
+					type_stack.push_back(LCPType(
+						op.loc, "int", 0
+					));
 				else
 				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "not");
-					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a.type) + ")");
+					print_invalid_type_error(op.loc, "int", human_readable_type(a), "not");
+					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 			}
@@ -340,16 +363,18 @@ void type_check_program(Program program)
 					exit(1);
 				}
 				
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
 
-				if (a.type == b.type)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				if (types_equal(a, b))
+					type_stack.push_back(LCPType(
+						op.loc, "int", 0
+					));
 				else
 				{
-					print_invalid_combination_of_types_error(op.loc, {b.type, a.type}, "and");
-					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b.type) + ")");
-					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a.type) + ")");
+					print_invalid_combination_of_types_error(op.loc, {b, a}, "and");
+					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
+					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 			}
@@ -361,16 +386,18 @@ void type_check_program(Program program)
 					exit(1);
 				}
 				
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
 
-				if (a.type == b.type)
-					type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				if (types_equal(a, b))
+					type_stack.push_back(LCPType(
+						op.loc, "int", 0
+					));
 				else
 				{
-					print_invalid_combination_of_types_error(op.loc, {b.type, a.type}, "or");
-					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b.type) + ")");
-					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a.type) + ")");
+					print_invalid_combination_of_types_error(op.loc, {b, a}, "or");
+					print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
+					print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 			}		
@@ -392,7 +419,7 @@ void type_check_program(Program program)
 					print_not_enough_arguments_error(op.loc, 1, 0, "dup");
 					exit(1);
 				}
-				TypeAtLoc a = type_stack.back();
+				LCPType a = type_stack.back();
 				a.loc = op.loc;
 				type_stack.push_back(a);
 			}
@@ -404,8 +431,8 @@ void type_check_program(Program program)
 					exit(1);
 				}
 
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
 				type_stack.push_back(a);
 				type_stack.push_back(b);
 			}
@@ -418,9 +445,9 @@ void type_check_program(Program program)
 				}
 
 				// [c, b, a] -> [b, a, c]
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc c = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
+				LCPType c = type_stack.back(); type_stack.pop_back();
 				type_stack.push_back(b);
 				type_stack.push_back(a);
 				type_stack.push_back(c);
@@ -434,8 +461,8 @@ void type_check_program(Program program)
 				}
 				
 				// [b, a] -> [b, a, b]
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
-				TypeAtLoc b = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType b = type_stack.back(); type_stack.pop_back();
 				type_stack.push_back(b);
 				type_stack.push_back(a);
 				b.loc = op.loc;
@@ -450,15 +477,15 @@ void type_check_program(Program program)
 					print_not_enough_arguments_error(op.loc, 1, 0, "syscall0");
 					exit(1);
 				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
 
-				if (a.type != DATATYPE_INT)
+				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "syscall0");
-					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a.type) + ")");
+					print_invalid_type_error(op.loc, "int", human_readable_type(a), "syscall0");
+					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				type_stack.push_back(LCPType(op.loc, "int", 0));
 			}
 			else if (op.type == OP_SYSCALL1)
 			{
@@ -467,16 +494,16 @@ void type_check_program(Program program)
 					print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "syscall1");
 					exit(1);
 				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
 				type_stack.pop_back();
 
-				if (a.type != DATATYPE_INT)
+				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "syscall1");
-					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a.type) + ")");
+					print_invalid_type_error(op.loc, "int", human_readable_type(a), "syscall1");
+					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				type_stack.push_back(LCPType(op.loc, "int", 0));
 			}
 			else if (op.type == OP_SYSCALL2)
 			{
@@ -485,17 +512,17 @@ void type_check_program(Program program)
 					print_not_enough_arguments_error(op.loc, 3, type_stack.size(), "syscall2");
 					exit(1);
 				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 
-				if (a.type != DATATYPE_INT)
+				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "syscall2");
-					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a.type) + ")");
+					print_invalid_type_error(op.loc, "int", human_readable_type(a), "syscall2");
+					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				type_stack.push_back(LCPType(op.loc, "int", 0));
 			}
 			else if (op.type == OP_SYSCALL3)
 			{
@@ -504,18 +531,18 @@ void type_check_program(Program program)
 					print_not_enough_arguments_error(op.loc, 4, type_stack.size(), "syscall3");
 					exit(1);
 				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 
-				if (a.type != DATATYPE_INT)
+				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "syscall3");
-					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a.type) + ")");
+					print_invalid_type_error(op.loc, "int", human_readable_type(a), "syscall3");
+					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				type_stack.push_back(LCPType(op.loc, "int", 0));
 			}
 			else if (op.type == OP_SYSCALL4)
 			{
@@ -524,19 +551,19 @@ void type_check_program(Program program)
 					print_not_enough_arguments_error(op.loc, 5, type_stack.size(), "syscall4");
 					exit(1);
 				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 
-				if (a.type != DATATYPE_INT)
+				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "syscall4");
-					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a.type) + ")");
+					print_invalid_type_error(op.loc, "int", human_readable_type(a), "syscall4");
+					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				type_stack.push_back(LCPType(op.loc, "int", 0));
 			}
 			else if (op.type == OP_SYSCALL5)
 			{
@@ -545,20 +572,20 @@ void type_check_program(Program program)
 					print_not_enough_arguments_error(op.loc, 6, type_stack.size(), "syscall5");
 					exit(1);
 				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 
-				if (a.type != DATATYPE_INT)
+				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "syscall5");
-					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a.type) + ")");
+					print_invalid_type_error(op.loc, "int", human_readable_type(a), "syscall5");
+					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				type_stack.push_back(LCPType(op.loc, "int", 0));
 			}
 			else if (op.type == OP_SYSCALL6)
 			{
@@ -567,7 +594,7 @@ void type_check_program(Program program)
 					print_not_enough_arguments_error(op.loc, 7, type_stack.size(), "syscall6");
 					exit(1);
 				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
@@ -575,13 +602,13 @@ void type_check_program(Program program)
 				type_stack.pop_back();
 				type_stack.pop_back();
 
-				if (a.type != DATATYPE_INT)
+				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "syscall6");
-					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a.type) + ")");
+					print_invalid_type_error(op.loc, "int", human_readable_type(a), "syscall6");
+					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				type_stack.push_back(LCPType(op.loc, "int", 0));
 			}
 
 			// labels
@@ -611,12 +638,12 @@ void type_check_program(Program program)
 					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpt", "conditional jump if true");
 					exit(1);
 				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
 
-				if (a.type != DATATYPE_INT)
+				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "cjmpt", "conditional jump if true");
-					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a.type) + ")");
+					print_invalid_type_error(op.loc, "int", human_readable_type(a), "cjmpt", "conditional jump if true");
+					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 
@@ -629,12 +656,12 @@ void type_check_program(Program program)
 					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpf", "conditional jump if false");
 					exit(1);
 				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
 
-				if (a.type != DATATYPE_INT)
+				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "cjmpf", "conditional jump if false");
-					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a.type) + ")");
+					print_invalid_type_error(op.loc, "int", human_readable_type(a), "cjmpf", "conditional jump if false");
+					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 
@@ -647,12 +674,12 @@ void type_check_program(Program program)
 					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpet", "conditional jump to end if true");
 					exit(1);
 				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
 
-				if (a.type != DATATYPE_INT)
+				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "cjmpet", "conditional jump to end if true");
-					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a.type) + ")");
+					print_invalid_type_error(op.loc, "int", human_readable_type(a), "cjmpet", "conditional jump to end if true");
+					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 
@@ -665,12 +692,12 @@ void type_check_program(Program program)
 					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpef", "conditional jump to end if false");
 					exit(1);
 				}
-				TypeAtLoc a = type_stack.back(); type_stack.pop_back();
+				LCPType a = type_stack.back(); type_stack.pop_back();
 
-				if (a.type != DATATYPE_INT)
+				if (!is_base_type_int(a))
 				{
-					print_invalid_type_error(op.loc, DATATYPE_INT, a.type, "cjmpet", "conditional jump to end if false");
-					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a.type) + ")");
+					print_invalid_type_error(op.loc, "int", human_readable_type(a), "cjmpet", "conditional jump to end if false");
+					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
 
@@ -680,12 +707,12 @@ void type_check_program(Program program)
 			// other
 			else if (op.type == OP_PUSH_INT)
 			{
-				type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
+				type_stack.push_back(LCPType(op.loc, "int", 0));
 			}
 			else if (op.type == OP_PUSH_STR)
 			{
-				type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_INT));
-				type_stack.push_back(TypeAtLoc(op.loc, DATATYPE_PTR));
+				type_stack.push_back(LCPType(op.loc, "int", 0));
+				type_stack.push_back(LCPType(op.loc, "int", 1)); // pointer to array of ints (string)
 			}
 			else if (op.type == OP_FUNCTION_CALL)
 			{
@@ -699,7 +726,7 @@ void type_check_program(Program program)
 					exit(1);
 				}
 
-				std::vector<TypeAtLoc> args;
+				std::vector<LCPType> args;
 				for (unsigned long int i = call_func.arg_stack.size(); i > 0; i--)
 				{
 					args.push_back(type_stack.back());
@@ -711,21 +738,17 @@ void type_check_program(Program program)
 				if (!args_match_types)
 				{
 					if (call_func.arg_stack.size() == 1)
-						print_invalid_type_error(op.loc, call_func.arg_stack.at(0).type, args.at(0).type, op.str_operand, "", true);
+						print_invalid_type_error(op.loc, human_readable_type(call_func.arg_stack.at(0)), human_readable_type(args.at(0)), op.str_operand, "", true);
 					else
 					{
-						std::vector<DATATYPE> types;
-						for (TypeAtLoc t : args)
-							types.push_back(t.type);
-
-						print_invalid_combination_of_types_error(op.loc, types, op.str_operand, "", true);
-						for (TypeAtLoc t : args)
-							print_note_at_loc(t.loc, "argument pushed here (" + human_readable_type(t.type) + ")");
+						print_invalid_combination_of_types_error(op.loc, args, op.str_operand, "", true);
+						for (LCPType t : args)
+							print_note_at_loc(t.loc, "argument pushed here (" + human_readable_type(t) + ")");
 					}
 					exit(1);
 				}
 
-				for (TypeAtLoc t : call_func.ret_stack)
+				for (LCPType t : call_func.ret_stack)
 					type_stack.push_back(t);
 			}
 
@@ -744,7 +767,7 @@ void type_check_program(Program program)
 			{
 				print_error_at_loc(function.loc, "unhandled data on the stack (expected " + std::to_string(function.ret_stack.size()) + " items, got " + std::to_string(type_stack.size()) + ")");
 
-				std::vector<TypeAtLoc> excess_stack;
+				std::vector<LCPType> excess_stack;
 				for (unsigned long int i = type_stack.size() - function.ret_stack.size(); i > 0; i--)
 				{
 					excess_stack.push_back(type_stack.back());
@@ -752,8 +775,8 @@ void type_check_program(Program program)
 				}
 				std::reverse(excess_stack.begin(), excess_stack.end());
 
-				for (TypeAtLoc t : excess_stack)
-					print_note_at_loc(t.loc, "excess data pushed here (" + human_readable_type(t.type) + ")");
+				for (LCPType t : excess_stack)
+					print_note_at_loc(t.loc, "excess data pushed here (" + human_readable_type(t) + ")");
 			}
 
 			else if (function.ret_stack.size() > type_stack.size())
@@ -761,18 +784,15 @@ void type_check_program(Program program)
 
 			else if (type_stack.size() > 1)
 			{
-				std::vector<DATATYPE> types;
-				for (TypeAtLoc t : type_stack)
-					types.push_back(t.type);
-				print_invalid_combination_of_types_error(function.loc, types, func_name, "", true);
-				for (TypeAtLoc t : type_stack)
-					print_note_at_loc(t.loc, "argument pushed here (" + human_readable_type(t.type) + ")");
+				print_invalid_combination_of_types_error(function.loc, type_stack, func_name, "", true);
+				for (LCPType t : type_stack)
+					print_note_at_loc(t.loc, "argument pushed here (" + human_readable_type(t) + ")");
 			}
 
 			else
 			{
-				print_invalid_type_error(function.loc, function.ret_stack.at(0).type, type_stack.at(0).type, func_name, "", true);
-				print_note_at_loc(type_stack.at(0).loc, "value pushed here (" + human_readable_type(type_stack.at(0).type) + ")");
+				print_invalid_type_error(function.loc, human_readable_type(function.ret_stack.at(0)), human_readable_type(type_stack.at(0)), func_name, "", true);
+				print_note_at_loc(type_stack.at(0).loc, "value pushed here (" + human_readable_type(type_stack.at(0)) + ")");
 			}
 
 			exit(1);
@@ -780,10 +800,10 @@ void type_check_program(Program program)
 
 		// second round of type-checking
 		// go through code again and check jmp labels to see if the stack values are the same as the label they are jumping to
-		for (std::pair<Op, std::vector<TypeAtLoc>> op_stack_pair : jump_op_stack_states)
+		for (std::pair<Op, std::vector<LCPType>> op_stack_pair : jump_op_stack_states)
 		{
 			Op op = op_stack_pair.first;
-			std::vector<TypeAtLoc> op_stack_state = op_stack_pair.second;
+			std::vector<LCPType> op_stack_state = op_stack_pair.second;
 
 			if (!label_stack_states.count(op.str_operand))
 			{
@@ -795,7 +815,6 @@ void type_check_program(Program program)
 			if (!compare_type_stacks(op_stack_state, label_stack_states.at(op.str_operand)))
 			{
 				print_error_at_loc(op.loc, "different types on stack then what was expected at the label.");
-
 				exit(1);
 			}
 		}

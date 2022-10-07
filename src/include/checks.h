@@ -13,7 +13,7 @@
 #include <assert.h>
 
 void verify_program(Program program);
-bool compare_type_stacks(std::vector<TypeAtLoc> type_stack_1, std::vector<TypeAtLoc> type_stack_2);
+bool compare_type_stacks(std::vector<LCPType> type_stack_1, std::vector<LCPType> type_stack_2);
 void type_check_program(Program program);
 
 #endif

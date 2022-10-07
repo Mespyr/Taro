@@ -1,0 +1,14 @@
+# check use of ^ symbol in arg stack and ret stack
+# as well as lack of it
+
+fun get_cool_str() [int ^int]
+	"Hello World!\n"
+end
+
+fun print(int ^int)
+	1 1 call3 pop
+end
+
+fun main()
+	get_cool_str print
+end

@@ -237,23 +237,21 @@ Program parse_tokens(std::vector<Token> tokens)
 			}
 			i++;
 
-			std::vector<TypeAtLoc> arg_stack;
-			std::vector<TypeAtLoc> ret_stack;
+			std::vector<LCPType> arg_stack;
+			std::vector<LCPType> ret_stack;
 
 			// parse arguments of function
 			while (tokens.at(i).value != ")")
 			{
 				Token tok = tokens.at(i);
 
-				if (tok.value == human_readable_type(DATATYPE_INT))
-					arg_stack.push_back(TypeAtLoc(tok.loc, DATATYPE_INT));
-				else if (tok.value == human_readable_type(DATATYPE_PTR))
-					arg_stack.push_back(TypeAtLoc(tok.loc, DATATYPE_PTR));
-				else
+				std::string tok_base_value = parse_type_str(tok.value).first;
+				if (tok_base_value != "int")
 				{
 					print_error_at_loc(tok.loc, "unknown argument type '" + tok.value + "'");
 					exit(1);
 				}
+				arg_stack.push_back(LCPType(tok.loc, tok.value));
 
 				i++;
 				if (i > tokens.size() - 1)
@@ -279,15 +277,13 @@ Program parse_tokens(std::vector<Token> tokens)
 				{
 					Token tok = tokens.at(i);
 
-					if (tok.value == human_readable_type(DATATYPE_INT))
-						ret_stack.push_back(TypeAtLoc(tok.loc, DATATYPE_INT));
-					else if (tok.value == human_readable_type(DATATYPE_PTR))
-						ret_stack.push_back(TypeAtLoc(tok.loc, DATATYPE_PTR));
-					else
+					std::string tok_base_value = parse_type_str(tok.value).first;
+					if (tok_base_value != "int")
 					{
 						print_error_at_loc(tok.loc, "unknown return type '" + tok.value + "'");
 						exit(1);
 					}
+					ret_stack.push_back(LCPType(tok.loc, tok.value));
 
 					i++;
 					if (i > tokens.size() - 1)

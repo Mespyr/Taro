@@ -17,26 +17,22 @@ It is still very unreadable though.
 - [x] Basic stack manipulation
 - [x] Function arguments and return values
 - [x] Type Checking
+- [x] have more fancy type notation (using '^' to indicate pointers, making custom types possible)
 - [ ] Datasets
-	1. [ ] stage one:
-	make memory block thingies like in Ach where you can define the size of the block like this:
-	```
-	memory EpicMemory 16 end
-	```
-	and access the parts of it using read and write commands
+- [ ] write code to generate a [prime spiral](https://mathimages.swarthmore.edu/index.php/Prime_spiral_(Ulam_spiral)) also known as a Ulam spiral.
 
+### Datasets
+LCP will have something like structs which will store data into sections kind of like this:
+```python
+dataset EpicDataset
+	num1 int
+	num2 int
+end
+```
 
-	2. [ ] stage two:
-	make something like structs which will store data into sections kind of like this:
-	```
-	dataset EpicDataset
-		num1 8 # 8 bytes
-		num2 8
-	end
-	```
-
-	and would be defined and accessed in the code like this:
-	```
+and would be defined and accessed in the code like this:
+```python
+fun main()
 	EpicDataset epic_name_for_dataset
 
 	# set num1 to 12
@@ -48,35 +44,35 @@ It is still very unreadable though.
 	&epic_name_for_dataset.num1
 	# grab num2
 	&epic_name_for_dataset.num2
-
+	
 	+ dump
-	```
+end
+```
 
-	Datasets themselves cannot be modified on the stack, so to pass them as arguments for functions, you would write it like this:
-	```
-	dataset Point
-		int x
-		int y
-	end
+You could also push datasets onto the stack and then set them as a veriable elsewhere, for example, inside of a function
 
-	fun calc_slope(Point:a Point:b)
-		# dataset name + the name you want for the pointer
-		@a.x @a.y
-		@b.x @b.y
-		# rest of code
-	end
+```python
+dataset String
+	size int
+	data ^int
+end
 
-	fun main()
-		Point a 5 @a.x 4 @a.y
-		Point b 5 @b.x 0 @b.y
+fun set_string(int ^int String)
+	set String str
 
-		# push pointers onto stack
-		a b calc_slope
-	end
-	```
+	@str.data
+	@str.size
+end
+
+fun print(String)
+	set String str
+	@str.size @str.data 1 1 call3 pop
+end
 
 
-### Things I want to do
-
-- [ ] make datasets a reality
-- [ ] write code to generate a [prime spiral](https://mathimages.swarthmore.edu/index.php/Prime_spiral_(Ulam_spiral)) also known as a Ulam spiral.
+fun main()
+	String str
+	"Hello, World!" str set_string
+	str print
+end
+```

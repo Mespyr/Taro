@@ -1,4 +1,4 @@
-fun print(int ptr)
+fun print(int ^int)
 	1 1 call3 pop
 end
 
