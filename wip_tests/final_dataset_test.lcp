@@ -1,9 +1,9 @@
-dataset String
+stuct String
 	size i64
 	data ^i8
 end
 
-fun init_string(i64 ^i8 String)
+fun String.init(i64 ^i8 String)
 	set String s
 	@s.data
 	@s.size
@@ -16,6 +16,6 @@ end
 
 fun main()
 	String name
-	"Finn Mcgee" name init_string
+	"Finn Mcgee" name String.init
 	name print
 end

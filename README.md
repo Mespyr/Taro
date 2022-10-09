@@ -19,13 +19,13 @@ It is still very unreadable though.
 - [x] Type Checking
 - [x] have more fancy type notation (using `^` to indicate pointers, making custom types possible)
 - [x] add two types of integer (i8, i64) instead of just default `int` keyword. good for string as string type is a `^i8`.
-- [ ] Datasets
+- [ ] Structs
 - [ ] write code to generate a [prime spiral](https://mathimages.swarthmore.edu/index.php/Prime_spiral_(Ulam_spiral)) also known as a Ulam spiral.
 
-### Datasets
-LCP will have something like structs which will store data into sections kind of like this:
+### Structs
+LCP will have structs which will store data into sections kind of like this:
 ```python
-dataset EpicDataset
+struct EpicStruct
   num1 i64
   num2 i64
 end
@@ -34,26 +34,26 @@ end
 and would be defined and accessed in the code like this:
 ```python
 fun main()
-  EpicDataset epic_name_for_dataset
+  EpicStruct epic_name_for_struct
 
   # set num1 to 12
-  12 @epic_name_for_dataset.num1
+  12 @epic_name_for_struct.num1
   # set num2 to 8
-  8 @epic_name_for_dataset.num2
+  8 @epic_name_for_struct.num2
 
   # grab num1
-  &epic_name_for_dataset.num1
+  &epic_name_for_struct.num1
   # grab num2
-  &epic_name_for_dataset.num2
+  &epic_name_for_struct.num2
   
   + dump
 end
 ```
 
-You could also push datasets onto the stack and then set them as a veriable elsewhere, for example, inside of a function
+You could also push structs onto the stack and then set them as a veriable elsewhere, for example, inside of a function
 
 ```python
-dataset String
+struct String
   size i64
   data ^i8
 end
