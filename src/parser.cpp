@@ -16,20 +16,6 @@ bool is_legal_name(Token token_name)
 	return true;
 }
 
-std::vector<std::string> split_by_dot(std::string str)
-{
-	str += ".";
-	std::vector<std::string> split;
-	long unsigned int pos = str.find(".");
-	while (pos != std::string::npos)
-	{
-		split.push_back(str.substr(0, pos)); // push back everything before the period
-		str = str.substr(pos+1); // set the string to everything after the period
-		pos = str.find("."); // find the next period
-	}
-	return split;
-}
-
 std::string add_escapes_to_string(std::string str)
 {
 	std::string buf;
@@ -457,75 +443,21 @@ Program parse_tokens(std::vector<Token> tokens)
 				}
 				else if (f_op.type == OP_SET_MEMBER)
 				{
-					std::vector<std::string> split_rec_path = split_by_dot(f_op.str_operand);
-					if (split_rec_path.size() < 2)
-					{
-						print_error_at_loc(f_op.loc, "member wasn't provided in the 'set struct member' intrinsic");
-						exit(1);
-					}
-					if (var_offsets.count(split_rec_path.front()))
-					{
-						std::string struct_name = split_rec_path.front();
-						// TODO: handle recusive values from having structs inside of structs
-						std::map<std::string, std::pair<LCPType, int>> struct_members = program.structs.at(var_offsets.at(struct_name).first.base_type).members;
-						// if struct doesn't have the provied member defined
-						if (!struct_members.count(split_rec_path.at(1)))
-						{
-							print_error_at_loc(f_op.loc, "struct '" + var_offsets.at(split_rec_path.front()).first.base_type + "' doesn't have the member '" + split_rec_path.at(1) + "' defined");	
-							exit(1);
-						}
-						// since we have 2 main sizes for different ops, either 8bit (chars) or 64bit (ints and pointers)
-						// we must switch between each to read them wthout causing an error
-						std::pair<LCPType, int> member_type = struct_members.at(split_rec_path.at(1));
-						if (member_type.first.base_type == get_base_type_name(TYPE_I8) && member_type.first.ptr_to_trace == 0)
-							f_op.type = OP_SET_MEMBER_8BIT;
-						else f_op.type = OP_SET_MEMBER_64BIT;
-						// str_operand is the member name + variable name
-						std::pair<LCPType, int> struct_type = var_offsets.at(struct_name);
-						f_op.int_operand = struct_type.second + member_type.second; // offset to where member is located
-						function_ops.push_back(f_op);
-					}
-					else
-					{
-						print_error_at_loc(f_op.loc, "struct '" + split_rec_path.front() + "' does not exist");
-						exit(1);
-					}
+					std::pair<LCPType, int> member_type_offset = get_variable_type_offset(f_op, var_offsets, program.structs);
+					if (member_type_offset.first.base_type == get_base_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
+						f_op.type = OP_SET_MEMBER_8BIT;
+					else f_op.type = OP_SET_MEMBER_64BIT;
+					f_op.int_operand = member_type_offset.second; // offset to where member is located
+					function_ops.push_back(f_op);
 				}
 				else if (f_op.type == OP_READ_MEMBER)
 				{
-					std::vector<std::string> split_rec_path = split_by_dot(f_op.str_operand);
-					if (split_rec_path.size() < 2)
-					{
-						print_error_at_loc(f_op.loc, "member wasn't provided in the 'read struct member' intrinsic");
-						exit(1);
-					}
-					if (var_offsets.count(split_rec_path.front()))
-					{
-						std::string struct_name = split_rec_path.front();
-						// TODO: handle recusive values from having structs inside of structs
-						std::map<std::string, std::pair<LCPType, int>> struct_members = program.structs.at(var_offsets.at(struct_name).first.base_type).members;
-						// if struct doesn't have the provied member defined
-						if (!struct_members.count(split_rec_path.at(1)))
-						{
-							print_error_at_loc(f_op.loc, "struct '" + var_offsets.at(split_rec_path.front()).first.base_type + "' doesn't have the member '" + split_rec_path.at(1) + "' defined");	
-							exit(1);
-						}
-						// since we have 2 main sizes for different ops, either 8bit (chars) or 64bit (ints and pointers)
-						// we must switch between each to read them wthout causing an error
-						std::pair<LCPType, int> member_type = struct_members.at(split_rec_path.at(1));
-						if (member_type.first.base_type == get_base_type_name(TYPE_I8) && member_type.first.ptr_to_trace == 0)
-							f_op.type = OP_READ_MEMBER_8BIT;
-						else f_op.type = OP_READ_MEMBER_64BIT;
-						// str_operand is the member name + variable name
-						std::pair<LCPType, int> struct_type = var_offsets.at(struct_name);
-						f_op.int_operand = struct_type.second + member_type.second; // offset to where member is located
-						function_ops.push_back(f_op);
-					}
-					else
-					{
-						print_error_at_loc(f_op.loc, "struct '" + split_rec_path.front() + "' does not exist");
-						exit(1);
-					}
+					std::pair<LCPType, int> member_type_offset = get_variable_type_offset(f_op, var_offsets, program.structs);
+					if (member_type_offset.first.base_type == get_base_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
+						f_op.type = OP_READ_MEMBER_8BIT;
+					else f_op.type = OP_READ_MEMBER_64BIT;
+					f_op.int_operand = member_type_offset.second; // offset to where member is located
+					function_ops.push_back(f_op);
 				}
 				else if (f_op.type == OP_JMP || f_op.type == OP_CJMPT || f_op.type == OP_CJMPF || f_op.type == OP_JMPE || f_op.type == OP_CJMPET || f_op.type == OP_CJMPEF)
 				{

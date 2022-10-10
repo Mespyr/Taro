@@ -60,9 +60,9 @@ int main(int argc, char* argv[])
 		}
 	#endif
 
-	/* std::cout << "[note] type-checking program" << std::endl; */
-	/* verify_program(program); */
-	/* type_check_program(program); */
+	std::cout << "[note] type-checking program" << std::endl;
+	verify_program(program);
+	type_check_program(program);
 
 	std::cout << "[note] compiling to assembly" << std::endl;
 	compile_to_asm(program, "out.asm");

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _ACH_ERROR_H_
 #define _ACH_ERROR_H_
 

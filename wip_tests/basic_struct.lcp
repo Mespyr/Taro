@@ -17,7 +17,7 @@ end
 fun main()
 	String name
 	"Hello World!\n" @name.data @name.size
-	&name.size &name.data 1 1 call3
+	&name.size &name.data 1 1 call3 pop
 
 	TwoCount two_count
 	0 @two_count.c1

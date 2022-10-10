@@ -39,12 +39,13 @@ bool compare_type_stacks(std::vector<LCPType> type_stack_1, std::vector<LCPType>
 // comparing it to the label_stack_states map
 void type_check_program(Program program)
 {
-	static_assert(OP_COUNT == 43, "unhandled op types in type_check_program()");
+	static_assert(OP_COUNT == 47, "unhandled op types in type_check_program()");
 
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++)
 	{
 		Function function = fn_key->second;
 		std::string func_name = fn_key->first;
+		std::map<std::string, LCPType> variables;
 		std::map<std::string, std::vector<LCPType>> label_stack_states;
 		std::vector<std::pair<Op, std::vector<LCPType>>> jump_op_stack_states;
 
@@ -469,6 +470,33 @@ void type_check_program(Program program)
 				type_stack.push_back(b);
 			}
 
+			// structs
+			else if (op.type == OP_DEFINE_VAR)
+			{
+				// do nothing as the parser has already saved all of the variables in a map inside of the Function class
+			}
+			else if (op.type == OP_SET_MEMBER_8BIT || op.type == OP_SET_MEMBER_64BIT)
+			{
+				if (type_stack.size() < 1)
+				{
+					print_not_enough_arguments_error(op.loc, 1, 0, "@", "set struct member");
+					exit(1);
+				}
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				std::pair<LCPType, int> member_type_offset = get_variable_type_offset(op, function.var_offsets, program.structs);
+				if (a.base_type != member_type_offset.first.base_type && a.ptr_to_trace != member_type_offset.first.ptr_to_trace)
+				{
+					print_error_at_loc(op.loc, "Cannot set '" + op.str_operand + "' to type '" + human_readable_type(a) + "'. Expected type '" + human_readable_type(member_type_offset.first) + "'");
+					exit(1);
+				}
+			}
+			else if (op.type == OP_READ_MEMBER_8BIT || op.type == OP_READ_MEMBER_64BIT)
+			{
+				std::pair<LCPType, int> member_type_offset = get_variable_type_offset(op, function.var_offsets, program.structs);
+				member_type_offset.first.loc = op.loc;
+				type_stack.push_back(member_type_offset.first);
+			}
+
 			// syscalls
 			else if (op.type == OP_SYSCALL0)
 			{
@@ -753,7 +781,7 @@ void type_check_program(Program program)
 			}
 
 			// unreachable
-			else if (op.type == OP_FUN || op.type == OP_END || op.type == OP_COUNT)
+			else if (op.type == OP_FUN || op.type == OP_END || op.type == OP_COUNT || op.type == OP_STRUCT || op.type == OP_SET_MEMBER || op.type == OP_READ_MEMBER)
 			{
 				print_error_at_loc(op.loc, "unreachable: op should be handled in the parsing step. This is probably a bug.");
 				exit(1);
