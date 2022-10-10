@@ -50,11 +50,12 @@ std::pair<LCPType, int> get_variable_type_offset(Op op, std::map<std::string, st
 			std::pair<LCPType, int> member_type_offset_pair = struct_members.at(split_member_path.at(current_member_idx));
 			// increment offset by the relative offset of the member
 			offset += member_type_offset_pair.second;
-			if (structs.count(member_type_offset_pair.first.base_type) && member_type_offset_pair.first.ptr_to_trace == 0)
+			// if the member is a struct and isn't the last member of the member path
+			// access the members of the member's type and continue
+			if (structs.count(member_type_offset_pair.first.base_type) && member_type_offset_pair.first.ptr_to_trace == 0 && current_member_idx < split_member_path.size() - 1)
 			{
 				// TODO: support other structs in accessing members by switching 'struct_members' variable to the members of the type
-				print_error_at_loc(op.loc, "structs are currently not supported yet");
-				exit(1);
+				struct_members = structs.at(member_type_offset_pair.first.base_type).members;
 				current_member_idx++;
 			}
 			else

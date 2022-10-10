@@ -2,7 +2,7 @@
 
 void compile_to_asm(Program program, std::string output_filename)
 {
-	static_assert(OP_COUNT == 47, "unhandled op types in compile_to_asm()");
+	static_assert(OP_COUNT == 50, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
 
@@ -254,6 +254,11 @@ void compile_to_asm(Program program, std::string output_filename)
 				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
 				outfile.writeln("\tmov [rax], rbx");
 			}
+			else if (op.type == OP_SET_MEMBER_STRUCT)
+			{
+				print_error_at_loc(op.loc, "currently, saving structs into memory is not supported yet");
+				exit(1);
+			}
 			else if (op.type == OP_READ_MEMBER_8BIT)
 			{
 				outfile.writeln("\t; OP_READ_MEMBER_8BIT");
@@ -263,7 +268,6 @@ void compile_to_asm(Program program, std::string output_filename)
 				outfile.writeln("\tmov bl, [rax]");
 				outfile.writeln("\tpush rbx");
 			}
-
 			else if (op.type == OP_READ_MEMBER_64BIT)
 			{
 				outfile.writeln("\t; OP_READ_MEMBER_64BIT");
@@ -272,6 +276,13 @@ void compile_to_asm(Program program, std::string output_filename)
 				outfile.writeln("\txor rbx, rbx");
 				outfile.writeln("\tmov rbx, [rax]");
 				outfile.writeln("\tpush rbx");
+			}
+			else if (op.type == OP_READ_MEMBER_STRUCT)
+			{
+				outfile.writeln("\t; OP_READ_MEMBER_STRUCT");
+				outfile.writeln("\tmov rax, [ret_stack_rsp]");
+				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
+				outfile.writeln("\tpush rax");
 			}
 
 			// syscalls
@@ -411,6 +422,11 @@ void compile_to_asm(Program program, std::string output_filename)
 				outfile.writeln("\tmov rax, " + std::to_string(op.str_operand.length()));
 				outfile.writeln("\tpush rax");
 				outfile.writeln("\tpush str_" + std::to_string(strings.size()-1));
+			}
+			else if (op.type == OP_PUSH_VAR)
+			{
+				outfile.writeln("\t; OP_PUSH_VAR");
+
 			}
 			else if (op.type == OP_FUNCTION_CALL)
             {

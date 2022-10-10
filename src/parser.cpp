@@ -56,9 +56,9 @@ std::string add_escapes_to_string(std::string str)
 	return ret;
 }
 
-Op convert_token_to_op(Token tok, Program program)
+Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pair<LCPType, int>> var_offsets)
 {
-	static_assert(OP_COUNT == 47, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 50, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -176,9 +176,10 @@ Op convert_token_to_op(Token tok, Program program)
 		// TODO: remember to support base types in OP_DEFINE_VAR
 		// OP_DEFINE_VAR
 		else if (program.structs.count(tok.value))
-		{
 			return Op(tok.loc, OP_DEFINE_VAR, tok.value);
-		}
+		// OP_PUSH_VAR
+		else if (var_offsets.count(tok.value))
+			return Op(tok.loc, OP_PUSH_VAR, tok.value);
 
 		else if (tok.value == "[" || tok.value == "]" || tok.value == "(" || tok.value == ")")
 		{				
@@ -187,7 +188,7 @@ Op convert_token_to_op(Token tok, Program program)
 		}
 	}
 	else if (tok.type == TOKEN_INT)
-		return Op(tok.loc, OP_PUSH_INT, atol(tok.value.c_str())); // TODO: check this
+		return Op(tok.loc, OP_PUSH_INT, atol(tok.value.c_str()));
 	else if (tok.type == TOKEN_STRING)
 		return Op(tok.loc, OP_PUSH_STR, add_escapes_to_string(tok.value.substr(1, tok.value.length() - 2)));
 
@@ -197,7 +198,7 @@ Op convert_token_to_op(Token tok, Program program)
 
 std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels)
 {
-	static_assert(OP_COUNT == 47, "unhandled op types in link_ops()");
+	static_assert(OP_COUNT == 50, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++)
 	{
@@ -226,7 +227,7 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<in
 
 Program parse_tokens(std::vector<Token> tokens)
 {
-	static_assert(OP_COUNT == 47, "unhandled op types in parse_tokens()");
+	static_assert(OP_COUNT == 50, "unhandled op types in parse_tokens()");
 
 	Program program;
 	long unsigned int i = 0;
@@ -351,7 +352,7 @@ Program parse_tokens(std::vector<Token> tokens)
 			// parse tokens in function
 			while (i < tokens.size())
 			{
-				Op f_op = convert_token_to_op(tokens.at(i), program);
+				Op f_op = convert_token_to_op(tokens.at(i), program, var_offsets);
 				
 				if (f_op.type == OP_FUN)
 				{
@@ -444,18 +445,30 @@ Program parse_tokens(std::vector<Token> tokens)
 				else if (f_op.type == OP_SET_MEMBER)
 				{
 					std::pair<LCPType, int> member_type_offset = get_variable_type_offset(f_op, var_offsets, program.structs);
+					// if plain i8
 					if (member_type_offset.first.base_type == get_base_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
 						f_op.type = OP_SET_MEMBER_8BIT;
-					else f_op.type = OP_SET_MEMBER_64BIT;
+					// if i64 or pointer
+					else if (member_type_offset.first.base_type == get_base_type_name(TYPE_I64) || member_type_offset.first.ptr_to_trace > 0)
+						f_op.type = OP_SET_MEMBER_64BIT;
+					// struct
+					else f_op.type = OP_SET_MEMBER_STRUCT;
+
 					f_op.int_operand = member_type_offset.second; // offset to where member is located
 					function_ops.push_back(f_op);
 				}
 				else if (f_op.type == OP_READ_MEMBER)
 				{
 					std::pair<LCPType, int> member_type_offset = get_variable_type_offset(f_op, var_offsets, program.structs);
+					std::cout << member_type_offset.first.base_type << " h" << std::endl;
 					if (member_type_offset.first.base_type == get_base_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
 						f_op.type = OP_READ_MEMBER_8BIT;
-					else f_op.type = OP_READ_MEMBER_64BIT;
+					// if i64 or pointer
+					else if (member_type_offset.first.base_type == get_base_type_name(TYPE_I64) || member_type_offset.first.ptr_to_trace > 0)
+						f_op.type = OP_READ_MEMBER_64BIT;
+					// struct
+					else f_op.type = OP_READ_MEMBER_STRUCT;
+
 					f_op.int_operand = member_type_offset.second; // offset to where member is located
 					function_ops.push_back(f_op);
 				}
@@ -465,6 +478,11 @@ Program parse_tokens(std::vector<Token> tokens)
 					if (i >= tokens.size()) break;
 					Token label_jumpto_tok = tokens.at(i);
 					f_op.str_operand = label_jumpto_tok.value;
+					function_ops.push_back(f_op);
+				}
+				else if (f_op.type == OP_PUSH_VAR)
+				{
+					f_op.int_operand = var_offsets.at(f_op.str_operand).second;
 					function_ops.push_back(f_op);
 				}
 				else function_ops.push_back(f_op);
@@ -532,13 +550,12 @@ Program parse_tokens(std::vector<Token> tokens)
 				std::pair<std::string, int> type_info = parse_type_str(type_tok.value);
 				std::string base_type = type_info.first;
 				int pointer_count = type_info.second;
-				// TODO: handle other structs
-				if (base_type != get_base_type_name(TYPE_I64) && base_type != get_base_type_name(TYPE_I8))
+
+				if (base_type != get_base_type_name(TYPE_I64) && base_type != get_base_type_name(TYPE_I8) && !program.structs.count(base_type))
 				{
 					print_error_at_loc(type_tok.loc, "unknown type '" + type_tok.value + "' found while parsing struct definition");
 					exit(1);
 				}
-
 				// get member name
 				i++;
 				if (i > tokens.size() - 1)
@@ -558,11 +575,13 @@ Program parse_tokens(std::vector<Token> tokens)
 					LCPType(member_name_tok.loc, type_tok.value), offset
 				}});
 
-				// TODO: handle other structs
 				// increase offset
 				// if the type is a pointer
 				if (pointer_count > 0)
 					offset += 8;
+				// structs (they have different sizes than words)
+				else if (program.structs.count(base_type))
+					offset += program.structs.at(base_type).size;
 				// 64-bit int
 				else if (base_type == get_base_type_name(TYPE_I64))
 					offset += 8;

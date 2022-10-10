@@ -39,7 +39,7 @@ bool compare_type_stacks(std::vector<LCPType> type_stack_1, std::vector<LCPType>
 // comparing it to the label_stack_states map
 void type_check_program(Program program)
 {
-	static_assert(OP_COUNT == 47, "unhandled op types in type_check_program()");
+	static_assert(OP_COUNT == 50, "unhandled op types in type_check_program()");
 
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++)
 	{
@@ -475,7 +475,7 @@ void type_check_program(Program program)
 			{
 				// do nothing as the parser has already saved all of the variables in a map inside of the Function class
 			}
-			else if (op.type == OP_SET_MEMBER_8BIT || op.type == OP_SET_MEMBER_64BIT)
+			else if (op.type == OP_SET_MEMBER_8BIT || op.type == OP_SET_MEMBER_64BIT || op.type == OP_SET_MEMBER_STRUCT)
 			{
 				if (type_stack.size() < 1)
 				{
@@ -484,6 +484,9 @@ void type_check_program(Program program)
 				}
 				LCPType a = type_stack.back(); type_stack.pop_back();
 				std::pair<LCPType, int> member_type_offset = get_variable_type_offset(op, function.var_offsets, program.structs);
+				// the type needs to be a pointer to a struct
+				if (op.type == OP_SET_MEMBER_STRUCT)
+					member_type_offset.first.ptr_to_trace += 1;
 				if (a.base_type != member_type_offset.first.base_type && a.ptr_to_trace != member_type_offset.first.ptr_to_trace)
 				{
 					print_error_at_loc(op.loc, "Cannot set '" + op.str_operand + "' to type '" + human_readable_type(a) + "'. Expected type '" + human_readable_type(member_type_offset.first) + "'");
@@ -494,6 +497,13 @@ void type_check_program(Program program)
 			{
 				std::pair<LCPType, int> member_type_offset = get_variable_type_offset(op, function.var_offsets, program.structs);
 				member_type_offset.first.loc = op.loc;
+				type_stack.push_back(member_type_offset.first);
+			}
+			else if (op.type == OP_READ_MEMBER_STRUCT)
+			{
+				std::pair<LCPType, int> member_type_offset = get_variable_type_offset(op, function.var_offsets, program.structs);
+				member_type_offset.first.loc = op.loc;
+				member_type_offset.first.ptr_to_trace++;
 				type_stack.push_back(member_type_offset.first);
 			}
 
@@ -741,6 +751,10 @@ void type_check_program(Program program)
 			{
 				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
 				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I8), 1)); // pointer to array of ints (string)
+			}
+			else if (op.type == OP_PUSH_VAR)
+			{
+				type_stack.push_back(LCPType(op.loc, function.var_offsets.at(op.str_operand).first.base_type, function.var_offsets.at(op.str_operand).first.ptr_to_trace + 1));
 			}
 			else if (op.type == OP_FUNCTION_CALL)
 			{
