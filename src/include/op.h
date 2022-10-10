@@ -35,6 +35,15 @@ enum OpType
 	// keywords
 	OP_FUN,
 	OP_END,
+	// structs
+	OP_STRUCT,
+	OP_DEFINE_VAR,
+	OP_SET_MEMBER, // default: change when size of member is found
+	OP_READ_MEMBER, // <-'
+	OP_SET_MEMBER_8BIT,
+	OP_SET_MEMBER_64BIT,
+	OP_READ_MEMBER_8BIT,
+	OP_READ_MEMBER_64BIT,
 	// syscalls
 	OP_SYSCALL0,
 	OP_SYSCALL1,

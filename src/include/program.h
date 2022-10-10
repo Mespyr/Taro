@@ -8,6 +8,19 @@
 #include "location.h"
 #include "types.h"
 
+// store data for structs
+class Struct
+{
+public:
+	Struct(Location loc, std::map<std::string, std::pair<LCPType, int>> members, int size) :
+		loc(loc), members(members), size(size)
+	{}
+
+	Location loc;
+	std::map<std::string, std::pair<LCPType, int>> members;
+	int size;
+};
+
 // stores ops for a function
 class Function
 {
@@ -21,12 +34,15 @@ public:
 	std::vector<LCPType> arg_stack;
 	std::vector<LCPType> ret_stack;
 	std::vector<Op> ops;
+	std::map<std::string, std::pair<LCPType, int>> var_offsets;
+	int memory_capacity;
 };
 
 class Program
 {
 public:
 	std::map<std::string, Function> functions;
+	std::map<std::string, Struct> structs;
 };
 
 #endif

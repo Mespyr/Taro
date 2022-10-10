@@ -9,7 +9,8 @@
 enum LCP_Base_Type
 {
 	TYPE_I64,
-	TYPE_I8
+	TYPE_I8,
+	BASE_TYPES_COUNT
 };
 
 class LCPType

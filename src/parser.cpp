@@ -2,11 +2,32 @@
 
 bool is_legal_name(Token token_name)
 {
+	static_assert(BASE_TYPES_COUNT == 2, "unhandled base types in is_legal_name()");
+
 	if (token_name.type == TOKEN_INT || token_name.type == TOKEN_STRING) return false;
 	if (is_builtin_word(token_name.value)) return false;
 	if (token_name.value.find('"') != std::string::npos) return false;
 
+	std::string base_type = parse_type_str(token_name.value).first;
+	if (base_type == get_base_type_name(TYPE_I64) || 
+		base_type == get_base_type_name(TYPE_I8))
+		return false;
+
 	return true;
+}
+
+std::vector<std::string> split_by_dot(std::string str)
+{
+	str += ".";
+	std::vector<std::string> split;
+	long unsigned int pos = str.find(".");
+	while (pos != std::string::npos)
+	{
+		split.push_back(str.substr(0, pos)); // push back everything before the period
+		str = str.substr(pos+1); // set the string to everything after the period
+		pos = str.find("."); // find the next period
+	}
+	return split;
 }
 
 std::string add_escapes_to_string(std::string str)
@@ -51,7 +72,7 @@ std::string add_escapes_to_string(std::string str)
 
 Op convert_token_to_op(Token tok, Program program)
 {
-	static_assert(OP_COUNT == 39, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 47, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -113,6 +134,9 @@ Op convert_token_to_op(Token tok, Program program)
 			return Op(tok.loc, OP_CJMPEF);
 		else if (tok.value == "cjmpet")
 			return Op(tok.loc, OP_CJMPET);
+		// structs
+		else if (tok.value == "struct")
+			return Op(tok.loc, OP_STRUCT);
 		// syscalls
 		else if (tok.value == "call0")
 			return Op(tok.loc, OP_SYSCALL0);
@@ -129,8 +153,10 @@ Op convert_token_to_op(Token tok, Program program)
 		else if (tok.value == "call6")
 			return Op(tok.loc, OP_SYSCALL6);
 		// other
+		// OP_FUNCTION_CALL
 		else if (program.functions.count(tok.value))
 			return Op(tok.loc, OP_FUNCTION_CALL, tok.value);
+		// OP_LABEL
 		else if (tok.value.back() == ':')
 		{
 			if (tok.value.size() == 1)
@@ -141,6 +167,33 @@ Op convert_token_to_op(Token tok, Program program)
 			tok.value.pop_back();
 			return Op(tok.loc, OP_LABEL, tok.value);
 		}
+		// OP_SET_MEMBER
+		else if (tok.value.front() == '@')
+		{
+			if (tok.value.size() == 1)
+			{
+				print_error_at_loc(tok.loc, "unexpected '@' char found while parsing");
+				exit(1);
+			}
+			return Op(tok.loc, OP_SET_MEMBER, tok.value.substr(1));
+		}
+		// OP_READ_MEMBER
+		else if (tok.value.front() == '&')
+		{
+			if (tok.value.size() == 1)
+			{
+				print_error_at_loc(tok.loc, "unexpected '&' char found while parsing");
+				exit(1);
+			}
+			return Op(tok.loc, OP_READ_MEMBER, tok.value.substr(1));
+		}
+		// TODO: remember to support base types in OP_DEFINE_VAR
+		// OP_DEFINE_VAR
+		else if (program.structs.count(tok.value))
+		{
+			return Op(tok.loc, OP_DEFINE_VAR, tok.value);
+		}
+
 		else if (tok.value == "[" || tok.value == "]" || tok.value == "(" || tok.value == ")")
 		{				
 			print_error_at_loc(tok.loc, "unexpected '" + tok.value + "' char found while parsing");
@@ -158,7 +211,7 @@ Op convert_token_to_op(Token tok, Program program)
 
 std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels)
 {
-	static_assert(OP_COUNT == 39, "unhandled op types in link_ops()");
+	static_assert(OP_COUNT == 47, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++)
 	{
@@ -187,7 +240,7 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<in
 
 Program parse_tokens(std::vector<Token> tokens)
 {
-	static_assert(OP_COUNT == 39, "unhandled op types in parse_tokens()");
+	static_assert(OP_COUNT == 47, "unhandled op types in parse_tokens()");
 
 	Program program;
 	long unsigned int i = 0;
@@ -195,12 +248,12 @@ Program parse_tokens(std::vector<Token> tokens)
 
 	while (i < tokens.size())
 	{
-		Op current_op = convert_token_to_op(tokens.at(i), program);
+	Op current_op = convert_token_to_op(tokens.at(i), program);
 		
 		if (current_op.type == OP_FUN)
 		{
 			i++;
-			// check if function name is in the tokens
+			// check if function name is in the token stream
 			if (i >= tokens.size())
 			{
 				print_error_at_loc(current_op.loc, "unexpected EOF found while parsing function definition");
@@ -302,6 +355,8 @@ Program parse_tokens(std::vector<Token> tokens)
 
 			std::vector<Op> function_ops;
 			std::map<std::string, std::pair<int, int>> labels;
+			std::map<std::string, std::pair<LCPType, int>> var_offsets;
+			int offset = 0;
 			bool found_function_end = false;
 			// recursion
 			int recursion_level = 0;
@@ -314,7 +369,12 @@ Program parse_tokens(std::vector<Token> tokens)
 				
 				if (f_op.type == OP_FUN)
 				{
-					print_error_at_loc(f_op.loc, "unexpected 'sec' keyword found while parsing. functions cannot be defined inside other functions");
+					print_error_at_loc(f_op.loc, "unexpected 'fun' keyword found while parsing. functions cannot be defined inside other functions");
+					exit(1);
+				}
+				else if (f_op.type == OP_STRUCT)
+				{
+					print_error_at_loc(f_op.loc, "unexpected 'struct' keyword found while parsing. Structs cannot be defined inside functions");
 					exit(1);
 				}
 				else if (f_op.type == OP_END)
@@ -360,11 +420,117 @@ Program parse_tokens(std::vector<Token> tokens)
 					f_op.int_operand = i;
 					function_ops.push_back(f_op);
 				}
+				else if (f_op.type == OP_DEFINE_VAR)
+				{
+					i++;
+					if (i >= tokens.size()) break;
+					Token var_name_tok = tokens.at(i);
+					if (!is_legal_name(var_name_tok))
+					{
+						print_error_at_loc(var_name_tok.loc, "illegal name for variable");
+						exit(1);
+					}
+					else if (program.functions.count(var_name_tok.value))
+					{
+						print_error_at_loc(var_name_tok.loc, "name '" + var_name_tok.value + "' already exists as a function");
+						exit(1);
+					}
+					else if (program.structs.count(var_name_tok.value))
+					{
+						print_error_at_loc(var_name_tok.loc, "name '" + var_name_tok.value + "' already exists as a struct");
+						exit(1);
+					}
+					else if (var_offsets.count(var_name_tok.value))
+					{
+						print_error_at_loc(var_name_tok.loc, "variable '" + var_name_tok.value + "' already exists");
+						exit(1);
+					}
+					// TODO: support base types
+					var_offsets.insert({var_name_tok.value,
+						{LCPType(var_name_tok.loc, f_op.str_operand), offset}
+					});
+					offset += program.structs.at(f_op.str_operand).size;
+					
+					// set str_operand to name of variable
+					f_op.str_operand = var_name_tok.value;
+					function_ops.push_back(f_op);
+				}
+				else if (f_op.type == OP_SET_MEMBER)
+				{
+					std::vector<std::string> split_rec_path = split_by_dot(f_op.str_operand);
+					if (split_rec_path.size() < 2)
+					{
+						print_error_at_loc(f_op.loc, "member wasn't provided in the 'set struct member' intrinsic");
+						exit(1);
+					}
+					if (var_offsets.count(split_rec_path.front()))
+					{
+						std::string struct_name = split_rec_path.front();
+						// TODO: handle recusive values from having structs inside of structs
+						std::map<std::string, std::pair<LCPType, int>> struct_members = program.structs.at(var_offsets.at(struct_name).first.base_type).members;
+						// if struct doesn't have the provied member defined
+						if (!struct_members.count(split_rec_path.at(1)))
+						{
+							print_error_at_loc(f_op.loc, "struct '" + var_offsets.at(split_rec_path.front()).first.base_type + "' doesn't have the member '" + split_rec_path.at(1) + "' defined");	
+							exit(1);
+						}
+						// since we have 2 main sizes for different ops, either 8bit (chars) or 64bit (ints and pointers)
+						// we must switch between each to read them wthout causing an error
+						std::pair<LCPType, int> member_type = struct_members.at(split_rec_path.at(1));
+						if (member_type.first.base_type == get_base_type_name(TYPE_I8) && member_type.first.ptr_to_trace == 0)
+							f_op.type = OP_SET_MEMBER_8BIT;
+						else f_op.type = OP_SET_MEMBER_64BIT;
+						// str_operand is the member name + variable name
+						std::pair<LCPType, int> struct_type = var_offsets.at(struct_name);
+						f_op.int_operand = struct_type.second + member_type.second; // offset to where member is located
+						function_ops.push_back(f_op);
+					}
+					else
+					{
+						print_error_at_loc(f_op.loc, "struct '" + split_rec_path.front() + "' does not exist");
+						exit(1);
+					}
+				}
+				else if (f_op.type == OP_READ_MEMBER)
+				{
+					std::vector<std::string> split_rec_path = split_by_dot(f_op.str_operand);
+					if (split_rec_path.size() < 2)
+					{
+						print_error_at_loc(f_op.loc, "member wasn't provided in the 'read struct member' intrinsic");
+						exit(1);
+					}
+					if (var_offsets.count(split_rec_path.front()))
+					{
+						std::string struct_name = split_rec_path.front();
+						// TODO: handle recusive values from having structs inside of structs
+						std::map<std::string, std::pair<LCPType, int>> struct_members = program.structs.at(var_offsets.at(struct_name).first.base_type).members;
+						// if struct doesn't have the provied member defined
+						if (!struct_members.count(split_rec_path.at(1)))
+						{
+							print_error_at_loc(f_op.loc, "struct '" + var_offsets.at(split_rec_path.front()).first.base_type + "' doesn't have the member '" + split_rec_path.at(1) + "' defined");	
+							exit(1);
+						}
+						// since we have 2 main sizes for different ops, either 8bit (chars) or 64bit (ints and pointers)
+						// we must switch between each to read them wthout causing an error
+						std::pair<LCPType, int> member_type = struct_members.at(split_rec_path.at(1));
+						if (member_type.first.base_type == get_base_type_name(TYPE_I8) && member_type.first.ptr_to_trace == 0)
+							f_op.type = OP_READ_MEMBER_8BIT;
+						else f_op.type = OP_READ_MEMBER_64BIT;
+						// str_operand is the member name + variable name
+						std::pair<LCPType, int> struct_type = var_offsets.at(struct_name);
+						f_op.int_operand = struct_type.second + member_type.second; // offset to where member is located
+						function_ops.push_back(f_op);
+					}
+					else
+					{
+						print_error_at_loc(f_op.loc, "struct '" + split_rec_path.front() + "' does not exist");
+						exit(1);
+					}
+				}
 				else if (f_op.type == OP_JMP || f_op.type == OP_CJMPT || f_op.type == OP_CJMPF || f_op.type == OP_JMPE || f_op.type == OP_CJMPET || f_op.type == OP_CJMPEF)
 				{
 					i++;
 					if (i >= tokens.size()) break;
-
 					Token label_jumpto_tok = tokens.at(i);
 					f_op.str_operand = label_jumpto_tok.value;
 					function_ops.push_back(f_op);
@@ -374,12 +540,115 @@ Program parse_tokens(std::vector<Token> tokens)
 				i++;
 			}
 			if (found_function_end)
+			{
 				program.functions.at(function_name).ops = link_ops(function_ops, labels);
+				program.functions.at(function_name).var_offsets = var_offsets;
+				program.functions.at(function_name).memory_capacity = offset;
+			}
 			else
 			{
 				print_error_at_loc(tokens.back().loc, "Unexpected EOF while parsing function body");
 				exit(1);
 			}
+		}
+		else if (current_op.type == OP_STRUCT)
+		{
+			i++;
+			// check if struct name is in the tokens stream
+			if (i >= tokens.size())
+			{
+				print_error_at_loc(current_op.loc, "unexpected EOF found while parsing struct definition");
+				exit(1);
+			}
+		
+			// check struct name
+			Token name_token = tokens.at(i);
+			std::string struct_name = name_token.value;
+
+			if (!is_legal_name(name_token))
+			{
+				print_error_at_loc(name_token.loc, "illegal name for struct");
+				exit(1);
+			}
+			else if (program.functions.count(struct_name))
+			{
+				print_error_at_loc(name_token.loc, "name '" + struct_name + "' already exists as a function");
+				exit(1);
+			}
+			else if (program.structs.count(struct_name))
+			{
+				print_error_at_loc(name_token.loc, "struct '" + struct_name + "' already exists");
+				exit(1);
+			}
+			i++;
+
+			// check if eof before parsing members of struct
+			if (i >= tokens.size())
+			{
+				print_error_at_loc(current_op.loc, "unexpected EOF found while parsing struct definition");
+				exit(1);
+			}
+
+			static_assert(BASE_TYPES_COUNT == 2, "unhandled base types in parse_tokens()");
+
+			std::map<std::string, std::pair<LCPType, int>> members;
+			int offset = 0;
+			while (tokens.at(i).value != "end")
+			{
+				// get type of next member
+				Token type_tok = tokens.at(i);
+				std::pair<std::string, int> type_info = parse_type_str(type_tok.value);
+				std::string base_type = type_info.first;
+				int pointer_count = type_info.second;
+				// TODO: handle other structs
+				if (base_type != get_base_type_name(TYPE_I64) && base_type != get_base_type_name(TYPE_I8))
+				{
+					print_error_at_loc(type_tok.loc, "unknown type '" + type_tok.value + "' found while parsing struct definition");
+					exit(1);
+				}
+
+				// get member name
+				i++;
+				if (i > tokens.size() - 1)
+				{
+					print_error_at_loc(type_tok.loc, "unexpected EOF found while parsing function definition");
+					exit(1);
+				}
+				Token member_name_tok = tokens.at(i);
+				if (!is_legal_name(member_name_tok))
+				{
+					print_error_at_loc(member_name_tok.loc, "illegal name for struct member");
+					exit(1);
+				}
+
+				// set variable type and relative offset
+				members.insert({member_name_tok.value, {
+					LCPType(member_name_tok.loc, type_tok.value), offset
+				}});
+
+				// TODO: handle other structs
+				// increase offset
+				// if the type is a pointer
+				if (pointer_count > 0)
+					offset += 8;
+				// 64-bit int
+				else if (base_type == get_base_type_name(TYPE_I64))
+					offset += 8;
+				// 8-bit int
+				else if (base_type == get_base_type_name(TYPE_I8))
+					offset += 1;
+
+				i++;
+				if (i > tokens.size() - 1)
+				{
+					print_error_at_loc(member_name_tok.loc, "unexpected EOF found while parsing function definition");
+					exit(1);
+				}
+			}
+
+			program.structs.insert({struct_name, 
+				Struct(current_op.loc, members, offset)
+			});
 		}
 		else
 		{

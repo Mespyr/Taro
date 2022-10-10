@@ -18,7 +18,11 @@ std::string get_base_type_name(LCP_Base_Type type)
 		case TYPE_I8:
 			return "i8";
 			break;
+		case BASE_TYPES_COUNT:
+			return "fuck you"; // really should not happen
+			break;
 	}
+	exit(1);
 }
 
 std::pair<std::string, int> parse_type_str(std::string str)

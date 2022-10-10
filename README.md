@@ -26,8 +26,8 @@ It is still very unreadable though.
 LCP will have structs which will store data into sections kind of like this:
 ```python
 struct EpicStruct
-  num1 i64
-  num2 i64
+  i64 num1
+  i64 num2
 end
 ```
 
@@ -37,14 +37,14 @@ fun main()
   EpicStruct epic_name_for_struct
 
   # set num1 to 12
-  12 @epic_name_for_struct.num1
+  12 &epic_name_for_struct.num1
   # set num2 to 8
-  8 @epic_name_for_struct.num2
+  8 &epic_name_for_struct.num2
 
   # grab num1
-  &epic_name_for_struct.num1
+  @epic_name_for_struct.num1
   # grab num2
-  &epic_name_for_struct.num2
+  @epic_name_for_struct.num2
   
   + dump
 end
@@ -54,20 +54,19 @@ You could also push structs onto the stack and then set them as a veriable elsew
 
 ```python
 struct String
-  size i64
-  data ^i8
+  i64 size
+  ^i8 data
 end
 
 fun init_String(i64 ^i8 String)
   set String str
-
-  @str.data
-  @str.size
+  &str.data
+  &str.size
 end
 
 fun print(String)
   set String str
-  &str.size &str.data 1 1 call3 pop
+  @str.size @str.data 1 1 call3 pop
 end
 
 

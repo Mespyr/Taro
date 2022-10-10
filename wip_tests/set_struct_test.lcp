@@ -1,6 +1,6 @@
 stuct String
-	size i64
-	data ^i8
+	i64 size
+	^i8 data
 end
 
 fun String.init(i64 ^i8 String)

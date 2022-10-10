@@ -39,7 +39,7 @@ bool compare_type_stacks(std::vector<LCPType> type_stack_1, std::vector<LCPType>
 // comparing it to the label_stack_states map
 void type_check_program(Program program)
 {
-	static_assert(OP_COUNT == 39, "unhandled op types in type_check_program()");
+	static_assert(OP_COUNT == 43, "unhandled op types in type_check_program()");
 
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++)
 	{
