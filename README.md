@@ -42,7 +42,7 @@ fun main()
 end
 ```
 To push a pointer to the variable onto the stack, put the variable name onto the stack
-```
+```python
 fun main()
   i64 count
   count # pointer to i64 (^i64)
@@ -75,14 +75,14 @@ fun main()
   i64 count2
 
   12 @count # set count to 12
-  count $count2 # set count2 to count
+  count @count2 # set count2 to count
 end
 ```
 
 This is useful if you want to pass a struct into a function and set is a variable to access its members
 ```python
 fun print(^String)
-  String s $s # get top value and set it to s
+  String s @s # get top value and set it to s
 end
 
 fun main()
