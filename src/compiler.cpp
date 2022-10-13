@@ -256,8 +256,20 @@ void compile_to_asm(Program program, std::string output_filename)
 			}
 			else if (op.type == OP_SET_MEMBER_STRUCT)
 			{
-				print_error_at_loc(op.loc, "currently, saving structs into memory is not supported yet");
-				exit(1);
+				outfile.writeln("\t; OP_SET_MEMBER_STRUCT");
+				outfile.writeln("\tpop rbx");
+				// get pointer to struct
+				outfile.writeln("\tmov rax, [ret_stack_rsp]");
+				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
+				outfile.writeln("\tmov rcx, [rbx]");
+				outfile.writeln("\tmov [rax], rcx");
+				for (int i = 8; i < op.int_operand_2; i+=8)
+				{
+					outfile.writeln("\tadd rax, 8");
+					outfile.writeln("\tadd rbx, 8");
+					outfile.writeln("\tmov rcx, [rbx]");
+					outfile.writeln("\tmov [rax], rcx");
+				}
 			}
 			else if (op.type == OP_READ_MEMBER_8BIT)
 			{
@@ -280,6 +292,13 @@ void compile_to_asm(Program program, std::string output_filename)
 			else if (op.type == OP_READ_MEMBER_STRUCT)
 			{
 				outfile.writeln("\t; OP_READ_MEMBER_STRUCT");
+				outfile.writeln("\tmov rax, [ret_stack_rsp]");
+				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
+				outfile.writeln("\tpush rax");
+			}
+			else if (op.type == OP_PUSH_VAR)
+			{
+				outfile.writeln("\t; OP_PUSH_VAR");
 				outfile.writeln("\tmov rax, [ret_stack_rsp]");
 				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
 				outfile.writeln("\tpush rax");
@@ -423,11 +442,6 @@ void compile_to_asm(Program program, std::string output_filename)
 				outfile.writeln("\tpush rax");
 				outfile.writeln("\tpush str_" + std::to_string(strings.size()-1));
 			}
-			else if (op.type == OP_PUSH_VAR)
-			{
-				outfile.writeln("\t; OP_PUSH_VAR");
-
-			}
 			else if (op.type == OP_FUNCTION_CALL)
             {
                 outfile.writeln("\t; OP_FUNCTION_CALL");
@@ -475,7 +489,7 @@ void compile_to_asm(Program program, std::string output_filename)
 		outfile.writeln("str_" + std::to_string(i) + ": db " + ss.str());
 	}
 
-    outfile.writeln("ret_stack_rsp: rq 1");
-    outfile.writeln("ret_stack: rb 4096");
-    outfile.writeln("ret_stack_end:");
+	outfile.writeln("ret_stack_rsp: rq 1");
+	outfile.writeln("ret_stack: rb 4096");
+	outfile.writeln("ret_stack_end:");
 }

@@ -1,0 +1,13 @@
+struct String
+	i64 size
+	^i8 data
+end
+
+fun printP(^String)
+	dump
+end
+
+fun main()
+	String name
+	name printP
+end

@@ -46,6 +46,11 @@ enum OpType
 	OP_READ_MEMBER_8BIT,
 	OP_READ_MEMBER_64BIT,
 	OP_READ_MEMBER_STRUCT,
+	OP_PUSH_VAR,
+	/* OP_SET_VAR, */
+	/* OP_SET_VAR_8BIT, */
+	/* OP_SET_VAR_64BIT, */
+	/* OP_SET_VAR_STRUCT, */
 	// syscalls
 	OP_SYSCALL0,
 	OP_SYSCALL1,
@@ -66,7 +71,6 @@ enum OpType
 	// other
 	OP_PUSH_INT,
 	OP_PUSH_STR,
-	OP_PUSH_VAR,
 	OP_FUNCTION_CALL,
 	// count | must always be last
 	OP_COUNT
@@ -96,6 +100,7 @@ public:
 	OpType type;
 
 	long long int_operand;
+	long long int_operand_2;
 	std::string str_operand;
 };
 

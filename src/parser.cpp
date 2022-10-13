@@ -280,13 +280,14 @@ Program parse_tokens(std::vector<Token> tokens)
 			std::vector<LCPType> arg_stack;
 			std::vector<LCPType> ret_stack;
 
+			static_assert(BASE_TYPES_COUNT == 2, "unhandled base types in get_struct_member()");
 			// parse arguments of function
 			while (tokens.at(i).value != ")")
 			{
 				Token tok = tokens.at(i);
 
 				std::string tok_base_value = parse_type_str(tok.value).first;
-				if (!is_base_type_int(tok_base_value))
+				if (tok_base_value != get_base_type_name(TYPE_I64) && tok_base_value != get_base_type_name(TYPE_I8) && !program.structs.count(tok_base_value))
 				{
 					print_error_at_loc(tok.loc, "unknown argument type '" + tok.value + "'");
 					exit(1);
@@ -318,7 +319,7 @@ Program parse_tokens(std::vector<Token> tokens)
 					Token tok = tokens.at(i);
 
 					std::string tok_base_value = parse_type_str(tok.value).first;
-					if (!is_base_type_int(tok_base_value))
+					if (tok_base_value != get_base_type_name(TYPE_I64) && tok_base_value != get_base_type_name(TYPE_I8) && !program.structs.count(tok_base_value))
 					{
 						print_error_at_loc(tok.loc, "unknown return type '" + tok.value + "'");
 						exit(1);
@@ -452,7 +453,11 @@ Program parse_tokens(std::vector<Token> tokens)
 					else if (member_type_offset.first.base_type == get_base_type_name(TYPE_I64) || member_type_offset.first.ptr_to_trace > 0)
 						f_op.type = OP_SET_MEMBER_64BIT;
 					// struct
-					else f_op.type = OP_SET_MEMBER_STRUCT;
+					else 
+					{
+						f_op.int_operand_2 = program.structs.at(member_type_offset.first.base_type).size;
+						f_op.type = OP_SET_MEMBER_STRUCT;
+					}
 
 					f_op.int_operand = member_type_offset.second; // offset to where member is located
 					function_ops.push_back(f_op);
@@ -460,7 +465,6 @@ Program parse_tokens(std::vector<Token> tokens)
 				else if (f_op.type == OP_READ_MEMBER)
 				{
 					std::pair<LCPType, int> member_type_offset = get_variable_type_offset(f_op, var_offsets, program.structs);
-					std::cout << member_type_offset.first.base_type << " h" << std::endl;
 					if (member_type_offset.first.base_type == get_base_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
 						f_op.type = OP_READ_MEMBER_8BIT;
 					// if i64 or pointer
@@ -596,9 +600,9 @@ Program parse_tokens(std::vector<Token> tokens)
 					exit(1);
 				}
 			}
-
+			// align the offset into sections of 8
 			program.structs.insert({struct_name, 
-				Struct(current_op.loc, members, offset)
+				Struct(current_op.loc, members, (offset + 7) / 8 * 8)
 			});
 		}
 		else

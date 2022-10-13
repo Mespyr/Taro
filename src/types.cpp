@@ -25,16 +25,17 @@ std::pair<LCPType, int> get_variable_type_offset(Op op, std::map<std::string, st
 {
 	static_assert(BASE_TYPES_COUNT == 2, "unhandled base types in get_struct_member()");
 
-	std::vector<std::string> split_member_path = split_by_dot(op.str_operand);
 	// TODO: support basic types when they are able to be made into variables
-	if (split_member_path.size() < 2)
-	{
-		print_error_at_loc(op.loc, "member name wasn't provided in the 'set struct member' intrinsic");
-		exit(1);
-	}
+	std::vector<std::string> split_member_path = split_by_dot(op.str_operand);
 	std::string var_name = split_member_path.front();
 	if (var_offsets.count(var_name))
 	{
+		if (split_member_path.size() == 1)
+		{
+			print_error_at_loc(op.loc, "member name wasn't provided in the 'set struct member' intrinsic");
+			exit(1);
+		}
+
 		std::map<std::string, std::pair<LCPType, int>> struct_members = structs.at(var_offsets.at(var_name).first.base_type).members;
 		int offset = var_offsets.at(var_name).second; // set offset to start of variable
 		unsigned long int current_member_idx = 1;

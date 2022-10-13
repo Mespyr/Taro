@@ -485,6 +485,7 @@ void type_check_program(Program program)
 				LCPType a = type_stack.back(); type_stack.pop_back();
 				std::pair<LCPType, int> member_type_offset = get_variable_type_offset(op, function.var_offsets, program.structs);
 				// the type needs to be a pointer to a struct
+				// op-type OP_SET_MEMBER_STRUCT assumes the value was a struct (no pointers)
 				if (op.type == OP_SET_MEMBER_STRUCT)
 					member_type_offset.first.ptr_to_trace += 1;
 				if (a.base_type != member_type_offset.first.base_type && a.ptr_to_trace != member_type_offset.first.ptr_to_trace)
@@ -506,6 +507,11 @@ void type_check_program(Program program)
 				member_type_offset.first.ptr_to_trace++;
 				type_stack.push_back(member_type_offset.first);
 			}
+			else if (op.type == OP_PUSH_VAR)
+			{
+				type_stack.push_back(LCPType(op.loc, function.var_offsets.at(op.str_operand).first.base_type, function.var_offsets.at(op.str_operand).first.ptr_to_trace + 1));
+			}
+
 
 			// syscalls
 			else if (op.type == OP_SYSCALL0)
@@ -751,10 +757,6 @@ void type_check_program(Program program)
 			{
 				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
 				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I8), 1)); // pointer to array of ints (string)
-			}
-			else if (op.type == OP_PUSH_VAR)
-			{
-				type_stack.push_back(LCPType(op.loc, function.var_offsets.at(op.str_operand).first.base_type, function.var_offsets.at(op.str_operand).first.ptr_to_trace + 1));
 			}
 			else if (op.type == OP_FUNCTION_CALL)
 			{
