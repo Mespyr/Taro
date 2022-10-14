@@ -1,6 +1,6 @@
 struct String
 	i64 size
-	^i8 count
+	^i8 data
 end
 
 fun print(^String)

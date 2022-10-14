@@ -35,17 +35,19 @@ enum OpType
 	// keywords
 	OP_FUN,
 	OP_END,
-	// structs
+	// variables
 	OP_STRUCT,
 	OP_DEFINE_VAR,
-	OP_SET_MEMBER, // default: change when size of member is found
-	OP_READ_MEMBER, // <-'
-	OP_SET_MEMBER_8BIT,
-	OP_SET_MEMBER_64BIT,
-	OP_SET_MEMBER_STRUCT,
-	OP_READ_MEMBER_8BIT,
-	OP_READ_MEMBER_64BIT,
-	OP_READ_MEMBER_STRUCT,
+	OP_SET, // default: change when type of set is found 
+	OP_READ, // <-'
+	OP_SET_VAR,
+	OP_READ_VAR,
+	OP_SET_VAR_MEMBER_8BIT,
+	OP_SET_VAR_MEMBER_64BIT,
+	OP_SET_VAR_MEMBER_STRUCT,
+	OP_READ_VAR_MEMBER_8BIT,
+	OP_READ_VAR_MEMBER_64BIT,
+	OP_READ_VAR_MEMBER_STRUCT,
 	OP_PUSH_VAR,
 	/* OP_SET_VAR, */
 	/* OP_SET_VAR_8BIT, */

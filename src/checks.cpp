@@ -39,7 +39,7 @@ bool compare_type_stacks(std::vector<LCPType> type_stack_1, std::vector<LCPType>
 // comparing it to the label_stack_states map
 void type_check_program(Program program)
 {
-	static_assert(OP_COUNT == 50, "unhandled op types in type_check_program()");
+	static_assert(OP_COUNT == 52, "unhandled op types in type_check_program()");
 
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++)
 	{
@@ -475,7 +475,29 @@ void type_check_program(Program program)
 			{
 				// do nothing as the parser has already saved all of the variables in a map inside of the Function class
 			}
-			else if (op.type == OP_SET_MEMBER_8BIT || op.type == OP_SET_MEMBER_64BIT || op.type == OP_SET_MEMBER_STRUCT)
+			else if (op.type == OP_SET_VAR)
+			{
+				if (type_stack.size() < 1)
+				{
+					print_not_enough_arguments_error(op.loc, 1, 0, "&", "set variable");
+					exit(1);
+				}
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType expected_type = function.var_offsets.at(op.str_operand).first;
+				expected_type.ptr_to_trace++;
+				// a should be a pointer to the expected_type
+				if (a.base_type != expected_type.base_type || a.ptr_to_trace != expected_type.ptr_to_trace)
+				{
+					print_error_at_loc(op.loc, "Cannot set '" + op.str_operand + "' to type '" + human_readable_type(a) + "'. Expected type '" + human_readable_type(expected_type) + "'");
+					exit(1);
+				}
+			}
+			else if (op.type == OP_READ_VAR)
+			{
+				print_note_at_loc(op.loc, "OP_READ_VAR is not implemented yet");
+				exit(1);
+			}
+			else if (op.type == OP_SET_VAR_MEMBER_8BIT || op.type == OP_SET_VAR_MEMBER_64BIT || op.type == OP_SET_VAR_MEMBER_STRUCT)
 			{
 				if (type_stack.size() < 1)
 				{
@@ -486,7 +508,7 @@ void type_check_program(Program program)
 				std::pair<LCPType, int> member_type_offset = get_variable_type_offset(op, function.var_offsets, program.structs);
 				// the type needs to be a pointer to a struct
 				// op-type OP_SET_MEMBER_STRUCT assumes the value was a struct (no pointers)
-				if (op.type == OP_SET_MEMBER_STRUCT)
+				if (op.type == OP_SET_VAR_MEMBER_STRUCT)
 					member_type_offset.first.ptr_to_trace += 1;
 				if (a.base_type != member_type_offset.first.base_type && a.ptr_to_trace != member_type_offset.first.ptr_to_trace)
 				{
@@ -494,13 +516,13 @@ void type_check_program(Program program)
 					exit(1);
 				}
 			}
-			else if (op.type == OP_READ_MEMBER_8BIT || op.type == OP_READ_MEMBER_64BIT)
+			else if (op.type == OP_READ_VAR_MEMBER_8BIT || op.type == OP_READ_VAR_MEMBER_64BIT)
 			{
 				std::pair<LCPType, int> member_type_offset = get_variable_type_offset(op, function.var_offsets, program.structs);
 				member_type_offset.first.loc = op.loc;
 				type_stack.push_back(member_type_offset.first);
 			}
-			else if (op.type == OP_READ_MEMBER_STRUCT)
+			else if (op.type == OP_READ_VAR_MEMBER_STRUCT)
 			{
 				std::pair<LCPType, int> member_type_offset = get_variable_type_offset(op, function.var_offsets, program.structs);
 				member_type_offset.first.loc = op.loc;
@@ -797,7 +819,7 @@ void type_check_program(Program program)
 			}
 
 			// unreachable
-			else if (op.type == OP_FUN || op.type == OP_END || op.type == OP_COUNT || op.type == OP_STRUCT || op.type == OP_SET_MEMBER || op.type == OP_READ_MEMBER)
+			else if (op.type == OP_FUN || op.type == OP_END || op.type == OP_COUNT || op.type == OP_STRUCT || op.type == OP_SET || op.type == OP_READ)
 			{
 				print_error_at_loc(op.loc, "unreachable: op should be handled in the parsing step. This is probably a bug.");
 				exit(1);

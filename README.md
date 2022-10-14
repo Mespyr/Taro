@@ -19,13 +19,13 @@ It is still very unreadable though.
 - [x] Type Checking
 - [x] have more fancy type notation (using `^` to indicate pointers, making custom types possible)
 - [x] add two types of integer (i8, i64) instead of just default `int` keyword. good for string as string type is a `^i8`.
-- [ ] Structs
+- [x] Structs
 	- [x] struct definition
 	- [x] struct definition as variable
 	- [x] setting and reading struct members
 	- [x] compile structs inside of other structs and write structs into them
 	- [x] passing structs into functions
-	- [ ] setting struct variables from other defined structs
+	- [x] setting struct variables from other defined structs
 - [ ] Variables
 	- [x] making struct veriables
 	- [ ] setting variable types to primitive types

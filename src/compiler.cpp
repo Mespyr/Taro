@@ -2,7 +2,7 @@
 
 void compile_to_asm(Program program, std::string output_filename)
 {
-	static_assert(OP_COUNT == 50, "unhandled op types in compile_to_asm()");
+	static_assert(OP_COUNT == 52, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
 
@@ -237,26 +237,10 @@ void compile_to_asm(Program program, std::string output_filename)
 				outfile.writeln("\tpush rbx");
 			}
 
-			// structs
-			else if (op.type == OP_SET_MEMBER_8BIT)
+			// variables
+			else if (op.type == OP_SET_VAR)
 			{
-				outfile.writeln("\t; OP_SET_MEMBER_8BIT");
-				outfile.writeln("\tpop rbx");
-				outfile.writeln("\tmov rax, [ret_stack_rsp]");
-				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
-				outfile.writeln("\tmov [rax], bl");
-			}
-			else if (op.type == OP_SET_MEMBER_64BIT)
-			{
-				outfile.writeln("\t; OP_SET_MEMBER_64BIT");
-				outfile.writeln("\tpop rbx");
-				outfile.writeln("\tmov rax, [ret_stack_rsp]");
-				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
-				outfile.writeln("\tmov [rax], rbx");
-			}
-			else if (op.type == OP_SET_MEMBER_STRUCT)
-			{
-				outfile.writeln("\t; OP_SET_MEMBER_STRUCT");
+				outfile.writeln("\t; OP_SET_VAR");
 				outfile.writeln("\tpop rbx");
 				// get pointer to struct
 				outfile.writeln("\tmov rax, [ret_stack_rsp]");
@@ -271,27 +255,60 @@ void compile_to_asm(Program program, std::string output_filename)
 					outfile.writeln("\tmov [rax], rcx");
 				}
 			}
-			else if (op.type == OP_READ_MEMBER_8BIT)
+			else if (op.type == OP_SET_VAR_MEMBER_8BIT)
 			{
-				outfile.writeln("\t; OP_READ_MEMBER_8BIT");
+				outfile.writeln("\t; OP_SET_VAR_MEMBER_8BIT");
+				outfile.writeln("\tpop rbx");
+				outfile.writeln("\tmov rax, [ret_stack_rsp]");
+				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
+				outfile.writeln("\tmov [rax], bl");
+			}
+			else if (op.type == OP_SET_VAR_MEMBER_64BIT)
+			{
+				outfile.writeln("\t; OP_SET_VAR_MEMBER_64BIT");
+				outfile.writeln("\tpop rbx");
+				outfile.writeln("\tmov rax, [ret_stack_rsp]");
+				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
+				outfile.writeln("\tmov [rax], rbx");
+			}
+			else if (op.type == OP_SET_VAR_MEMBER_STRUCT)
+			{
+				outfile.writeln("\t; OP_SET_VAR_MEMBER_STRUCT");
+				outfile.writeln("\tpop rbx");
+				// get pointer to struct
+				outfile.writeln("\tmov rax, [ret_stack_rsp]");
+				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
+				outfile.writeln("\tmov rcx, [rbx]");
+				outfile.writeln("\tmov [rax], rcx");
+				for (int i = 8; i < op.int_operand_2; i+=8)
+				{
+					outfile.writeln("\tadd rax, 8");
+					outfile.writeln("\tadd rbx, 8");
+					outfile.writeln("\tmov rcx, [rbx]");
+					outfile.writeln("\tmov [rax], rcx");
+				}
+			}
+			else if (op.type == OP_READ_VAR_MEMBER_8BIT)
+			{
+				outfile.writeln("\t; OP_READ_VAR_MEMBER_8BIT");
 				outfile.writeln("\tmov rax, [ret_stack_rsp]");
 				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
 				outfile.writeln("\txor rbx, rbx");
 				outfile.writeln("\tmov bl, [rax]");
 				outfile.writeln("\tpush rbx");
 			}
-			else if (op.type == OP_READ_MEMBER_64BIT)
+			else if (op.type == OP_READ_VAR_MEMBER_64BIT)
 			{
-				outfile.writeln("\t; OP_READ_MEMBER_64BIT");
+				outfile.writeln("\t; OP_READ_VAR_MEMBER_64BIT");
 				outfile.writeln("\tmov rax, [ret_stack_rsp]");
 				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
 				outfile.writeln("\txor rbx, rbx");
 				outfile.writeln("\tmov rbx, [rax]");
 				outfile.writeln("\tpush rbx");
 			}
-			else if (op.type == OP_READ_MEMBER_STRUCT)
+			else if (op.type == OP_READ_VAR_MEMBER_STRUCT)
 			{
-				outfile.writeln("\t; OP_READ_MEMBER_STRUCT");
+				outfile.writeln("\t; OP_READ_VAR_MEMBER_STRUCT");
 				outfile.writeln("\tmov rax, [ret_stack_rsp]");
 				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
 				outfile.writeln("\tpush rax");

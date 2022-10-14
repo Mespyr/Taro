@@ -58,7 +58,7 @@ std::string add_escapes_to_string(std::string str)
 
 Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pair<LCPType, int>> var_offsets)
 {
-	static_assert(OP_COUNT == 50, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 52, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -153,7 +153,7 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 			tok.value.pop_back();
 			return Op(tok.loc, OP_LABEL, tok.value);
 		}
-		// OP_SET_MEMBER
+		// OP_SET
 		else if (tok.value.front() == '@')
 		{
 			if (tok.value.size() == 1)
@@ -161,9 +161,9 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 				print_error_at_loc(tok.loc, "unexpected '@' char found while parsing");
 				exit(1);
 			}
-			return Op(tok.loc, OP_SET_MEMBER, tok.value.substr(1));
+			return Op(tok.loc, OP_SET, tok.value.substr(1));
 		}
-		// OP_READ_MEMBER
+		// OP_READ
 		else if (tok.value.front() == '&')
 		{
 			if (tok.value.size() == 1)
@@ -171,7 +171,7 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 				print_error_at_loc(tok.loc, "unexpected '&' char found while parsing");
 				exit(1);
 			}
-			return Op(tok.loc, OP_READ_MEMBER, tok.value.substr(1));
+			return Op(tok.loc, OP_READ, tok.value.substr(1));
 		}
 		// TODO: remember to support base types in OP_DEFINE_VAR
 		// OP_DEFINE_VAR
@@ -198,7 +198,7 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 
 std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels)
 {
-	static_assert(OP_COUNT == 50, "unhandled op types in link_ops()");
+	static_assert(OP_COUNT == 52, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++)
 	{
@@ -227,7 +227,7 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<in
 
 Program parse_tokens(std::vector<Token> tokens)
 {
-	static_assert(OP_COUNT == 50, "unhandled op types in parse_tokens()");
+	static_assert(OP_COUNT == 52, "unhandled op types in parse_tokens()");
 
 	Program program;
 	long unsigned int i = 0;
@@ -443,38 +443,58 @@ Program parse_tokens(std::vector<Token> tokens)
 					f_op.str_operand = var_name_tok.value;
 					function_ops.push_back(f_op);
 				}
-				else if (f_op.type == OP_SET_MEMBER)
+				else if (f_op.type == OP_SET)
 				{
-					std::pair<LCPType, int> member_type_offset = get_variable_type_offset(f_op, var_offsets, program.structs);
-					// if plain i8
-					if (member_type_offset.first.base_type == get_base_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
-						f_op.type = OP_SET_MEMBER_8BIT;
-					// if i64 or pointer
-					else if (member_type_offset.first.base_type == get_base_type_name(TYPE_I64) || member_type_offset.first.ptr_to_trace > 0)
-						f_op.type = OP_SET_MEMBER_64BIT;
-					// struct
-					else 
+					// if setting a struct
+					if (var_offsets.count(f_op.str_operand))
 					{
-						f_op.int_operand_2 = program.structs.at(member_type_offset.first.base_type).size;
-						f_op.type = OP_SET_MEMBER_STRUCT;
+						f_op.type = OP_SET_VAR;
+						f_op.int_operand = var_offsets.at(f_op.str_operand).second;
+						f_op.int_operand_2 = program.structs.at(var_offsets.at(f_op.str_operand).first.base_type).size; // size of struct
+						function_ops.push_back(f_op);
 					}
-
-					f_op.int_operand = member_type_offset.second; // offset to where member is located
-					function_ops.push_back(f_op);
+					// if its a struct member
+					else
+					{
+						std::pair<LCPType, int> member_type_offset = get_variable_type_offset(f_op, var_offsets, program.structs);
+						// if plain i8
+						if (member_type_offset.first.base_type == get_base_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
+							f_op.type = OP_SET_VAR_MEMBER_8BIT;
+						// if i64 or pointer
+						else if (member_type_offset.first.base_type == get_base_type_name(TYPE_I64) || member_type_offset.first.ptr_to_trace > 0)
+							f_op.type = OP_SET_VAR_MEMBER_64BIT;
+						// struct
+						else
+						{
+							f_op.int_operand_2 = program.structs.at(member_type_offset.first.base_type).size;
+							f_op.type = OP_SET_VAR_MEMBER_STRUCT;
+						}
+						f_op.int_operand = member_type_offset.second; // offset to where member is located
+						function_ops.push_back(f_op);
+					}
 				}
-				else if (f_op.type == OP_READ_MEMBER)
+				else if (f_op.type == OP_READ)
 				{
-					std::pair<LCPType, int> member_type_offset = get_variable_type_offset(f_op, var_offsets, program.structs);
-					if (member_type_offset.first.base_type == get_base_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
-						f_op.type = OP_READ_MEMBER_8BIT;
-					// if i64 or pointer
-					else if (member_type_offset.first.base_type == get_base_type_name(TYPE_I64) || member_type_offset.first.ptr_to_trace > 0)
-						f_op.type = OP_READ_MEMBER_64BIT;
-					// struct
-					else f_op.type = OP_READ_MEMBER_STRUCT;
+					if (var_offsets.count(f_op.str_operand))
+					{
+						f_op.type = OP_READ_VAR;
+						f_op.int_operand = var_offsets.at(f_op.str_operand).second;
+						function_ops.push_back(f_op);
+					}
+					else
+					{
+						std::pair<LCPType, int> member_type_offset = get_variable_type_offset(f_op, var_offsets, program.structs);
+						if (member_type_offset.first.base_type == get_base_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
+							f_op.type = OP_READ_VAR_MEMBER_8BIT;
+						// if i64 or pointer
+						else if (member_type_offset.first.base_type == get_base_type_name(TYPE_I64) || member_type_offset.first.ptr_to_trace > 0)
+							f_op.type = OP_READ_VAR_MEMBER_64BIT;
+						// struct
+						else f_op.type = OP_READ_VAR_MEMBER_STRUCT;
 
-					f_op.int_operand = member_type_offset.second; // offset to where member is located
-					function_ops.push_back(f_op);
+						f_op.int_operand = member_type_offset.second; // offset to where member is located
+						function_ops.push_back(f_op);
+					}
 				}
 				else if (f_op.type == OP_JMP || f_op.type == OP_CJMPT || f_op.type == OP_CJMPF || f_op.type == OP_JMPE || f_op.type == OP_CJMPET || f_op.type == OP_CJMPEF)
 				{
