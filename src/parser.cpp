@@ -7,6 +7,9 @@ bool is_legal_name(Token token_name)
 	if (token_name.type == TOKEN_INT || token_name.type == TOKEN_STRING) return false;
 	if (is_builtin_word(token_name.value)) return false;
 	if (token_name.value.find('"') != std::string::npos) return false;
+	if (token_name.value.find('@') != std::string::npos) return false;
+	if (token_name.value.find('&') != std::string::npos) return false;
+	if (token_name.value.find('.') != std::string::npos) return false;
 
 	std::string base_type = parse_type_str(token_name.value).first;
 	if (base_type == get_base_type_name(TYPE_I64) || 
