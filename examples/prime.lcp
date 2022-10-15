@@ -44,13 +44,13 @@ end
 fun main()
 	1 loop:
 		# stay in loop until greater or equal to 1000
-		dup 1000 < cjmpef loop
+		dup 10000 < cjmpef loop
 
 		# skip section if number is not prime
 		print_prime:
 			dup ?prime cjmpef print_prime
 			# print prime number
-			dup dump	
+			dup dump
 		end
 	
 		1 +
