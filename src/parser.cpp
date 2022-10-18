@@ -2,19 +2,17 @@
 
 bool is_legal_name(Token token_name)
 {
-	static_assert(BASE_TYPES_COUNT == 2, "unhandled base types in is_legal_name()");
-
+	// if token is an integer or string
 	if (token_name.type == TOKEN_INT || token_name.type == TOKEN_STRING) return false;
-	if (is_builtin_word(token_name.value)) return false;
+	// any illegal characters in names
 	if (token_name.value.find('"') != std::string::npos) return false;
+	if (token_name.value.find('^') != std::string::npos) return false;
 	if (token_name.value.find('@') != std::string::npos) return false;
 	if (token_name.value.find('&') != std::string::npos) return false;
 	if (token_name.value.find('.') != std::string::npos) return false;
-
-	std::string base_type = parse_type_str(token_name.value).first;
-	if (base_type == get_base_type_name(TYPE_I64) || 
-		base_type == get_base_type_name(TYPE_I8))
-		return false;
+	// if token is builtin word or type name
+	if (is_builtin_word(token_name.value)) return false;
+	if (is_prim_type(token_name.value)) return false;
 
 	return true;
 }
@@ -176,7 +174,7 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 			}
 			return Op(tok.loc, OP_READ, tok.value.substr(1));
 		}
-		// TODO: remember to support base types in OP_DEFINE_VAR
+		// TODO: remember to support prim types in OP_DEFINE_VAR
 		// OP_DEFINE_VAR
 		else if (program.structs.count(tok.value))
 			return Op(tok.loc, OP_DEFINE_VAR, tok.value);
@@ -283,14 +281,13 @@ Program parse_tokens(std::vector<Token> tokens)
 			std::vector<LCPType> arg_stack;
 			std::vector<LCPType> ret_stack;
 
-			static_assert(BASE_TYPES_COUNT == 2, "unhandled base types in get_struct_member()");
 			// parse arguments of function
 			while (tokens.at(i).value != ")")
 			{
 				Token tok = tokens.at(i);
-
 				std::string tok_base_value = parse_type_str(tok.value).first;
-				if (tok_base_value != get_base_type_name(TYPE_I64) && tok_base_value != get_base_type_name(TYPE_I8) && !program.structs.count(tok_base_value))
+				// if not a primitive type or a struct
+				if (!is_prim_type(tok_base_value) && !program.structs.count(tok_base_value))
 				{
 					print_error_at_loc(tok.loc, "unknown argument type '" + tok.value + "'");
 					exit(1);
@@ -320,9 +317,9 @@ Program parse_tokens(std::vector<Token> tokens)
 				while (tokens.at(i).value != "]")
 				{
 					Token tok = tokens.at(i);
-
 					std::string tok_base_value = parse_type_str(tok.value).first;
-					if (tok_base_value != get_base_type_name(TYPE_I64) && tok_base_value != get_base_type_name(TYPE_I8) && !program.structs.count(tok_base_value))
+					// if isn't a primitive type or struct
+					if (!is_prim_type(tok_base_value) && !program.structs.count(tok_base_value))
 					{
 						print_error_at_loc(tok.loc, "unknown return type '" + tok.value + "'");
 						exit(1);
@@ -436,7 +433,7 @@ Program parse_tokens(std::vector<Token> tokens)
 						print_error_at_loc(var_name_tok.loc, "variable '" + var_name_tok.value + "' already exists");
 						exit(1);
 					}
-					// TODO: support base types
+					// TODO: support prim types
 					var_offsets.insert({var_name_tok.value,
 						{LCPType(var_name_tok.loc, f_op.str_operand), offset}
 					});
@@ -459,12 +456,13 @@ Program parse_tokens(std::vector<Token> tokens)
 					// if its a struct member
 					else
 					{
-						std::pair<LCPType, int> member_type_offset = get_variable_type_offset(f_op, var_offsets, program.structs);
+						static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in parse_tokens()");
+						std::pair<LCPType, int> member_type_offset = variable_type_offset(f_op, var_offsets, program.structs);
 						// if plain i8
-						if (member_type_offset.first.base_type == get_base_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
+						if (member_type_offset.first.base_type == prim_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
 							f_op.type = OP_SET_VAR_MEMBER_8BIT;
 						// if i64 or pointer
-						else if (member_type_offset.first.base_type == get_base_type_name(TYPE_I64) || member_type_offset.first.ptr_to_trace > 0)
+						else if (member_type_offset.first.base_type == prim_type_name(TYPE_I64) || member_type_offset.first.ptr_to_trace > 0)
 							f_op.type = OP_SET_VAR_MEMBER_64BIT;
 						// struct
 						else
@@ -486,11 +484,12 @@ Program parse_tokens(std::vector<Token> tokens)
 					}
 					else
 					{
-						std::pair<LCPType, int> member_type_offset = get_variable_type_offset(f_op, var_offsets, program.structs);
-						if (member_type_offset.first.base_type == get_base_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
+						static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in parse_tokens()");
+						std::pair<LCPType, int> member_type_offset = variable_type_offset(f_op, var_offsets, program.structs);
+						if (member_type_offset.first.base_type == prim_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
 							f_op.type = OP_READ_VAR_MEMBER_8BIT;
 						// if i64 or pointer
-						else if (member_type_offset.first.base_type == get_base_type_name(TYPE_I64) || member_type_offset.first.ptr_to_trace > 0)
+						else if (member_type_offset.first.base_type == prim_type_name(TYPE_I64) || member_type_offset.first.ptr_to_trace > 0)
 							f_op.type = OP_READ_VAR_MEMBER_64BIT;
 						// struct
 						else f_op.type = OP_READ_VAR_MEMBER_STRUCT;
@@ -566,8 +565,6 @@ Program parse_tokens(std::vector<Token> tokens)
 				exit(1);
 			}
 
-			static_assert(BASE_TYPES_COUNT == 2, "unhandled base types in parse_tokens()");
-
 			std::map<std::string, std::pair<LCPType, int>> members;
 			int offset = 0;
 			while (tokens.at(i).value != "end")
@@ -578,7 +575,7 @@ Program parse_tokens(std::vector<Token> tokens)
 				std::string base_type = type_info.first;
 				int pointer_count = type_info.second;
 
-				if (base_type != get_base_type_name(TYPE_I64) && base_type != get_base_type_name(TYPE_I8) && !program.structs.count(base_type))
+				if (!is_prim_type(base_type) && !program.structs.count(base_type))
 				{
 					print_error_at_loc(type_tok.loc, "unknown type '" + type_tok.value + "' found while parsing struct definition");
 					exit(1);
@@ -602,7 +599,8 @@ Program parse_tokens(std::vector<Token> tokens)
 					LCPType(member_name_tok.loc, type_tok.value), offset
 				}});
 
-				// increase offset
+				static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in parse_tokens()");
+				// increase offset by size of type
 				// if the type is a pointer
 				if (pointer_count > 0)
 					offset += 8;
@@ -610,10 +608,10 @@ Program parse_tokens(std::vector<Token> tokens)
 				else if (program.structs.count(base_type))
 					offset += program.structs.at(base_type).size;
 				// 64-bit int
-				else if (base_type == get_base_type_name(TYPE_I64))
+				else if (base_type == prim_type_name(TYPE_I64))
 					offset += 8;
 				// 8-bit int
-				else if (base_type == get_base_type_name(TYPE_I8))
+				else if (base_type == prim_type_name(TYPE_I8))
 					offset += 1;
 
 				i++;

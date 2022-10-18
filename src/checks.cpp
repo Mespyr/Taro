@@ -84,17 +84,17 @@ void type_check_program(Program program)
 				// additions goes in following combinations [b, a] -> [b + a]
 
 				// int + int -> int
-				if (is_base_type_int(a) && is_base_type_int(b))
+				if (is_prim_type_int(a) && is_prim_type_int(b))
 					type_stack.push_back(LCPType(
-						op.loc, get_base_type_name(TYPE_I64), 0
+						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				// ptr + int -> ptr
-				else if (is_base_type_int(a) && is_pointer(b))
+				else if (is_prim_type_int(a) && is_pointer(b))
 					type_stack.push_back(LCPType(
 						op.loc, b.base_type, b.ptr_to_trace
 					));
 				// int + ptr -> ptr
-				else if (is_pointer(a) && is_base_type_int(b))
+				else if (is_pointer(a) && is_prim_type_int(b))
 					type_stack.push_back(LCPType(
 						op.loc, a.base_type, a.ptr_to_trace
 					));
@@ -120,19 +120,19 @@ void type_check_program(Program program)
 				// subtraction goes in following combinations [b, a] -> [b - a]
 
 				// int - int -> int
-				if (is_base_type_int(a) && is_base_type_int(b))
+				if (is_prim_type_int(a) && is_prim_type_int(b))
 					type_stack.push_back(LCPType(
-						op.loc, get_base_type_name(TYPE_I64), 0
+						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				// ptr - int -> ptr
-				else if (is_base_type_int(a) && is_pointer(b))
+				else if (is_prim_type_int(a) && is_pointer(b))
 					type_stack.push_back(LCPType(
 						op.loc, b.base_type, b.ptr_to_trace
 					));
 				// ptr - ptr -> int
 				else if (is_pointer(a) && is_pointer(b))
 					type_stack.push_back(LCPType(
-						op.loc, get_base_type_name(TYPE_I64), 0
+						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -156,9 +156,9 @@ void type_check_program(Program program)
 				// multiplication goes in following combinations
 
 				// int * int -> int
-				if (is_base_type_int(a) && is_base_type_int(b))
+				if (is_prim_type_int(a) && is_prim_type_int(b))
 					type_stack.push_back(LCPType(
-						op.loc, get_base_type_name(TYPE_I64), 0
+						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -182,10 +182,10 @@ void type_check_program(Program program)
 				// division goes in following combinations
 
 				// int / int -> int, int
-				if (is_base_type_int(a) && is_base_type_int(b))
+				if (is_prim_type_int(a) && is_prim_type_int(b))
 				{
-					type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
-					type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
+					type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I64), 0));
+					type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I64), 0));
 				}
 				else
 				{
@@ -210,7 +210,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, get_base_type_name(TYPE_I64), 0
+						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -233,7 +233,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, get_base_type_name(TYPE_I64), 0
+						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -256,7 +256,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, get_base_type_name(TYPE_I64), 0
+						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -279,7 +279,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, get_base_type_name(TYPE_I64), 0
+						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -302,7 +302,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, get_base_type_name(TYPE_I64), 0
+						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -325,7 +325,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, get_base_type_name(TYPE_I64), 0
+						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -345,13 +345,13 @@ void type_check_program(Program program)
 				
 				LCPType a = type_stack.back(); type_stack.pop_back();
 
-				if (is_base_type_int(a))
+				if (is_prim_type_int(a))
 					type_stack.push_back(LCPType(
-						op.loc, get_base_type_name(TYPE_I64), 0
+						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else
 				{
-					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "not");
+					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "not");
 					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
@@ -369,7 +369,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, get_base_type_name(TYPE_I64), 0
+						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -392,7 +392,7 @@ void type_check_program(Program program)
 
 				if (types_equal(a, b))
 					type_stack.push_back(LCPType(
-						op.loc, get_base_type_name(TYPE_I64), 0
+						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else
 				{
@@ -471,10 +471,7 @@ void type_check_program(Program program)
 			}
 
 			// structs
-			else if (op.type == OP_DEFINE_VAR)
-			{
-				// do nothing as the parser has already saved all of the variables in a map inside of the Function class
-			}
+			// don't check OP_DEFINE_VAR as the parser has already saved all of the variables in a map inside of the Function class
 			else if (op.type == OP_SET_VAR)
 			{
 				if (type_stack.size() < 1)
@@ -505,7 +502,7 @@ void type_check_program(Program program)
 					exit(1);
 				}
 				LCPType a = type_stack.back(); type_stack.pop_back();
-				std::pair<LCPType, int> member_type_offset = get_variable_type_offset(op, function.var_offsets, program.structs);
+				std::pair<LCPType, int> member_type_offset = variable_type_offset(op, function.var_offsets, program.structs);
 				// the type needs to be a pointer to a struct
 				// op-type OP_SET_MEMBER_STRUCT assumes the value was a struct (no pointers)
 				if (op.type == OP_SET_VAR_MEMBER_STRUCT)
@@ -518,13 +515,13 @@ void type_check_program(Program program)
 			}
 			else if (op.type == OP_READ_VAR_MEMBER_8BIT || op.type == OP_READ_VAR_MEMBER_64BIT)
 			{
-				std::pair<LCPType, int> member_type_offset = get_variable_type_offset(op, function.var_offsets, program.structs);
+				std::pair<LCPType, int> member_type_offset = variable_type_offset(op, function.var_offsets, program.structs);
 				member_type_offset.first.loc = op.loc;
 				type_stack.push_back(member_type_offset.first);
 			}
 			else if (op.type == OP_READ_VAR_MEMBER_STRUCT)
 			{
-				std::pair<LCPType, int> member_type_offset = get_variable_type_offset(op, function.var_offsets, program.structs);
+				std::pair<LCPType, int> member_type_offset = variable_type_offset(op, function.var_offsets, program.structs);
 				member_type_offset.first.loc = op.loc;
 				member_type_offset.first.ptr_to_trace++;
 				type_stack.push_back(member_type_offset.first);
@@ -533,7 +530,6 @@ void type_check_program(Program program)
 			{
 				type_stack.push_back(LCPType(op.loc, function.var_offsets.at(op.str_operand).first.base_type, function.var_offsets.at(op.str_operand).first.ptr_to_trace + 1));
 			}
-
 
 			// syscalls
 			else if (op.type == OP_SYSCALL0)
@@ -545,13 +541,13 @@ void type_check_program(Program program)
 				}
 				LCPType a = type_stack.back(); type_stack.pop_back();
 
-				if (!is_base_type_int(a))
+				if (!is_prim_type_int(a))
 				{
-					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "syscall0");
+					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall0");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
+				type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL1)
 			{
@@ -563,13 +559,13 @@ void type_check_program(Program program)
 				LCPType a = type_stack.back(); type_stack.pop_back();
 				type_stack.pop_back();
 
-				if (!is_base_type_int(a))
+				if (!is_prim_type_int(a))
 				{
-					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "syscall1");
+					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall1");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
+				type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL2)
 			{
@@ -582,13 +578,13 @@ void type_check_program(Program program)
 				type_stack.pop_back();
 				type_stack.pop_back();
 
-				if (!is_base_type_int(a))
+				if (!is_prim_type_int(a))
 				{
-					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "syscall2");
+					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall2");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
+				type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL3)
 			{
@@ -602,13 +598,13 @@ void type_check_program(Program program)
 				type_stack.pop_back();
 				type_stack.pop_back();
 
-				if (!is_base_type_int(a))
+				if (!is_prim_type_int(a))
 				{
-					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "syscall3");
+					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall3");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
+				type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL4)
 			{
@@ -623,13 +619,13 @@ void type_check_program(Program program)
 				type_stack.pop_back();
 				type_stack.pop_back();
 
-				if (!is_base_type_int(a))
+				if (!is_prim_type_int(a))
 				{
-					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "syscall4");
+					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall4");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
+				type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL5)
 			{
@@ -645,13 +641,13 @@ void type_check_program(Program program)
 				type_stack.pop_back();
 				type_stack.pop_back();
 
-				if (!is_base_type_int(a))
+				if (!is_prim_type_int(a))
 				{
-					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "syscall5");
+					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall5");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
+				type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL6)
 			{
@@ -668,13 +664,13 @@ void type_check_program(Program program)
 				type_stack.pop_back();
 				type_stack.pop_back();
 
-				if (!is_base_type_int(a))
+				if (!is_prim_type_int(a))
 				{
-					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "syscall6");
+					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall6");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
+				type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 
 			// labels
@@ -706,9 +702,9 @@ void type_check_program(Program program)
 				}
 				LCPType a = type_stack.back(); type_stack.pop_back();
 
-				if (!is_base_type_int(a))
+				if (!is_prim_type_int(a))
 				{
-					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "cjmpt", "conditional jump if true");
+					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "cjmpt", "conditional jump if true");
 					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
@@ -724,9 +720,9 @@ void type_check_program(Program program)
 				}
 				LCPType a = type_stack.back(); type_stack.pop_back();
 
-				if (!is_base_type_int(a))
+				if (!is_prim_type_int(a))
 				{
-					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "cjmpf", "conditional jump if false");
+					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "cjmpf", "conditional jump if false");
 					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
@@ -742,9 +738,9 @@ void type_check_program(Program program)
 				}
 				LCPType a = type_stack.back(); type_stack.pop_back();
 
-				if (!is_base_type_int(a))
+				if (!is_prim_type_int(a))
 				{
-					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "cjmpet", "conditional jump to end if true");
+					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "cjmpet", "conditional jump to end if true");
 					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
@@ -760,9 +756,9 @@ void type_check_program(Program program)
 				}
 				LCPType a = type_stack.back(); type_stack.pop_back();
 
-				if (!is_base_type_int(a))
+				if (!is_prim_type_int(a))
 				{
-					print_invalid_type_error(op.loc, get_base_type_name(TYPE_I64), human_readable_type(a), "cjmpet", "conditional jump to end if false");
+					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "cjmpet", "conditional jump to end if false");
 					print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
@@ -773,12 +769,12 @@ void type_check_program(Program program)
 			// other
 			else if (op.type == OP_PUSH_INT)
 			{
-				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
+				type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_PUSH_STR)
 			{
-				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I64), 0));
-				type_stack.push_back(LCPType(op.loc, get_base_type_name(TYPE_I8), 1)); // pointer to array of ints (string)
+				type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I64), 0));
+				type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I8), 1)); // pointer to array of ints (string)
 			}
 			else if (op.type == OP_FUNCTION_CALL)
 			{

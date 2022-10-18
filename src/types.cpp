@@ -21,9 +21,23 @@ std::vector<std::string> split_by_dot(std::string str)
 	return split;
 }
 
-std::pair<LCPType, int> get_variable_type_offset(Op op, std::map<std::string, std::pair<LCPType, int>> var_offsets, std::map<std::string, Struct> structs)
+std::pair<std::string, int> parse_type_str(std::string str)
 {
-	static_assert(BASE_TYPES_COUNT == 2, "unhandled base types in get_struct_member()");
+	int i = 0;
+
+	// strip base_type of all '^' and inc ptr_to_trace for each
+	while (str.at(0) == '^')
+	{
+		i++;
+		str = str.substr(1);
+	}
+
+	return {str, i};
+}
+
+std::pair<LCPType, int> variable_type_offset(Op op, std::map<std::string, std::pair<LCPType, int>> var_offsets, std::map<std::string, Struct> structs)
+{
+	static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in get_struct_member()");
 
 	// TODO: support basic types when they are able to be made into variables
 	std::vector<std::string> split_member_path = split_by_dot(op.str_operand);
@@ -55,7 +69,6 @@ std::pair<LCPType, int> get_variable_type_offset(Op op, std::map<std::string, st
 			// access the members of the member's type and continue
 			if (structs.count(member_type_offset_pair.first.base_type) && member_type_offset_pair.first.ptr_to_trace == 0 && current_member_idx < split_member_path.size() - 1)
 			{
-				// TODO: support other structs in accessing members by switching 'struct_members' variable to the members of the type
 				struct_members = structs.at(member_type_offset_pair.first.base_type).members;
 				current_member_idx++;
 			}
@@ -71,7 +84,7 @@ std::pair<LCPType, int> get_variable_type_offset(Op op, std::map<std::string, st
 	exit(1);
 }
 
-std::string get_base_type_name(LCP_Base_Type type)
+std::string prim_type_name(LCPPrimType type)
 {
 	switch(type)
 	{
@@ -81,25 +94,11 @@ std::string get_base_type_name(LCP_Base_Type type)
 		case TYPE_I8:
 			return "i8";
 			break;
-		case BASE_TYPES_COUNT:
+		case PRIM_TYPES_COUNT:
 			return "fuck you"; // except finn ofc
 			break;
 	}
 	exit(1);
-}
-
-std::pair<std::string, int> parse_type_str(std::string str)
-{
-	int i = 0;
-
-	// strip base_type of all '^' and inc ptr_to_trace for each
-	while (str.at(0) == '^')
-	{
-		i++;
-		str = str.substr(1);
-	}
-
-	return {str, i};
 }
 
 std::string human_readable_type(LCPType t)
@@ -116,14 +115,35 @@ bool types_equal(LCPType a, LCPType b)
 	return (a.ptr_to_trace == b.ptr_to_trace && a.base_type == b.base_type);
 }
 
-bool is_base_type_int(LCPType t)
+bool is_prim_type(LCPType t)
 {
-	return (t.ptr_to_trace == 0 && (t.base_type == get_base_type_name(TYPE_I64) || t.base_type == get_base_type_name(TYPE_I8)));
+	static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in is_prim_type(LCPType)");
+
+	if (t.base_type == prim_type_name(TYPE_I64) ||
+		t.base_type == prim_type_name(TYPE_I8))
+		return true;
+
+	return false;
+}
+bool is_prim_type(std::string t)
+{
+	static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in is_prim_type(std::string)");
+
+	if (t == prim_type_name(TYPE_I64) ||
+		t == prim_type_name(TYPE_I8))
+		return true;
+
+	return false;
 }
 
-bool is_base_type_int(std::string t)
+bool is_prim_type_int(LCPType t)
 {
-	return (t == get_base_type_name(TYPE_I64) || t == get_base_type_name(TYPE_I8));
+	return (t.ptr_to_trace == 0 && (t.base_type == prim_type_name(TYPE_I64) || t.base_type == prim_type_name(TYPE_I8)));
+}
+
+bool is_prim_type_int(std::string t)
+{
+	return (t == prim_type_name(TYPE_I64) || t == prim_type_name(TYPE_I8));
 }
 
 bool is_pointer(LCPType t)
