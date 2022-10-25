@@ -7,6 +7,15 @@
 #include "location.h"
 #include "token.h"
 
+enum OpCodeMode
+{
+	MODE_8BIT,
+	MODE_64BIT,
+	MODE_STRUCT,
+
+	MODE_COUNT
+};
+
 enum OpType
 {
 	// debugging
@@ -35,24 +44,15 @@ enum OpType
 	// keywords
 	OP_FUN,
 	OP_END,
-	// variables
 	OP_STRUCT,
+	// variables
 	OP_DEFINE_VAR,
-	OP_SET, // default: change when type of set is found 
-	OP_READ, // <-'
 	OP_SET_VAR,
+	OP_SET_VAR_FROM_PTR,
 	OP_READ_VAR,
-	OP_SET_VAR_MEMBER_8BIT,
-	OP_SET_VAR_MEMBER_64BIT,
-	OP_SET_VAR_MEMBER_STRUCT,
-	OP_READ_VAR_MEMBER_8BIT,
-	OP_READ_VAR_MEMBER_64BIT,
-	OP_READ_VAR_MEMBER_STRUCT,
+	OP_SET_VAR_STRUCT_MEMBER,
+	OP_READ_VAR_STRUCT_MEMBER,
 	OP_PUSH_VAR,
-	/* OP_SET_VAR, */
-	/* OP_SET_VAR_8BIT, */
-	/* OP_SET_VAR_64BIT, */
-	/* OP_SET_VAR_STRUCT, */
 	// syscalls
 	OP_SYSCALL0,
 	OP_SYSCALL1,
@@ -104,6 +104,7 @@ public:
 	long long int_operand;
 	long long int_operand_2;
 	std::string str_operand;
+	OpCodeMode mode;
 };
 
 bool is_builtin_word(std::string word);

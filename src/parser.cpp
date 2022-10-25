@@ -49,17 +49,15 @@ std::string add_escapes_to_string(std::string str)
 			i++;
 			continue;
 		}
-
 		// skip both chars if escape sequence found in buffer
 		i+=2;
 	}
-
 	return ret;
 }
 
 Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pair<LCPType, int>> var_offsets)
 {
-	static_assert(OP_COUNT == 52, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 47, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -162,7 +160,7 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 				print_error_at_loc(tok.loc, "unexpected '@' char found while parsing");
 				exit(1);
 			}
-			return Op(tok.loc, OP_SET, tok.value.substr(1));
+			return Op(tok.loc, OP_SET_VAR, tok.value.substr(1));
 		}
 		// OP_READ
 		else if (tok.value.front() == '&')
@@ -172,11 +170,11 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 				print_error_at_loc(tok.loc, "unexpected '&' char found while parsing");
 				exit(1);
 			}
-			return Op(tok.loc, OP_READ, tok.value.substr(1));
+			return Op(tok.loc, OP_READ_VAR, tok.value.substr(1));
 		}
 		// TODO: remember to support prim types in OP_DEFINE_VAR
 		// OP_DEFINE_VAR
-		else if (program.structs.count(tok.value))
+		else if (is_prim_type(tok.value) || program.structs.count(tok.value))
 			return Op(tok.loc, OP_DEFINE_VAR, tok.value);
 		// OP_PUSH_VAR
 		else if (var_offsets.count(tok.value))
@@ -199,7 +197,7 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 
 std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels)
 {
-	static_assert(OP_COUNT == 52, "unhandled op types in link_ops()");
+	static_assert(OP_COUNT == 47, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++)
 	{
@@ -228,7 +226,7 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<in
 
 Program parse_tokens(std::vector<Token> tokens)
 {
-	static_assert(OP_COUNT == 52, "unhandled op types in parse_tokens()");
+	static_assert(OP_COUNT == 47, "unhandled op types in parse_tokens()");
 
 	Program program;
 	long unsigned int i = 0;
@@ -433,67 +431,98 @@ Program parse_tokens(std::vector<Token> tokens)
 						print_error_at_loc(var_name_tok.loc, "variable '" + var_name_tok.value + "' already exists");
 						exit(1);
 					}
-					// TODO: support prim types
+
 					var_offsets.insert({var_name_tok.value,
 						{LCPType(var_name_tok.loc, f_op.str_operand), offset}
 					});
-					offset += program.structs.at(f_op.str_operand).size;
-					
-					// set str_operand to name of variable
-					f_op.str_operand = var_name_tok.value;
-					function_ops.push_back(f_op);
+
+					if (is_pointer(f_op.str_operand))
+						offset += 8;
+					else if (is_prim_type(f_op.str_operand))
+						offset += sizeof_type(f_op.str_operand);
+					else offset += program.structs.at(f_op.str_operand).size;
 				}
-				else if (f_op.type == OP_SET)
+				else if (f_op.type == OP_SET_VAR)
 				{
-					// if setting a struct
+					// if it is a variable
 					if (var_offsets.count(f_op.str_operand))
 					{
-						f_op.type = OP_SET_VAR;
+						LCPType type = var_offsets.at(f_op.str_operand).first;
+						if (is_prim_type(type.base_type) || is_pointer(type))
+						{
+							static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in parse_tokens()");
+							// 8bit values
+							if (sizeof_type(type) == 1)
+								f_op.mode = MODE_8BIT;
+							// 64bit values
+							else if (sizeof_type(type) == 8)
+								f_op.mode = MODE_64BIT;
+						}
+						else f_op.mode = MODE_STRUCT;
 						f_op.int_operand = var_offsets.at(f_op.str_operand).second;
-						f_op.int_operand_2 = program.structs.at(var_offsets.at(f_op.str_operand).first.base_type).size; // size of struct
+						f_op.int_operand_2 = sizeof_type(type, program.structs); // size of struct or type
 						function_ops.push_back(f_op);
 					}
 					// if its a struct member
 					else
 					{
-						static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in parse_tokens()");
+						static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in parse_tokens()");
 						std::pair<LCPType, int> member_type_offset = variable_type_offset(f_op, var_offsets, program.structs);
-						// if plain i8
-						if (member_type_offset.first.base_type == prim_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
-							f_op.type = OP_SET_VAR_MEMBER_8BIT;
-						// if i64 or pointer
-						else if (member_type_offset.first.base_type == prim_type_name(TYPE_I64) || member_type_offset.first.ptr_to_trace > 0)
-							f_op.type = OP_SET_VAR_MEMBER_64BIT;
-						// struct
-						else
+						if (program.structs.count(member_type_offset.first.base_type))
 						{
+							// sizeof struct
 							f_op.int_operand_2 = program.structs.at(member_type_offset.first.base_type).size;
-							f_op.type = OP_SET_VAR_MEMBER_STRUCT;
+							f_op.mode = MODE_STRUCT;
 						}
+						// 8bit values
+						else if (sizeof_type(member_type_offset.first, program.structs) == 1)
+							f_op.mode = MODE_8BIT;
+						// 64bit values
+						else if (sizeof_type(member_type_offset.first, program.structs) == 8)
+							f_op.mode = MODE_64BIT;
+						f_op.type = OP_SET_VAR_STRUCT_MEMBER;
 						f_op.int_operand = member_type_offset.second; // offset to where member is located
 						function_ops.push_back(f_op);
 					}
 				}
-				else if (f_op.type == OP_READ)
+				else if (f_op.type == OP_READ_VAR)
 				{
+					// if reading a variable
 					if (var_offsets.count(f_op.str_operand))
 					{
-						f_op.type = OP_READ_VAR;
+						LCPType type = var_offsets.at(f_op.str_operand).first;
+						if (!is_prim_type(type) && !is_pointer(type))
+						{
+							print_error_at_loc(f_op.loc, "Can't read whole variable for a non-primitive type (type " + human_readable_type(type) + ")");
+							exit(1);
+						}
+
+						static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in parse_tokens()");
+						// 8bit values
+						if (sizeof_type(type) == 1)
+							f_op.mode = MODE_8BIT;
+						// 64bit values
+						else if (sizeof_type(type) == 8)
+							f_op.mode = MODE_64BIT;
+
 						f_op.int_operand = var_offsets.at(f_op.str_operand).second;
 						function_ops.push_back(f_op);
 					}
+					// if reading struct member
 					else
 					{
 						static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in parse_tokens()");
 						std::pair<LCPType, int> member_type_offset = variable_type_offset(f_op, var_offsets, program.structs);
-						if (member_type_offset.first.base_type == prim_type_name(TYPE_I8) && member_type_offset.first.ptr_to_trace == 0)
-							f_op.type = OP_READ_VAR_MEMBER_8BIT;
-						// if i64 or pointer
-						else if (member_type_offset.first.base_type == prim_type_name(TYPE_I64) || member_type_offset.first.ptr_to_trace > 0)
-							f_op.type = OP_READ_VAR_MEMBER_64BIT;
-						// struct
-						else f_op.type = OP_READ_VAR_MEMBER_STRUCT;
+						if (program.structs.count(member_type_offset.first.base_type))
+							f_op.mode = MODE_STRUCT;
+						// 8bit values
+						else if (sizeof_type(member_type_offset.first, program.structs) == 1)
+							f_op.mode = MODE_8BIT;
+						// 64bit values
+						else if (sizeof_type(member_type_offset.first, program.structs) == 8)
+							f_op.mode = MODE_64BIT;
 
+						f_op.type = OP_READ_VAR_STRUCT_MEMBER;
 						f_op.int_operand = member_type_offset.second; // offset to where member is located
 						function_ops.push_back(f_op);
 					}
@@ -599,20 +628,9 @@ Program parse_tokens(std::vector<Token> tokens)
 					LCPType(member_name_tok.loc, type_tok.value), offset
 				}});
 
-				static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in parse_tokens()");
 				// increase offset by size of type
-				// if the type is a pointer
-				if (pointer_count > 0)
-					offset += 8;
-				// structs (they have different sizes than words)
-				else if (program.structs.count(base_type))
-					offset += program.structs.at(base_type).size;
-				// 64-bit int
-				else if (base_type == prim_type_name(TYPE_I64))
-					offset += 8;
-				// 8-bit int
-				else if (base_type == prim_type_name(TYPE_I8))
-					offset += 1;
+				if (pointer_count > 0) offset += 8;
+				else offset += sizeof_type(base_type, program.structs);
 
 				i++;
 				if (i > tokens.size() - 1)

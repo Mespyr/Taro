@@ -28,7 +28,8 @@ It is still very unreadable though.
 	- [x] setting struct variables from other defined structs
 - [ ] Variables
 	- [x] making struct veriables
-	- [ ] setting variable types to primitive types
+	- [x] setting variable types to primitive types
+	- [ ] changing between setting variable form variable on stack and value on stack (a pointer vs the primitive type)
 - [ ] Arrays
 - [ ] write code to generate a [prime spiral](https://mathimages.swarthmore.edu/index.php/Prime_spiral_(Ulam_spiral)) also known as a Ulam spiral.
 

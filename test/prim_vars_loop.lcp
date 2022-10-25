@@ -11,5 +11,5 @@ fun main()
 		jmp loop
 	end
 
-	"Done!\n" 1 1 call3
+	"Done!\n" 1 1 call3 pop
 end

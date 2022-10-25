@@ -35,6 +35,15 @@ std::pair<std::string, int> parse_type_str(std::string str)
 	return {str, i};
 }
 
+std::string human_readable_type(LCPType t)
+{
+	std::string str;
+	for (int i = 0; i < t.ptr_to_trace; i++)
+		str.push_back('^');
+
+	return str + t.base_type;
+}
+
 std::pair<LCPType, int> variable_type_offset(Op op, std::map<std::string, std::pair<LCPType, int>> var_offsets, std::map<std::string, Struct> structs)
 {
 	static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in get_struct_member()");
@@ -95,19 +104,39 @@ std::string prim_type_name(LCPPrimType type)
 			return "i8";
 			break;
 		case PRIM_TYPES_COUNT:
-			return "fuck you"; // except finn ofc
-			break;
+			print_error("DONT PASS PRIM_TYPES_COUNT INTO prim_type_size()");
+			exit(1);
 	}
 	exit(1);
 }
 
-std::string human_readable_type(LCPType t)
+int sizeof_type(LCPType type, std::map<std::string, Struct> structs)
 {
-	std::string str;
-	for (int i = 0; i < t.ptr_to_trace; i++)
-		str.push_back('^');
-
-	return str + t.base_type;
+	if (is_pointer(type)) return 8;
+	if (is_prim_type(type))
+	{
+		static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in is_prim_type(LCPType)");
+		
+		if (type.base_type == prim_type_name(TYPE_I8)) return 1;
+		if (type.base_type == prim_type_name(TYPE_I64)) return 8;
+	}
+	return structs.at(type.base_type).size;	
+}
+int sizeof_type(std::string type, std::map<std::string, Struct> structs)
+{
+	std::pair<std::string, int> t = parse_type_str(type);
+	// t.first is type name
+	// t.second is pointer count
+	if (t.second > 0) return 8;
+	if (is_prim_type(t.first))
+	{
+		static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in is_prim_type(LCPType)");
+		
+		if (t.first == prim_type_name(TYPE_I8)) return 1;
+		if (t.first == prim_type_name(TYPE_I64)) return 8;
+	}
+	return structs.at(t.first).size;	
+	return 0;
 }
 
 bool types_equal(LCPType a, LCPType b)
@@ -129,8 +158,9 @@ bool is_prim_type(std::string t)
 {
 	static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in is_prim_type(std::string)");
 
-	if (t == prim_type_name(TYPE_I64) ||
-		t == prim_type_name(TYPE_I8))
+	std::string base_t = parse_type_str(t).first;
+	if (base_t == prim_type_name(TYPE_I64) ||
+		base_t == prim_type_name(TYPE_I8))
 		return true;
 
 	return false;
@@ -149,4 +179,10 @@ bool is_prim_type_int(std::string t)
 bool is_pointer(LCPType t)
 {
 	return (t.ptr_to_trace > 0);
+}
+
+bool is_pointer(std::string t)
+{
+	int pcount = parse_type_str(t).second;
+	return (pcount > 0);
 }
