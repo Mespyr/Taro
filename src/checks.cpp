@@ -34,12 +34,10 @@ bool compare_type_stacks(std::vector<LCPType> type_stack_1, std::vector<LCPType>
 	return true;
 }
 
-// TODO: make it so that stack state on jump ops is stored in a map
-// then checked over with the second part of type-checking
-// comparing it to the label_stack_states map
 void type_check_program(Program &program)
 {
 	static_assert(OP_COUNT == 47, "unhandled op types in type_check_program()");
+	static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++)
 	{
@@ -475,6 +473,7 @@ void type_check_program(Program &program)
 			// primitive variables
 			else if (op.type == OP_SET_VAR)
 			{
+				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 				if (type_stack.size() < 1)
 				{
 					print_not_enough_arguments_error(op.loc, 1, 0, "&", "set variable");
@@ -483,8 +482,7 @@ void type_check_program(Program &program)
 				LCPType a = type_stack.back(); type_stack.pop_back();
 				LCPType expected_type = function.var_offsets.at(op.str_operand).first;
 
-				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
-				if (op.mode == MODE_8BIT || op.mode == MODE_64BIT)
+				if (op.is_prim_type_mode())
 				{
 					if (!types_equal(a, expected_type))
 					{
@@ -514,7 +512,7 @@ void type_check_program(Program &program)
 			else if (op.type == OP_READ_VAR)
 			{
 				// if it is a primitive type sizes as only primitive types can be read directly
-				if (op.mode == MODE_8BIT || op.mode == MODE_64BIT)
+				if (op.is_prim_type_mode())
 				{
 					LCPType t = function.var_offsets.at(op.str_operand).first;
 					t.loc = op.loc;
@@ -523,6 +521,7 @@ void type_check_program(Program &program)
 			}
 			else if (op.type == OP_SET_VAR_STRUCT_MEMBER)
 			{
+				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 				if (type_stack.size() < 1)
 				{
 					print_not_enough_arguments_error(op.loc, 1, 0, "@", "set struct member");
@@ -542,6 +541,7 @@ void type_check_program(Program &program)
 			}
 			else if (op.type == OP_READ_VAR_STRUCT_MEMBER)
 			{
+				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 				std::pair<LCPType, int> member_type_offset = variable_type_offset(op, function.var_offsets, program.structs);
 				member_type_offset.first.loc = op.loc;
 				if (op.mode == MODE_STRUCT)

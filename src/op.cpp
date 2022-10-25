@@ -1,5 +1,17 @@
 #include "include/op.h"
 
+bool Op::is_prim_type_mode()
+{
+	static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in Op::is_prim_type_mode()");
+
+	if (mode == MODE_8BIT ||
+		mode == MODE_64BIT
+	) return true;
+
+	return false;
+}
+
+
 bool is_builtin_word(std::string word)
 {
 	static_assert(OP_COUNT == 47, "unhandled op types in type_check_program()");

@@ -98,6 +98,8 @@ public:
 		str_operand(str_operand)
 	{}
 
+	bool is_prim_type_mode();
+
 	Location loc;
 	OpType type;
 
