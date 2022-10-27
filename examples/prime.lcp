@@ -2,26 +2,20 @@ fun mod(i64 i64) [i64] / swp pop end
 fun sq(i64) [i64] dup * end
 
 fun ?prime(i64) [i64]
-	# stack: is_prime, num, idx
-	1 swp # is_prime
-	2     # idx
+	i64 is_prime
+	1 @is_prime
+	2 # stack: num, idx
 
-	# if number is not less than 2, skip to beginning of loop
-	over over < cjmpf loop
-	# set 'is_prime' to 0 and skip loop
-	rot pop 0
-	rot rot
+	over 2 < cjmpf loop # if num is not less than 2, then continue to loop
+	0 @is_prime # number is not prime
 	jmpe loop
 
 	loop:
 		over over sq > cjmpef loop # while 'num' is greater than 'idx**2' stay in loop
 
 		if_lab: # if number is not divisible by 'idx' skip this label
-			# check if modulo is equal to 0 and skip if not
 			over over mod 0 = cjmpef if_lab
-			# set 'is_prime' to 0
-			rot pop 0
-			rot rot
+			0 @is_prime
 			jmpe loop
 		end
 
@@ -29,6 +23,7 @@ fun ?prime(i64) [i64]
 	end
 
 	pop pop
+	&is_prime
 end
 
 fun main()

@@ -272,14 +272,23 @@ void compile_to_asm(Program program, std::string output_filename)
 			}
 			else if (op.type == OP_SET_VAR_FROM_PTR)
 			{
+				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in compile_to_asm()");
 				// rbx is the pointer we are setting the variable to
 				// rax is the pointer to the variable
 				outfile.writeln("\t; OP_SET_VAR_FROM_PTR " + op.str_operand + " offset:" + std::to_string(op.int_operand) + " size:" + std::to_string(op.int_operand_2));
 				outfile.writeln("\tpop rbx");
 				outfile.writeln("\tmov rax, [ret_stack_rsp]");
 				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
-				outfile.writeln("\tmov rcx, [rbx]");
-				outfile.writeln("\tmov [rax], rcx");
+				if (op.mode == MODE_8BIT)
+				{
+					outfile.writeln("\tmov cl, [rbx]");
+					outfile.writeln("\tmov [rax], cl");
+				}
+				else if (op.mode == MODE_64BIT)
+				{
+					outfile.writeln("\tmov rcx, [rbx]");
+					outfile.writeln("\tmov [rax], rcx");
+				}
 			}
 			else if (op.type == OP_READ_VAR)
 			{
