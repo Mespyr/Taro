@@ -24,6 +24,7 @@ def main():
 
 	passed = 0
 	failed = 0
+	new = 0
 
 	for test in test_files:
 		# generate output based off of test code
@@ -54,6 +55,7 @@ def main():
 					print(f"test \033[1;34m'{test_base_name}' \033[1;32mpassed")
 					os.system("tput sgr0")
 		else:
+			new += 1
 			# save new test file
 			print(genfile)
 			save_ = input(f"Do you want to save this to 'test/output/{test_base_name}'? (y/n) ")
@@ -61,7 +63,7 @@ def main():
 				with open("test/output/" + test_base_name, "w+") as outfile:
 					outfile.write(genfile)
 
-	print(f"\033[1;32m{passed} passed, \033[1;31m{failed} failed")
+	print(f"\033[1;32m{passed} passed, \033[1;31m{failed} failed, \033[1;33m{new} new")
 
 if __name__ == "__main__":
 	main()
