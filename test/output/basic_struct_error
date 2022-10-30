@@ -1,0 +1,10 @@
+COMPILE: 1
+STDOUT:
+[note] tokenizing file
+[note] parsing tokens
+[note] type-checking program
+
+STDERR:
+test/basic_struct_error.lcp:8:8: Cannot set 'name.size' to type '^i8'. Expected type 'i64'
+	"Finn" @name.size
+	       ^^^^^^^^^^

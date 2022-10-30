@@ -1,0 +1,24 @@
+COMPILE: 0
+STDOUT:
+[note] tokenizing file
+[note] parsing tokens
+[note] type-checking program
+[note] compiling to assembly
+[cmd] fasm out.asm
+flat assembler  version 1.73.30  (16384 kilobytes memory, x64)
+3 passes, 1381 bytes.
+
+STDERR:
+
+RUN: 0
+STDOUT:
+Name: Finn McGee
+ - School: Example School
+ - Grade: 9
+ - Age: 15
+Name: Ben Dover
+ - School: Example School
+ - Grade: 10
+ - Age: 16
+
+STDERR:

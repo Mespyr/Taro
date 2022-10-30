@@ -1,0 +1,16 @@
+COMPILE: 1
+STDOUT:
+[note] tokenizing file
+[note] parsing tokens
+[note] type-checking program
+
+STDERR:
+test/stack_mani.lcp:1:4: unhandled data on the stack (expected 0 items, got 2)
+fun main()
+    ^^^^
+test/stack_mani.lcp:10:1: note: excess data pushed here (i64)
+	12 13 over dump
+	^^
+test/stack_mani.lcp:10:4: note: excess data pushed here (i64)
+	12 13 over dump
+	   ^^

@@ -1,0 +1,38 @@
+COMPILE: 0
+STDOUT:
+[note] tokenizing file
+[note] parsing tokens
+[note] type-checking program
+[note] compiling to assembly
+[cmd] fasm out.asm
+flat assembler  version 1.73.30  (16384 kilobytes memory, x64)
+3 passes, 1206 bytes.
+
+STDERR:
+
+RUN: 0
+STDOUT:
+1
+0
+1
+0
+1
+0
+1
+1
+0
+1
+1
+0
+1
+0
+18446744073709551615
+18446744073709551614
+1
+0
+0
+1
+1
+0
+
+STDERR:

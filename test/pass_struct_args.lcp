@@ -4,7 +4,7 @@ struct String
 end
 
 fun printP(^String)
-	dump
+	pop
 end
 
 fun main()

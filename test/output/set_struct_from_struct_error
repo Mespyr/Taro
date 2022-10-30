@@ -1,0 +1,10 @@
+COMPILE: 1
+STDOUT:
+[note] tokenizing file
+[note] parsing tokens
+[note] type-checking program
+
+STDERR:
+test/set_struct_from_struct_error.lcp:9:4: Cannot set 's' to type 'i64'. Expected type '^String'
+	12 @s
+	   ^^

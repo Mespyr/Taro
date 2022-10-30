@@ -1,0 +1,9 @@
+COMPILE: 1
+STDOUT:
+[note] tokenizing file
+[note] parsing tokens
+
+STDERR:
+test/parser.lcp:9:1: unknown word 'qwekdjqwklejqklwe'
+	qwekdjqwklejqklwe
+	^^^^^^^^^^^^^^^^^

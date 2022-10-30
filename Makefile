@@ -21,6 +21,9 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(OBJ_DIR)
 $(OBJ_DIR):
 	mkdir -p $@
 
+test: all
+	python3 run_tests.py
+
 clean:
 	$(RM) -r $(OBJ_DIR) *.o out *.asm
 	$(RM) $(BIN)
