@@ -1,0 +1,16 @@
+COMPILE: 1
+STDOUT:
+[note] tokenizing file
+[note] parsing tokens
+[note] type-checking program
+
+STDERR:
+test/invalid_addition.lcp:8:5: invalid types for operation '+' (addition) (^Str, i64)
+	s 8 +
+	    ^
+test/invalid_addition.lcp:8:1: note: first value pushed here (^Str)
+	s 8 +
+	^
+test/invalid_addition.lcp:8:3: note: second value pushed here (i64)
+	s 8 +
+	  ^

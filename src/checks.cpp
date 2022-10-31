@@ -88,16 +88,6 @@ void type_check_program(Program &program)
 					type_stack.push_back(LCPType(
 						op.loc, prim_type_name(TYPE_I64), 0
 					));
-				// ptr + int -> ptr
-				else if (is_prim_type_int(a) && is_pointer(b))
-					type_stack.push_back(LCPType(
-						op.loc, b.base_type, b.ptr_to_trace
-					));
-				// int + ptr -> ptr
-				else if (is_pointer(a) && is_prim_type_int(b))
-					type_stack.push_back(LCPType(
-						op.loc, a.base_type, a.ptr_to_trace
-					));
 				else
 				{
 					print_invalid_combination_of_types_error(op.loc, {b, a}, "+", "addition");
@@ -121,16 +111,6 @@ void type_check_program(Program &program)
 
 				// int - int -> int
 				if (is_prim_type_int(a) && is_prim_type_int(b))
-					type_stack.push_back(LCPType(
-						op.loc, prim_type_name(TYPE_I64), 0
-					));
-				// ptr - int -> ptr
-				else if (is_prim_type_int(a) && is_pointer(b))
-					type_stack.push_back(LCPType(
-						op.loc, b.base_type, b.ptr_to_trace
-					));
-				// ptr - ptr -> int
-				else if (is_pointer(a) && is_pointer(b))
 					type_stack.push_back(LCPType(
 						op.loc, prim_type_name(TYPE_I64), 0
 					));
