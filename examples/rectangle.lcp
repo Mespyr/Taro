@@ -42,7 +42,7 @@ fun Rectangle::info(^Rectangle)
 	" - Height: " print &r.height dump
 	" - Area: " print
 	r Rectangle::area dump
-	" - Perimeter: " print 
+	" - Perimeter: " print
 	r Rectangle::perimeter dump
 	"Visual:\n" print
 	r Rectangle::visualise

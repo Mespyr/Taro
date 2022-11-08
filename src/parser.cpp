@@ -174,7 +174,7 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 		}
 		// TODO: remember to support prim types in OP_DEFINE_VAR
 		// OP_DEFINE_VAR
-		else if (is_prim_type(tok.value) || program.structs.count(tok.value))
+		else if (is_prim_type(tok.value) || program.structs.count(tok.value) || is_pointer(tok.value))
 			return Op(tok.loc, OP_DEFINE_VAR, tok.value);
 		// OP_PUSH_VAR
 		else if (var_offsets.count(tok.value))
