@@ -270,12 +270,12 @@ void compile_to_asm(Program program, std::string output_filename)
 					}
 				}
 			}
-			else if (op.type == OP_SET_VAR_FROM_PTR)
+			else if (op.type == OP_SET_VAR_FROM_OTHER_PTR)
 			{
 				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in compile_to_asm()");
 				// rbx is the pointer we are setting the variable to
 				// rax is the pointer to the variable
-				outfile.writeln("\t; OP_SET_VAR_FROM_PTR " + op.str_operand + " offset:" + std::to_string(op.int_operand) + " size:" + std::to_string(op.int_operand_2));
+				outfile.writeln("\t; OP_SET_VAR_FROM_OTHER_PTR " + op.str_operand + " offset:" + std::to_string(op.int_operand) + " size:" + std::to_string(op.int_operand_2));
 				outfile.writeln("\tpop rbx");
 				outfile.writeln("\tmov rax, [ret_stack_rsp]");
 				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));

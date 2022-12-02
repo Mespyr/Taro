@@ -54,7 +54,10 @@ public:
 std::vector<std::string> split_by_dot(std::string str);
 std::pair<std::string, int> parse_type_str(std::string str);
 std::string human_readable_type(LCPType t);
-std::pair<LCPType, int> variable_type_offset(Op op, std::map<std::string, std::pair<LCPType, int>> var_offsets, std::map<std::string, Struct> structs);
+
+std::pair<LCPType, int> struct_member_offset(Op op, std::map<std::string, Struct> structs);
+std::pair<LCPType, int> variable_member_offset(Op op, std::map<std::string, std::pair<LCPType, int>> var_offsets, std::map<std::string, Struct> structs);
+
 std::string prim_type_name(LCPPrimType type);
 
 int sizeof_type(LCPType type, std::map<std::string, Struct> structs = {});

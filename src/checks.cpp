@@ -36,7 +36,7 @@ bool compare_type_stacks(std::vector<LCPType> type_stack_1, std::vector<LCPType>
 
 void type_check_program(Program &program)
 {
-	static_assert(OP_COUNT == 47, "unhandled op types in type_check_program()");
+	static_assert(OP_COUNT == 54, "unhandled op types in type_check_program()");
 	static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++)
@@ -450,7 +450,7 @@ void type_check_program(Program &program)
 				type_stack.push_back(b);
 			}
 
-			// primitive variables
+			// variables
 			else if (op.type == OP_SET_VAR)
 			{
 				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
@@ -474,7 +474,7 @@ void type_check_program(Program &program)
 							print_invalid_type_error(op.loc, human_readable_type(expected_type), human_readable_type(a), "@", "set variable");
 							exit(1);
 						}
-						op.type = OP_SET_VAR_FROM_PTR;
+						op.type = OP_SET_VAR_FROM_OTHER_PTR;
 						program.functions.at(func_name).ops.at(i) = op;
 					}
 				}
@@ -489,16 +489,6 @@ void type_check_program(Program &program)
 					}
 				}
 			}
-			else if (op.type == OP_READ_VAR)
-			{
-				// if it is a primitive type sizes as only primitive types can be read directly
-				if (op.is_prim_type_mode())
-				{
-					LCPType t = function.var_offsets.at(op.str_operand).first;
-					t.loc = op.loc;
-					type_stack.push_back(t);
-				}
-			}
 			else if (op.type == OP_SET_VAR_STRUCT_MEMBER)
 			{
 				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
@@ -508,7 +498,7 @@ void type_check_program(Program &program)
 					exit(1);
 				}
 				LCPType a = type_stack.back(); type_stack.pop_back();
-				std::pair<LCPType, int> member_type_offset = variable_type_offset(op, function.var_offsets, program.structs);
+				std::pair<LCPType, int> member_type_offset = variable_member_offset(op, function.var_offsets, program.structs);
 				// the type needs to be a pointer to a struct
 				// op-type OP_SET_MEMBER_STRUCT assumes the value was a struct (no pointers)
 				if (op.mode == MODE_STRUCT)
@@ -519,10 +509,25 @@ void type_check_program(Program &program)
 					exit(1);
 				}
 			}
+			else if (op.type == OP_READ_VAR)
+			{
+				// if it is a primitive type sizes as only primitive types can be read directly
+				if (op.is_prim_type_mode())
+				{
+					LCPType t = function.var_offsets.at(op.str_operand).first;
+					t.loc = op.loc;
+					type_stack.push_back(t);
+				}
+				else
+				{
+					print_error_at_loc(op.loc, "compiler error: op OP_READ_VAR is set in a non-primitive mode, this is probably a bug in the parser");
+					exit(1);
+				}
+			}
 			else if (op.type == OP_READ_VAR_STRUCT_MEMBER)
 			{
 				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
-				std::pair<LCPType, int> member_type_offset = variable_type_offset(op, function.var_offsets, program.structs);
+				std::pair<LCPType, int> member_type_offset = variable_member_offset(op, function.var_offsets, program.structs);
 				member_type_offset.first.loc = op.loc;
 				if (op.mode == MODE_STRUCT)
 					member_type_offset.first.ptr_to_trace++;
@@ -535,6 +540,119 @@ void type_check_program(Program &program)
 					function.var_offsets.at(op.str_operand).first.base_type,
 					function.var_offsets.at(op.str_operand).first.ptr_to_trace + 1
 				));
+			}
+			// variable pointers
+			else if (op.type == OP_SET_PTR)
+			{
+				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
+				if (type_stack.size() < 2)
+				{
+					print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "@", "set pointer");
+					exit(1);
+				}
+				LCPType a = type_stack.back(); type_stack.pop_back(); // ptr
+				LCPType b = type_stack.back(); type_stack.pop_back(); // value
+				LCPType expected_type(op.loc, op.str_operand);
+
+				if (!types_equal(expected_type, a))
+				{
+					print_invalid_type_error(op.loc, human_readable_type(expected_type), human_readable_type(a), "@", "set pointer");
+					exit(1);
+				}
+
+				if (op.is_prim_type_mode())
+				{
+					if (!types_equal(a, expected_type))
+					{
+						// check in value on stack is a pointer to the said value (a variable)
+						expected_type.ptr_to_trace++;
+						if (!types_equal(a, expected_type))
+						{
+							expected_type.ptr_to_trace--;
+							print_invalid_type_error(op.loc, human_readable_type(expected_type), human_readable_type(a), "@", "set variable");
+							exit(1);
+						}
+						op.type = OP_SET_PTR_FROM_OTHER_PTR;
+						program.functions.at(func_name).ops.at(i) = op;
+					}
+				}
+				else if (op.mode == MODE_STRUCT)
+				{
+					expected_type.ptr_to_trace++;
+					// a should be a pointer to the expected_type, print error if not
+					if (a.base_type != expected_type.base_type || a.ptr_to_trace != expected_type.ptr_to_trace)
+					{
+						print_error_at_loc(op.loc, "Cannot set pointer of type '" + op.str_operand + "' to type '" + human_readable_type(a) + "'. Expected type '" + human_readable_type(expected_type) + "'");
+						exit(1);
+					}
+				}
+			}
+			else if (op.type == OP_SET_PTR_STRUCT_MEMBER)
+			{
+				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
+				if (type_stack.size() < 2)
+				{
+					print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "@", "set pointer member");
+					exit(1);
+				}
+				LCPType a = type_stack.back(); type_stack.pop_back(); // ptr
+				LCPType b = type_stack.back(); type_stack.pop_back(); // value
+				LCPType expected_type(op.loc, split_by_dot(op.str_operand).front());
+				
+				if (!types_equal(expected_type, a))
+				{
+					print_invalid_type_error(op.loc, human_readable_type(expected_type), human_readable_type(a), "@", "set pointer member");
+					exit(1);
+				}
+				std::pair<LCPType, int> member_type_offset = struct_member_offset(op, program.structs);
+				if (op.mode == MODE_STRUCT)
+					member_type_offset.first.ptr_to_trace++;
+				if (!types_equal(b, member_type_offset.first))
+				{
+					print_error_at_loc(op.loc, "Cannot set pointer of type '" + op.str_operand + "' to type '" + human_readable_type(a) + "'. Expected type '" + human_readable_type(member_type_offset.first) + "'");
+					exit(1);
+				}
+			}
+			else if (op.type == OP_READ_PTR)
+			{
+				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
+				if (type_stack.size() < 1)
+				{
+					print_not_enough_arguments_error(op.loc, 1, 0, "&", "read pointer");
+					exit(1);
+				}
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType expected_type(op.loc, op.str_operand);
+
+				if (!types_equal(expected_type, a))
+				{
+					print_invalid_type_error(op.loc, human_readable_type(expected_type), human_readable_type(a), "&", "read pointer");
+					exit(1);
+				}
+				type_stack.push_back(expected_type);
+			}
+			else if (op.type == OP_READ_PTR_STRUCT_MEMBER)
+			{
+				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
+				if (type_stack.size() < 1)
+				{
+					print_not_enough_arguments_error(op.loc, 1, 0, "&", "read pointer member");
+					exit(1);
+				}
+				LCPType a = type_stack.back(); type_stack.pop_back();
+				LCPType t(op.loc, split_by_dot(op.str_operand).front()); // get type of struct we are getting the member from
+
+				if (!types_equal(t, a))
+				{
+					print_invalid_type_error(op.loc, human_readable_type(t), human_readable_type(a), "&", "read pointer member");
+					exit(1);
+				}
+
+				std::pair<LCPType, int> member_type_offset = struct_member_offset(op, program.structs);
+				member_type_offset.first.loc = op.loc;
+				if (op.mode == MODE_STRUCT)
+					member_type_offset.first.ptr_to_trace++;
+				type_stack.push_back(member_type_offset.first);
 			}
 
 			// syscalls
