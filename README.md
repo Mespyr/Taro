@@ -33,8 +33,8 @@ It is still very unreadable though.
 - [ ] allow pushing of different type integers onto the stack (ex: i8, i16, i32, i64)
 	- [ ] passing those values into functions with size in mind (you can pass i8, i16, and i32 integers into functions that require i64, but you cant pass i64 into a function with i8)
 	- [ ] allow type notation when pushing integers onto the stack (ex: specify that 5 be pushed as an i64 instead of an i8)
-- [ ] allow modifying values stored at pointers on the stack
-	- [ ] access members of structs pushed onto the stack
-	- [ ] write and read values to pointers of primitive types
+- [x] allow modifying values stored at pointers on the stack
+	- [x] access members of structs pushed onto the stack
+	- [x] write and read values to pointers of primitive types
 - [ ] Arrays
 - [ ] write code to generate a [prime spiral](https://mathimages.swarthmore.edu/index.php/Prime_spiral_(Ulam_spiral)) also known as a Ulam spiral.
