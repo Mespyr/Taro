@@ -554,22 +554,24 @@ void type_check_program(Program &program)
 				LCPType b = type_stack.back(); type_stack.pop_back(); // value
 				LCPType expected_type(op.loc, op.str_operand);
 
+				expected_type.ptr_to_trace++;
 				if (!types_equal(expected_type, a))
 				{
 					print_invalid_type_error(op.loc, human_readable_type(expected_type), human_readable_type(a), "@", "set pointer");
 					exit(1);
 				}
+				expected_type.ptr_to_trace--;
 
 				if (op.is_prim_type_mode())
 				{
-					if (!types_equal(a, expected_type))
+					if (!types_equal(b, expected_type))
 					{
 						// check in value on stack is a pointer to the said value (a variable)
 						expected_type.ptr_to_trace++;
-						if (!types_equal(a, expected_type))
+						if (!types_equal(b, expected_type))
 						{
 							expected_type.ptr_to_trace--;
-							print_invalid_type_error(op.loc, human_readable_type(expected_type), human_readable_type(a), "@", "set variable");
+							print_invalid_type_error(op.loc, human_readable_type(expected_type), human_readable_type(b), "@", "set pointer");
 							exit(1);
 						}
 						op.type = OP_SET_PTR_FROM_OTHER_PTR;
@@ -599,17 +601,20 @@ void type_check_program(Program &program)
 				LCPType b = type_stack.back(); type_stack.pop_back(); // value
 				LCPType expected_type(op.loc, split_by_dot(op.str_operand).front());
 				
+				expected_type.ptr_to_trace++;
 				if (!types_equal(expected_type, a))
 				{
 					print_invalid_type_error(op.loc, human_readable_type(expected_type), human_readable_type(a), "@", "set pointer member");
 					exit(1);
 				}
+				expected_type.ptr_to_trace--;
+
 				std::pair<LCPType, int> member_type_offset = struct_member_offset(op, program.structs);
 				if (op.mode == MODE_STRUCT)
 					member_type_offset.first.ptr_to_trace++;
 				if (!types_equal(b, member_type_offset.first))
 				{
-					print_error_at_loc(op.loc, "Cannot set pointer of type '" + op.str_operand + "' to type '" + human_readable_type(a) + "'. Expected type '" + human_readable_type(member_type_offset.first) + "'");
+					print_error_at_loc(op.loc, "cannot set pointer of type '" + op.str_operand + "' to type '" + human_readable_type(b) + "'. Expected type '" + human_readable_type(member_type_offset.first) + "'");
 					exit(1);
 				}
 			}
@@ -624,11 +629,13 @@ void type_check_program(Program &program)
 				LCPType a = type_stack.back(); type_stack.pop_back();
 				LCPType expected_type(op.loc, op.str_operand);
 
+				expected_type.ptr_to_trace++;
 				if (!types_equal(expected_type, a))
 				{
 					print_invalid_type_error(op.loc, human_readable_type(expected_type), human_readable_type(a), "&", "read pointer");
 					exit(1);
 				}
+				expected_type.ptr_to_trace--;
 				type_stack.push_back(expected_type);
 			}
 			else if (op.type == OP_READ_PTR_STRUCT_MEMBER)
@@ -640,13 +647,15 @@ void type_check_program(Program &program)
 					exit(1);
 				}
 				LCPType a = type_stack.back(); type_stack.pop_back();
-				LCPType t(op.loc, split_by_dot(op.str_operand).front()); // get type of struct we are getting the member from
+				LCPType expected_type(op.loc, split_by_dot(op.str_operand).front()); // get type of struct we are getting the member from
 
-				if (!types_equal(t, a))
+				expected_type.ptr_to_trace++;
+				if (!types_equal(expected_type, a))
 				{
-					print_invalid_type_error(op.loc, human_readable_type(t), human_readable_type(a), "&", "read pointer member");
+					print_invalid_type_error(op.loc, human_readable_type(expected_type), human_readable_type(a), "&", "read pointer member");
 					exit(1);
 				}
+				expected_type.ptr_to_trace--;
 
 				std::pair<LCPType, int> member_type_offset = struct_member_offset(op, program.structs);
 				member_type_offset.first.loc = op.loc;

@@ -505,11 +505,7 @@ Program parse_tokens(std::vector<Token> tokens)
 							f_op.type = OP_SET_PTR_STRUCT_MEMBER;
 
 							if (program.structs.count(member_type_offset.first.base_type))
-							{
-								// sizeof struct
-								f_op.int_operand_2 = program.structs.at(member_type_offset.first.base_type).size;
 								f_op.mode = MODE_STRUCT;
-							}
 							// 8bit values
 							else if (sizeof_type(member_type_offset.first, program.structs) == 1)
 								f_op.mode = MODE_8BIT;
@@ -518,6 +514,7 @@ Program parse_tokens(std::vector<Token> tokens)
 								f_op.mode = MODE_64BIT;
 
 							f_op.int_operand = member_type_offset.second; // relative offset of member in pointer
+							f_op.int_operand_2 = sizeof_type(member_type_offset.first, program.structs); // size of member
 							function_ops.push_back(f_op);
 						}
 						// if setting variable member
@@ -525,11 +522,7 @@ Program parse_tokens(std::vector<Token> tokens)
 						{
 							std::pair<LCPType, int> member_type_offset = variable_member_offset(f_op, var_offsets, program.structs);
 							if (program.structs.count(member_type_offset.first.base_type))
-							{
-								// sizeof struct
-								f_op.int_operand_2 = program.structs.at(member_type_offset.first.base_type).size;
 								f_op.mode = MODE_STRUCT;
-							}
 							// 8bit values
 							else if (sizeof_type(member_type_offset.first, program.structs) == 1)
 								f_op.mode = MODE_8BIT;
@@ -538,6 +531,7 @@ Program parse_tokens(std::vector<Token> tokens)
 								f_op.mode = MODE_64BIT;
 							f_op.type = OP_SET_VAR_STRUCT_MEMBER;
 							f_op.int_operand = member_type_offset.second; // offset to where member is located
+							f_op.int_operand_2 = sizeof_type(member_type_offset.first, program.structs); // size of member
 							function_ops.push_back(f_op);
 						}
 					}
@@ -583,8 +577,8 @@ Program parse_tokens(std::vector<Token> tokens)
 						else if (sizeof_type(f_op.str_operand) == 8)
 							f_op.mode = MODE_64BIT;
 
-						f_op.type = OP_READ_VAR;
-						f_op.int_operand = var_offsets.at(f_op.str_operand).second;
+						f_op.type = OP_READ_PTR;
+						f_op.int_operand = sizeof_type(f_op.str_operand, program.structs);
 						function_ops.push_back(f_op);
 					}
 					// if reading value of struct member
@@ -600,11 +594,7 @@ Program parse_tokens(std::vector<Token> tokens)
 							f_op.type = OP_READ_PTR_STRUCT_MEMBER;
 
 							if (program.structs.count(member_type_offset.first.base_type))
-							{
-								// sizeof struct
-								f_op.int_operand_2 = program.structs.at(member_type_offset.first.base_type).size;
 								f_op.mode = MODE_STRUCT;
-							}
 							// 8bit values
 							else if (sizeof_type(member_type_offset.first, program.structs) == 1)
 								f_op.mode = MODE_8BIT;
@@ -613,6 +603,7 @@ Program parse_tokens(std::vector<Token> tokens)
 								f_op.mode = MODE_64BIT;
 
 							f_op.int_operand = member_type_offset.second; // relative offset of member in pointer
+							f_op.int_operand_2 = sizeof_type(member_type_offset.first, program.structs);
 							function_ops.push_back(f_op);
 						}
 						// if reading variable member
@@ -630,6 +621,7 @@ Program parse_tokens(std::vector<Token> tokens)
 
 							f_op.type = OP_READ_VAR_STRUCT_MEMBER;
 							f_op.int_operand = member_type_offset.second; // offset to where member is located
+							f_op.int_operand_2 = sizeof_type(member_type_offset.first, program.structs);
 							function_ops.push_back(f_op);
 						}
 					}

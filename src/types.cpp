@@ -53,12 +53,6 @@ std::pair<LCPType, int> struct_member_offset(Op op, std::map<std::string, Struct
 	
 	if (structs.count(type_name))
 	{
-		if (split_member_path.size() == 1)
-		{
-			print_error_at_loc(op.loc, "member name wasn't provided in the 'set pointer member' intrinsic");
-			exit(1);
-		}
-
 		std::map<std::string, std::pair<LCPType, int>> struct_members = structs.at(type_name).members;
 		int offset = 0; // set offset to start of variable
 		unsigned long int current_member_idx = 1;
@@ -87,6 +81,7 @@ std::pair<LCPType, int> struct_member_offset(Op op, std::map<std::string, Struct
 				break;
 			}
 		}
+		return {member_type, offset};
 	}
 	print_error_at_loc(op.loc, "compiler error: non-existant struct type was passed into the function struct_member_offset() when this function checks for the ");
 	exit(1);

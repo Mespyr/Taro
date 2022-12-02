@@ -2,7 +2,7 @@
 
 void compile_to_asm(Program program, std::string output_filename)
 {
-	static_assert(OP_COUNT == 47, "unhandled op types in compile_to_asm()");
+	static_assert(OP_COUNT == 54, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
 
@@ -290,19 +290,6 @@ void compile_to_asm(Program program, std::string output_filename)
 					outfile.writeln("\tmov [rax], rcx");
 				}
 			}
-			else if (op.type == OP_READ_VAR)
-			{
-				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in compile_to_asm()");
-				outfile.writeln("\t; OP_READ_VAR " + op.str_operand + " offset:" + std::to_string(op.int_operand));
-				outfile.writeln("\tmov rax, [ret_stack_rsp]");
-				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
-				outfile.writeln("\txor rbx, rbx");
-				if (op.mode == MODE_8BIT)
-					outfile.writeln("\tmov bl, [rax]");
-				else if (op.mode == MODE_64BIT)
-					outfile.writeln("\tmov rbx, [rax]");
-				outfile.writeln("\tpush rbx");
-			}
 			else if (op.type == OP_SET_VAR_STRUCT_MEMBER)
 			{
 				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in compile_to_asm()");
@@ -327,10 +314,23 @@ void compile_to_asm(Program program, std::string output_filename)
 					}
 				}
 			}
+			else if (op.type == OP_READ_VAR)
+			{
+				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in compile_to_asm()");
+				outfile.writeln("\t; OP_READ_VAR " + op.str_operand + " offset:" + std::to_string(op.int_operand));
+				outfile.writeln("\tmov rax, [ret_stack_rsp]");
+				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
+				outfile.writeln("\txor rbx, rbx");
+				if (op.mode == MODE_8BIT)
+					outfile.writeln("\tmov bl, [rax]");
+				else if (op.mode == MODE_64BIT)
+					outfile.writeln("\tmov rbx, [rax]");
+				outfile.writeln("\tpush rbx");
+			}
 			else if (op.type == OP_READ_VAR_STRUCT_MEMBER)
 			{
 				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in compile_to_asm()");
-				outfile.writeln("\t; OP_READ_VAR_STRUCT_MEMBER " + op.str_operand + " offset:" + std::to_string(op.int_operand));
+				outfile.writeln("\t; OP_READ_VAR_STRUCT_MEMBER " + op.str_operand + " offset:" + std::to_string(op.int_operand) + " size:" + std::to_string(op.int_operand_2));
 				outfile.writeln("\tmov rax, [ret_stack_rsp]");
 				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
 				if (op.mode == MODE_STRUCT)
@@ -351,6 +351,107 @@ void compile_to_asm(Program program, std::string output_filename)
 				outfile.writeln("\tmov rax, [ret_stack_rsp]");
 				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
 				outfile.writeln("\tpush rax");
+			}
+			// variable pointers
+			else if (op.type == OP_SET_PTR)
+			{
+				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in compile_to_asm()");
+				outfile.writeln("\t; OP_SET_PTR " + op.str_operand + " size:" + std::to_string(op.int_operand));
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpop rbx");
+				if (op.is_prim_type_mode())
+				{
+					if (op.mode == MODE_8BIT)
+						outfile.writeln("\tmov [rax], bl");
+					else if (op.mode == MODE_64BIT)
+						outfile.writeln("\tmov [rax], rbx");
+				}
+				else if (op.mode == MODE_STRUCT)
+				{
+					// get pointer to struct
+					outfile.writeln("\tmov rcx, [rbx]");
+					outfile.writeln("\tmov [rax], rcx");
+					for (int i = 8; i < op.int_operand; i+=8)
+					{
+						outfile.writeln("\tadd rax, 8");
+						outfile.writeln("\tadd rbx, 8");
+						outfile.writeln("\tmov rcx, [rbx]");
+						outfile.writeln("\tmov [rax], rcx");
+					}
+				}
+			}
+			else if (op.type == OP_SET_PTR_FROM_OTHER_PTR)
+			{
+				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in compile_to_asm()");
+				// rax is the pointer to the variable
+				// rbx is the pointer we are setting the ptr to
+				outfile.writeln("\t; OP_SET_PTR_FROM_OTHER_PTR " + op.str_operand + " size:" + std::to_string(op.int_operand));
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tpop rbx");
+				if (op.mode == MODE_8BIT)
+				{
+					outfile.writeln("\tmov cl, [rbx]");
+					outfile.writeln("\tmov [rax], cl");
+				}
+				else if (op.mode == MODE_64BIT)
+				{
+					outfile.writeln("\tmov rcx, [rbx]");
+					outfile.writeln("\tmov [rax], rcx");
+				}
+			}
+			else if (op.type == OP_SET_PTR_STRUCT_MEMBER)
+			{
+				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in compile_to_asm()");
+				outfile.writeln("\t; OP_SET_PTR_STRUCT_MEMBER " + op.str_operand + " relative-offset:" + std::to_string(op.int_operand) + " size:" + std::to_string(op.int_operand_2));
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
+				outfile.writeln("\tpop rbx");
+				if (op.mode == MODE_8BIT)
+					outfile.writeln("\tmov [rax], bl");
+				else if (op.mode == MODE_64BIT)
+					outfile.writeln("\tmov [rax], rbx");
+				else if (op.mode == MODE_STRUCT)
+				{
+					outfile.writeln("\tmov rcx, [rbx]");
+					outfile.writeln("\tmov [rax], rcx");
+					for (int i = 8; i < op.int_operand_2; i+=8)
+					{
+						outfile.writeln("\tadd rax, 8");
+						outfile.writeln("\tadd rbx, 8");
+						outfile.writeln("\tmov rcx, [rbx]");
+						outfile.writeln("\tmov [rax], rcx");
+					}
+				}
+			}
+			else if (op.type == OP_READ_PTR)
+			{
+				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in compile_to_asm()");
+				outfile.writeln("\t; OP_READ_PTR");
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\txor rbx, rbx");
+				if (op.mode == MODE_8BIT)
+					outfile.writeln("\tmov bl, [rax]");
+				else if (op.mode == MODE_64BIT)
+					outfile.writeln("\tmov rbx, [rax]");
+				outfile.writeln("\tpush rbx");
+			}
+			else if (op.type == OP_READ_PTR_STRUCT_MEMBER)
+			{
+				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in compile_to_asm()");
+				outfile.writeln("\t; OP_READ_PTR_STRUCT_MEMBER relative-offset:" + std::to_string(op.int_operand) + " size:" + std::to_string(op.int_operand_2));
+				outfile.writeln("\tpop rax");
+				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
+				if (op.mode == MODE_STRUCT)
+					outfile.writeln("\tpush rax");
+				else
+				{
+					outfile.writeln("\txor rbx, rbx");
+					if (op.mode == MODE_8BIT)
+						outfile.writeln("\tmov bl, [rax]");
+					else if (op.mode == MODE_64BIT)
+						outfile.writeln("\tmov rbx, [rax]");
+					outfile.writeln("\tpush rbx");
+				}
 			}
 
 			// syscalls
