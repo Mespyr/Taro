@@ -1,13 +1,15 @@
-fun main()
-	0 1
-	loop:
-		# exit loop if number is greater than 1000
-		dup 10000 > cjmpet loop
+fun fib(i64) [i64]
+	i64 n @n
+	i64 i 0 @i
 
-		over over + # duplicate and add two numbers
-		dup dump    # print number
-		rot pop     # drop previous number	
-
+	0 1 loop:
+		&n &i > cjmpef loop
+		swp over +
+		&i 1 + @i
 		jmp loop
-	end pop pop
+	end pop
+end
+
+fun main()
+	100000000 fib dump
 end
