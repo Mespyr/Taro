@@ -37,4 +37,47 @@ It is still very unreadable though.
 	- [x] access members of structs pushed onto the stack
 	- [x] write and read values to pointers of primitive types
 - [ ] Arrays
+- [ ] Constants (const keyword)
 - [ ] write code to generate a [prime spiral](https://mathimages.swarthmore.edu/index.php/Prime_spiral_(Ulam_spiral)) also known as a Ulam spiral.
+
+#### Arrays Ideal Design
+```python
+struct String
+  i64 size
+  ^i8 data
+end
+
+struct Op
+  String value
+  i64 type
+end
+
+fun debug_ops(Op:array i64)
+  i64 idx 0 @idx
+  loop:
+    dup &idx <= cjmpet loop
+    over &idx arrayat # get Op at idx
+
+    &Op.value
+    dup &String.size
+    &String.data 1 1 call3 pop
+
+    &idx 1 + @idx
+    jmp loop
+  end
+end
+
+fun main()
+  Op:100 ops
+  ops 10 debug_ops
+end
+```
+Arrays are defined as the type + ':' + the size of the array, like so: `i64:3` defines an array of three 64-bit integers.
+
+### Constants Ideal Design
+```python
+const NUM 12 end
+const NUM_DOUBLED NUM 2 * end
+```
+const keyword defines the const, then the name of it, then the calculations to get the final value, then end.
+This can be placed anywhere as it is calculated at compile time, and can be used to define array sizes as well as push values onto the stack.
