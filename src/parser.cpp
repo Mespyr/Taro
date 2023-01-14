@@ -465,11 +465,22 @@ Program parse_tokens(std::vector<Token> tokens)
 						function_ops.push_back(f_op);
 					}
 					// if setting value of pointer
-					else if (program.structs.count(f_op.str_operand) || is_prim_type(f_op.str_operand))
+					else if (program.structs.count(f_op.str_operand) || is_prim_type(f_op.str_operand) || is_pointer(f_op.str_operand))
 					{
 						static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in parse_tokens()");
 						// if setting primitive type
-						if (is_prim_type(f_op.str_operand) || is_pointer(f_op.str_operand))
+						if (is_pointer(f_op.str_operand))
+						{
+							std::pair<std::string, int> type_pair = parse_type_str(f_op.str_operand);
+							if (program.structs.count(type_pair.first) || is_prim_type(type_pair.first))
+								f_op.mode = MODE_64BIT;
+							else
+							{
+								print_error_at_loc(f_op.loc, "unknown type or variable name '" + f_op.str_operand + "'");
+								exit(1);
+							}
+						}
+						else if (is_prim_type(f_op.str_operand))
 						{
 							// 8bit values
 							if (sizeof_type(f_op.str_operand) == 1)
@@ -503,8 +514,9 @@ Program parse_tokens(std::vector<Token> tokens)
 						{
 							std::pair<LCPType, int> member_type_offset = struct_member_offset(f_op, program.structs);
 							f_op.type = OP_SET_PTR_STRUCT_MEMBER;
-
-							if (program.structs.count(member_type_offset.first.base_type))
+							if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
+								f_op.mode = MODE_64BIT;
+							else if (program.structs.count(member_type_offset.first.base_type))
 								f_op.mode = MODE_STRUCT;
 							// 8bit values
 							else if (sizeof_type(member_type_offset.first, program.structs) == 1)
@@ -521,7 +533,9 @@ Program parse_tokens(std::vector<Token> tokens)
 						else
 						{
 							std::pair<LCPType, int> member_type_offset = variable_member_offset(f_op, var_offsets, program.structs);
-							if (program.structs.count(member_type_offset.first.base_type))
+							if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
+								f_op.mode = MODE_64BIT;
+							else if (program.structs.count(member_type_offset.first.base_type))
 								f_op.mode = MODE_STRUCT;
 							// 8bit values
 							else if (sizeof_type(member_type_offset.first, program.structs) == 1)
@@ -593,7 +607,9 @@ Program parse_tokens(std::vector<Token> tokens)
 							std::pair<LCPType, int> member_type_offset = struct_member_offset(f_op, program.structs);
 							f_op.type = OP_READ_PTR_STRUCT_MEMBER;
 
-							if (program.structs.count(member_type_offset.first.base_type))
+							if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
+								f_op.mode = MODE_64BIT;
+							else if (program.structs.count(member_type_offset.first.base_type))
 								f_op.mode = MODE_STRUCT;
 							// 8bit values
 							else if (sizeof_type(member_type_offset.first, program.structs) == 1)
@@ -610,7 +626,9 @@ Program parse_tokens(std::vector<Token> tokens)
 						else
 						{
 							std::pair<LCPType, int> member_type_offset = variable_member_offset(f_op, var_offsets, program.structs);
-							if (program.structs.count(member_type_offset.first.base_type))
+							if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
+								f_op.mode = MODE_64BIT;
+							else if (program.structs.count(member_type_offset.first.base_type))
 								f_op.mode = MODE_STRUCT;
 							// 8bit values
 							else if (sizeof_type(member_type_offset.first, program.structs) == 1)
@@ -702,11 +720,17 @@ Program parse_tokens(std::vector<Token> tokens)
 				std::pair<std::string, int> type_info = parse_type_str(type_tok.value);
 				std::string base_type = type_info.first;
 				int pointer_count = type_info.second;
-
+			
+				// if type is an existing type (primitive or struct)
+				// or if the type is a pointer to the currently defined type
 				if (!is_prim_type(base_type) && !program.structs.count(base_type))
 				{
-					print_error_at_loc(type_tok.loc, "unknown type '" + type_tok.value + "' found while parsing struct definition");
-					exit(1);
+					if (base_type == struct_name && pointer_count > 0);
+					else
+					{
+						print_error_at_loc(type_tok.loc, "unknown type '" + type_tok.value + "' found while parsing struct definition");
+						exit(1);
+					}
 				}
 				// get member name
 				i++;

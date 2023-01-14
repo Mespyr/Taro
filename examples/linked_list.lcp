@@ -1,0 +1,37 @@
+struct Node
+	i64 value
+	^Node next
+end
+
+fun print_list_elems(^Node i64)
+	i64 num_elements @num_elements
+	0 loop:
+		dup &num_elements = cjmpet loop
+		swp dup &Node.value dump # print value of current node
+		&Node.next # go to next node
+		swp 1 +
+		jmp loop
+	end pop pop
+end
+
+fun main()
+	# initialize (sort of) a list
+	Node n1
+	Node n2
+	Node n3
+	Node n4
+	Node n5
+
+	n2 @n1.next
+	n3 @n2.next
+	n4 @n3.next
+	n5 @n4.next
+
+	12 @n1.value
+	13 @n2.value
+	14 @n3.value
+	15 @n4.value
+	34 35 + @n5.value
+
+	n1 5 print_list_elems
+end
