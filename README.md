@@ -38,6 +38,7 @@ It is still very unreadable though.
 	- [x] write and read values to pointers of primitive types
 - [ ] Arrays
 - [ ] Constants (const keyword)
+- [ ] Tuples (sorta?).
 - [ ] write code to generate a [prime spiral](https://mathimages.swarthmore.edu/index.php/Prime_spiral_(Ulam_spiral)) also known as a Ulam spiral.
 
 #### Arrays Ideal Design
@@ -82,3 +83,13 @@ fun main()
   Op:OP_ARRAY_MAX ops
 end
 ```
+
+### Tuples Ideal Design
+Tuples are just sections of data on the stack, acting as one item
+You can pass it into functions and create it on the fly.
+```python
+
+```
+
+
+
