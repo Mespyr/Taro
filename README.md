@@ -88,8 +88,24 @@ end
 Tuples are just sections of data on the stack, acting as one item
 You can pass it into functions and create it on the fly.
 ```python
+fun add3({i64 i64 i64}) [i64]
+  <-> # expand tuple into 3 ints
+  + +
+end
 
+fun main()
+  1 2 3
+  {3} add3 dump
+end
 ```
 
+You can also have multiple different types in the tuple
+```python
+fun print({i64 ^i8})
+  <-> 1 1 call3 pop
+end
 
-
+fun main()
+  "Hello" {2} print
+end
+```
