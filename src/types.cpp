@@ -162,7 +162,7 @@ int sizeof_type(LCPType type, std::map<std::string, Struct> structs)
 		if (type.base_type == prim_type_name(TYPE_I8)) return 1;
 		if (type.base_type == prim_type_name(TYPE_I64)) return 8;
 	}
-	return structs.at(type.base_type).size;	
+	return structs.at(type.base_type).size;
 }
 int sizeof_type(std::string type, std::map<std::string, Struct> structs)
 {
@@ -177,8 +177,7 @@ int sizeof_type(std::string type, std::map<std::string, Struct> structs)
 		if (t.first == prim_type_name(TYPE_I8)) return 1;
 		if (t.first == prim_type_name(TYPE_I64)) return 8;
 	}
-	return structs.at(t.first).size;	
-	return 0;
+	return structs.at(t.first).size;
 }
 
 bool types_equal(LCPType a, LCPType b)

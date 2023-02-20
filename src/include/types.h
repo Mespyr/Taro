@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _LCP_TYPES_H_
-#define _LCP_TYPES_H_
 
 #include <string>
 #include <vector>
@@ -73,5 +71,3 @@ bool is_prim_type_int(std::string t);
 
 bool is_pointer(LCPType t);
 bool is_pointer(std::string t);
-
-#endif

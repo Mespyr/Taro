@@ -10,6 +10,7 @@ bool is_legal_name(Token token_name)
 	if (token_name.value.find('@') != std::string::npos) return false;
 	if (token_name.value.find('&') != std::string::npos) return false;
 	if (token_name.value.find('.') != std::string::npos) return false;
+	if (token_name.value.front() == '<' || token_name.value.back() == '>') return false;
 	// if token is builtin word or type name
 	if (is_builtin_word(token_name.value)) return false;
 	if (is_prim_type(token_name.value)) return false;
@@ -57,7 +58,7 @@ std::string add_escapes_to_string(std::string str)
 
 Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pair<LCPType, int>> var_offsets)
 {
-	static_assert(OP_COUNT == 54, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 55, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -138,6 +139,17 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 		else if (tok.value == "call6")
 			return Op(tok.loc, OP_SYSCALL6);
 		// other
+		// OP_PUSH_TYPE_INST
+		else if (tok.value.front() == '<' && tok.value.back() == '>')
+		{
+			std::string push_struct_name = parse_type_str(tok.value.substr(1, tok.value.size() - 2)).first;
+			if (!program.structs.count(push_struct_name) && !is_prim_type(push_struct_name))
+			{
+				print_error_at_loc(tok.loc, "unknown type in 'push type instance' (<...>), '" + push_struct_name + "'");
+				exit(1);
+			}
+			return Op(tok.loc, OP_PUSH_TYPE_INST, push_struct_name);
+		}
 		// OP_FUNCTION_CALL
 		else if (program.functions.count(tok.value))
 			return Op(tok.loc, OP_FUNCTION_CALL, tok.value);
@@ -172,7 +184,7 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 			}
 			return Op(tok.loc, OP_READ, tok.value.substr(1));
 		}
-		// TODO: remember to support prim types in OP_DEFINE_VAR
+
 		// OP_DEFINE_VAR
 		else if (is_prim_type(tok.value) || program.structs.count(tok.value) || is_pointer(tok.value))
 			return Op(tok.loc, OP_DEFINE_VAR, tok.value);
@@ -197,7 +209,7 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 
 std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels)
 {
-	static_assert(OP_COUNT == 54, "unhandled op types in link_ops()");
+	static_assert(OP_COUNT == 55, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++)
 	{
@@ -226,7 +238,7 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<in
 
 Program parse_tokens(std::vector<Token> tokens)
 {
-	static_assert(OP_COUNT == 54, "unhandled op types in parse_tokens()");
+	static_assert(OP_COUNT == 55, "unhandled op types in parse_tokens()");
 
 	Program program;
 	long unsigned int i = 0;
@@ -384,7 +396,7 @@ Program parse_tokens(std::vector<Token> tokens)
 						f_op.type = OP_LABEL_END;
 						f_op.int_operand = label_pair.second;
 						f_op.str_operand = ended_label;
-						function_ops.push_back(f_op);	
+						function_ops.push_back(f_op);
 					}
 				}
 				else if (f_op.type == OP_LABEL)
@@ -436,11 +448,7 @@ Program parse_tokens(std::vector<Token> tokens)
 						{LCPType(var_name_tok.loc, f_op.str_operand), offset}
 					});
 
-					if (is_pointer(f_op.str_operand))
-						offset += 8;
-					else if (is_prim_type(f_op.str_operand))
-						offset += sizeof_type(f_op.str_operand);
-					else offset += program.structs.at(f_op.str_operand).size;
+					offset += sizeof_type(f_op.str_operand, program.structs);
 				}
 				else if (f_op.type == OP_SET)
 				{
@@ -464,11 +472,10 @@ Program parse_tokens(std::vector<Token> tokens)
 						f_op.int_operand_2 = sizeof_type(type, program.structs); // size of type (amount of data needed to move it around)
 						function_ops.push_back(f_op);
 					}
-					// if setting value of pointer
 					else if (program.structs.count(f_op.str_operand) || is_prim_type(f_op.str_operand) || is_pointer(f_op.str_operand))
 					{
 						static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in parse_tokens()");
-						// if setting primitive type
+						// if setting value of pointer
 						if (is_pointer(f_op.str_operand))
 						{
 							std::pair<std::string, int> type_pair = parse_type_str(f_op.str_operand);
@@ -480,6 +487,7 @@ Program parse_tokens(std::vector<Token> tokens)
 								exit(1);
 							}
 						}
+						// if setting primitive type
 						else if (is_prim_type(f_op.str_operand))
 						{
 							// 8bit values
@@ -657,8 +665,13 @@ Program parse_tokens(std::vector<Token> tokens)
 					f_op.int_operand = var_offsets.at(f_op.str_operand).second;
 					function_ops.push_back(f_op);
 				}
+				else if (f_op.type == OP_PUSH_TYPE_INST)
+				{
+					f_op.int_operand = offset;
+					offset += sizeof_type(f_op.str_operand, program.structs);
+					function_ops.push_back(f_op);
+				}
 				else function_ops.push_back(f_op);
-
 				i++;
 			}
 			if (found_function_end)
@@ -775,6 +788,5 @@ Program parse_tokens(std::vector<Token> tokens)
 
 		i++;
 	}
-
 	return program;
 }

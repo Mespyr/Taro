@@ -1,5 +1,4 @@
-#ifndef _LCP_TOKEN_H_
-#define _LCP_TOKEN_H_
+#pragma once
 
 #include <string>
 #include "location.h"
@@ -25,5 +24,3 @@ public:
 	TokenType type;
 	Location loc;
 };
-
-#endif

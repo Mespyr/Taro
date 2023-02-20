@@ -1,5 +1,4 @@
-#ifndef _LCP_PARSER_H_
-#define _LCP_PARSER_H_
+#pragma once
 
 #include <vector>
 #include <assert.h>
@@ -15,5 +14,3 @@ std::string add_escapes_to_string(std::string str);
 Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pair<LCPType, int>> var_offsets = {});
 std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels);
 Program parse_tokens(std::vector<Token> tokens);
-
-#endif

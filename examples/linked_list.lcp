@@ -3,7 +3,19 @@ struct Node
 	^Node next
 end
 
-fun print_list_elems(^Node i64)
+fun Node::set_value(i64 ^Node) [^Node]
+	swp over @Node.value
+end
+
+fun Node::set_next(^Node ^Node) [^Node]
+	# first: next
+	# second: head
+	# returns next node
+	over swp @Node.next
+end
+
+fun Node::print_list_elems(i64 ^Node)
+	swp
 	i64 num_elements @num_elements
 	0 loop:
 		dup &num_elements = cjmpet loop
@@ -15,23 +27,19 @@ fun print_list_elems(^Node i64)
 end
 
 fun main()
-	# initialize (sort of) a list
-	Node n1
-	Node n2
-	Node n3
-	Node n4
-	Node n5
+	Node head
+	12 head Node::set_value pop
 
-	n2 @n1.next
-	n3 @n2.next
-	n4 @n3.next
-	n5 @n4.next
+	1 <Node> Node::set_value
+	head Node::set_next
+	2 <Node> Node::set_value
+	swp Node::set_next
+	3 <Node> Node::set_value
+	swp Node::set_next
+	5 <Node> Node::set_value
+	swp Node::set_next
+	7 <Node> Node::set_value
+	swp Node::set_next pop
 
-	12 @n1.value
-	13 @n2.value
-	14 @n3.value
-	15 @n4.value
-	34 35 + @n5.value
-
-	n1 5 print_list_elems
+	6 head Node::print_list_elems
 end

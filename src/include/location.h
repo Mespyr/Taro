@@ -1,5 +1,4 @@
-#ifndef _LCP_LOCATION_H_
-#define _LCP_LOCATION_H_
+#pragma once
 
 #include <string>
 
@@ -17,5 +16,3 @@ public:
 	long unsigned int line_number, column_number_start, column_number_end;
 	std::string line, file_location;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _LCP_OP_H_
-#define _LCP_OP_H_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -83,6 +82,7 @@ enum OpType
 	// other
 	OP_PUSH_INT,
 	OP_PUSH_STR,
+	OP_PUSH_TYPE_INST,
 	OP_FUNCTION_CALL,
 	// count | must always be last
 	OP_COUNT
@@ -120,5 +120,3 @@ public:
 };
 
 bool is_builtin_word(std::string word);
-
-#endif

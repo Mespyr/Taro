@@ -1,5 +1,4 @@
-#ifndef _LCP_PROGRAM_H_
-#define _LCP_PROGRAM_H_
+#pragma once
 
 #include <vector> 
 #include <string>
@@ -31,5 +30,3 @@ public:
 	std::map<std::string, Function> functions;
 	std::map<std::string, Struct> structs;
 };
-
-#endif

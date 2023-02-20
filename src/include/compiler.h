@@ -1,5 +1,4 @@
-#ifndef _LCP_COMPILER_H_
-#define _LCP_COMPILER_H_
+#pragma once
 
 #include <string>
 #include <assert.h>
@@ -9,5 +8,3 @@
 #include "file.h"
 
 void compile_to_asm(Program program, std::string output_filename);
-
-#endif

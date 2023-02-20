@@ -1,5 +1,4 @@
-#ifndef _LCP_FILE_H_
-#define _LCP_FILE_H_
+#pragma once
 
 #include <fstream>
 #include <string>
@@ -25,5 +24,3 @@ public:
 private:
 	std::fstream file;
 };
-
-#endif

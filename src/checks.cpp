@@ -36,7 +36,7 @@ bool compare_type_stacks(std::vector<LCPType> type_stack_1, std::vector<LCPType>
 
 void type_check_program(Program &program)
 {
-	static_assert(OP_COUNT == 54, "unhandled op types in type_check_program()");
+	static_assert(OP_COUNT == 55, "unhandled op types in type_check_program()");
 	static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++)
@@ -908,6 +908,12 @@ void type_check_program(Program &program)
 			{
 				type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I64), 0));
 				type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I8), 1)); // pointer to array of ints (string)
+			}
+			else if (op.type == OP_PUSH_TYPE_INST)
+			{
+				LCPType t(op.loc, op.str_operand);
+				t.ptr_to_trace++;
+				type_stack.push_back(t);
 			}
 			else if (op.type == OP_FUNCTION_CALL)
 			{

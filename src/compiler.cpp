@@ -2,7 +2,7 @@
 
 void compile_to_asm(Program program, std::string output_filename)
 {
-	static_assert(OP_COUNT == 54, "unhandled op types in compile_to_asm()");
+	static_assert(OP_COUNT == 55, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
 
@@ -591,6 +591,13 @@ void compile_to_asm(Program program, std::string output_filename)
 				outfile.writeln("\tmov rax, " + std::to_string(op.str_operand.length()));
 				outfile.writeln("\tpush rax");
 				outfile.writeln("\tpush str_" + std::to_string(strings.size()-1));
+			}
+			else if (op.type == OP_PUSH_TYPE_INST)
+			{
+				outfile.writeln("\t; OP_PUSH_STRUCT_INST offset:" + std::to_string(op.int_operand));
+				outfile.writeln("\tmov rax, [ret_stack_rsp]");
+				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
+				outfile.writeln("\tpush rax");
 			}
 			else if (op.type == OP_FUNCTION_CALL)
             {
