@@ -7,6 +7,19 @@
 #include "location.h"
 #include "types.h"
 
+// stores constant values
+class Const
+{
+public:
+	Const(Location loc, long long value) :
+		loc(loc),
+		value(value)
+	{}
+
+	Location loc;
+	long long value;
+};
+
 // stores ops for a function
 class Function
 {
@@ -28,5 +41,6 @@ class Program
 {
 public:
 	std::map<std::string, Function> functions;
+	std::map<std::string, Const> consts;
 	std::map<std::string, Struct> structs;
 };

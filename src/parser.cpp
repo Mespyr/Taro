@@ -1,4 +1,5 @@
 #include "include/parser.h"
+#include "include/eval.h"
 
 bool is_legal_name(Token token_name)
 {
@@ -58,7 +59,7 @@ std::string add_escapes_to_string(std::string str)
 
 Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pair<LCPType, int>> var_offsets)
 {
-	static_assert(OP_COUNT == 55, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 56, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -106,8 +107,12 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 		// keywords
 		else if (tok.value == "fun")
 			return Op(tok.loc, OP_FUN);
+		else if (tok.value == "const")
+			return Op(tok.loc, OP_CONST);
 		else if (tok.value == "end")
 			return Op(tok.loc, OP_END);
+		else if (tok.value == "struct")
+			return Op(tok.loc, OP_STRUCT);
 		else if (tok.value == "jmp")
 			return Op(tok.loc, OP_JMP);
 		else if (tok.value == "cjmpf")
@@ -120,9 +125,6 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 			return Op(tok.loc, OP_CJMPEF);
 		else if (tok.value == "cjmpet")
 			return Op(tok.loc, OP_CJMPET);
-		// structs
-		else if (tok.value == "struct")
-			return Op(tok.loc, OP_STRUCT);
 		// syscalls
 		else if (tok.value == "call0")
 			return Op(tok.loc, OP_SYSCALL0);
@@ -148,11 +150,13 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 				print_error_at_loc(tok.loc, "unknown type in 'push type instance' (<...>), '" + push_struct_name + "'");
 				exit(1);
 			}
-			return Op(tok.loc, OP_PUSH_TYPE_INST, push_struct_name);
+			return Op(tok.loc, OP_PUSH_TYPE_INSTANCE, push_struct_name);
 		}
 		// OP_FUNCTION_CALL
 		else if (program.functions.count(tok.value))
 			return Op(tok.loc, OP_FUNCTION_CALL, tok.value);
+		else if (program.consts.count(tok.value))
+			return Op(tok.loc, OP_PUSH_INT, program.consts.at(tok.value).value);
 		// OP_LABEL
 		else if (tok.value.back() == ':')
 		{
@@ -209,7 +213,7 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 
 std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels)
 {
-	static_assert(OP_COUNT == 55, "unhandled op types in link_ops()");
+	static_assert(OP_COUNT == 56, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++)
 	{
@@ -238,7 +242,7 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<in
 
 Program parse_tokens(std::vector<Token> tokens)
 {
-	static_assert(OP_COUNT == 55, "unhandled op types in parse_tokens()");
+	static_assert(OP_COUNT == 56, "unhandled op types in parse_tokens()");
 
 	Program program;
 	long unsigned int i = 0;
@@ -270,6 +274,11 @@ Program parse_tokens(std::vector<Token> tokens)
 			else if (program.functions.count(function_name))
 			{
 				print_error_at_loc(name_token.loc, "function '" + function_name + "' already exists");
+				exit(1);
+			}
+			else if (program.structs.count(function_name))
+			{
+				print_error_at_loc(name_token.loc, "struct '" + function_name + "' already exists");
 				exit(1);
 			}
 			i++;
@@ -367,12 +376,12 @@ Program parse_tokens(std::vector<Token> tokens)
 				
 				if (f_op.type == OP_FUN)
 				{
-					print_error_at_loc(f_op.loc, "unexpected 'fun' keyword found while parsing. functions cannot be defined inside other functions");
+					print_error_at_loc(f_op.loc, "unexpected 'fun' keyword found inside function definition");
 					exit(1);
 				}
 				else if (f_op.type == OP_STRUCT)
 				{
-					print_error_at_loc(f_op.loc, "unexpected 'struct' keyword found while parsing. Structs cannot be defined inside functions");
+					print_error_at_loc(f_op.loc, "unexpected 'struct' keyword found inside function definition");
 					exit(1);
 				}
 				else if (f_op.type == OP_END)
@@ -665,7 +674,7 @@ Program parse_tokens(std::vector<Token> tokens)
 					f_op.int_operand = var_offsets.at(f_op.str_operand).second;
 					function_ops.push_back(f_op);
 				}
-				else if (f_op.type == OP_PUSH_TYPE_INST)
+				else if (f_op.type == OP_PUSH_TYPE_INSTANCE)
 				{
 					f_op.int_operand = offset;
 					offset += sizeof_type(f_op.str_operand, program.structs);
@@ -779,6 +788,48 @@ Program parse_tokens(std::vector<Token> tokens)
 			program.structs.insert({struct_name, 
 				Struct(current_op.loc, members, (offset + 7) / 8 * 8)
 			});
+		}
+		else if (current_op.type == OP_CONST)
+		{
+			i++;
+			// check if function name is in the token stream
+			if (i >= tokens.size())
+			{
+				print_error_at_loc(current_op.loc, "unexpected EOF found while parsing function definition");
+				exit(1);
+			}
+		
+			// check function name
+			Token name_token = tokens.at(i);
+			std::string const_name = name_token.value;
+
+			if (!is_legal_name(name_token))
+			{
+				print_error_at_loc(name_token.loc, "illegal name for function");
+				exit(1);
+			}
+			else if (program.functions.count(const_name))
+			{
+				print_error_at_loc(name_token.loc, "function '" + const_name + "' already exists");
+				exit(1);
+			}
+			else if (program.structs.count(const_name))
+			{
+				print_error_at_loc(name_token.loc, "struct '" + const_name + "' already exists");
+				exit(1);
+			}
+			i++;
+
+			// check if eof before parsing expression
+			if (i >= tokens.size())
+			{
+				print_error_at_loc(current_op.loc, "unexpected EOF found while parsing function definition");
+				exit(1);
+			}
+
+			ConstExpr eval = eval_const_expression(program, tokens, i, name_token.loc);
+			i = eval.i;
+			program.consts.insert({const_name, Const(name_token.loc, eval.value)});
 		}
 		else
 		{

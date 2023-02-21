@@ -14,14 +14,14 @@ bool Op::is_prim_type_mode()
 
 bool is_builtin_word(std::string word)
 {
-	static_assert(OP_COUNT == 55, "unhandled op types in type_check_program()");
+	static_assert(OP_COUNT == 56, "unhandled op types in type_check_program()");
 	std::vector<std::string> builtin_words = {
 		"dump",
 		"+", "-", "*", "/",
 		"=", ">", "<", ">=", "<=", "!=", "not", "and", "or",
 		"pop", "dup", "swp", "rot", "over",
 		"call0", "call1", "call2", "call3", "call4", "call5", "call6",
-		"fun", "end", "struct", "jmp", "cjmpt", "cjmpf", "jmpe", "cjmpet", "cjmpef"
+		"fun", "const", "end", "struct", "jmp", "cjmpt", "cjmpf", "jmpe", "cjmpet", "cjmpef"
 	};
 
 	for (std::string w : builtin_words)

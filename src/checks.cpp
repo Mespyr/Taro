@@ -36,7 +36,7 @@ bool compare_type_stacks(std::vector<LCPType> type_stack_1, std::vector<LCPType>
 
 void type_check_program(Program &program)
 {
-	static_assert(OP_COUNT == 55, "unhandled op types in type_check_program()");
+	static_assert(OP_COUNT == 56, "unhandled op types in type_check_program()");
 	static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++)
@@ -909,7 +909,7 @@ void type_check_program(Program &program)
 				type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I64), 0));
 				type_stack.push_back(LCPType(op.loc, prim_type_name(TYPE_I8), 1)); // pointer to array of ints (string)
 			}
-			else if (op.type == OP_PUSH_TYPE_INST)
+			else if (op.type == OP_PUSH_TYPE_INSTANCE)
 			{
 				LCPType t(op.loc, op.str_operand);
 				t.ptr_to_trace++;
@@ -954,7 +954,7 @@ void type_check_program(Program &program)
 			}
 
 			// unreachable
-			else if (op.type == OP_FUN || op.type == OP_END || op.type == OP_COUNT || op.type == OP_STRUCT || op.type == OP_DEFINE_VAR)
+			else if (op.type == OP_FUN || op.type == OP_END || op.type == OP_COUNT || op.type == OP_STRUCT || op.type == OP_DEFINE_VAR || op.type == OP_CONST)
 			{
 				print_error_at_loc(op.loc, "unreachable: op should be handled in the parsing step. This is probably a bug.");
 				exit(1);

@@ -2,7 +2,7 @@
 
 void compile_to_asm(Program program, std::string output_filename)
 {
-	static_assert(OP_COUNT == 55, "unhandled op types in compile_to_asm()");
+	static_assert(OP_COUNT == 56, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
 
@@ -48,10 +48,10 @@ void compile_to_asm(Program program, std::string output_filename)
 	std::vector<std::string> strings;
 
 	// compile functions
-    for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++)
-    {
+	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++)
+	{
 		// setup function
-        Function function = fn_key->second;
+		Function function = fn_key->second;
 		outfile.writeln("; function " + fn_key->first);
 		outfile.writeln("func_addr_" + std::to_string(function.addr) + ":");
 		outfile.writeln("\tsub rsp, " + std::to_string(function.memory_capacity));
@@ -580,7 +580,7 @@ void compile_to_asm(Program program, std::string output_filename)
 			// other
 			else if (op.type == OP_PUSH_INT)
 			{
-                outfile.writeln("\t; OP_PUSH_INT " + std::to_string(op.int_operand));
+				outfile.writeln("\t; OP_PUSH_INT " + std::to_string(op.int_operand));
 				outfile.writeln("\tmov rax, " + std::to_string(op.int_operand));
 				outfile.writeln("\tpush rax");
 			}
@@ -592,22 +592,22 @@ void compile_to_asm(Program program, std::string output_filename)
 				outfile.writeln("\tpush rax");
 				outfile.writeln("\tpush str_" + std::to_string(strings.size()-1));
 			}
-			else if (op.type == OP_PUSH_TYPE_INST)
+			else if (op.type == OP_PUSH_TYPE_INSTANCE)
 			{
-				outfile.writeln("\t; OP_PUSH_STRUCT_INST offset:" + std::to_string(op.int_operand));
+				outfile.writeln("\t; OP_PUSH_TYPE_INSTANCE offset:" + std::to_string(op.int_operand));
 				outfile.writeln("\tmov rax, [ret_stack_rsp]");
 				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
 				outfile.writeln("\tpush rax");
 			}
 			else if (op.type == OP_FUNCTION_CALL)
-            {
-                outfile.writeln("\t; OP_FUNCTION_CALL " + op.str_operand);
-                outfile.writeln("\tmov rax, rsp");
-                outfile.writeln("\tmov rsp, [ret_stack_rsp]");
-                outfile.writeln("\tcall func_addr_" + std::to_string(program.functions.at(op.str_operand).addr));
-                outfile.writeln("\tmov [ret_stack_rsp], rsp");
-                outfile.writeln("\tmov rsp, rax");
-            }
+			{
+				outfile.writeln("\t; OP_FUNCTION_CALL " + op.str_operand);
+				outfile.writeln("\tmov rax, rsp");
+				outfile.writeln("\tmov rsp, [ret_stack_rsp]");
+				outfile.writeln("\tcall func_addr_" + std::to_string(program.functions.at(op.str_operand).addr));
+				outfile.writeln("\tmov [ret_stack_rsp], rsp");
+				outfile.writeln("\tmov rsp, rax");
+			}
 		}
 
 		// end function

@@ -44,6 +44,7 @@ enum OpType
 	OP_FUN,
 	OP_END,
 	OP_STRUCT,
+	OP_CONST,
 	// variables
 	OP_DEFINE_VAR,
 	OP_SET,
@@ -82,7 +83,7 @@ enum OpType
 	// other
 	OP_PUSH_INT,
 	OP_PUSH_STR,
-	OP_PUSH_TYPE_INST,
+	OP_PUSH_TYPE_INSTANCE,
 	OP_FUNCTION_CALL,
 	// count | must always be last
 	OP_COUNT
