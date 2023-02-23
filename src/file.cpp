@@ -1,30 +1,25 @@
 #include "include/file.h"
 
-File::File(std::string filename, FILE_MODE mode)
-{
+File::File(std::string filename, FILE_MODE mode) {
 	if (mode == FILE_WRITE) 
 		file.open(filename, std::ios::out);
 	else file.open(filename, std::ios::in);
 }
 
-File::~File()
-{
+File::~File() {
 	file.close();
 }
 
-bool File::operator==(bool t)
-{
+bool File::operator==(bool t) {
 	return (bool) file == t;
 }
 
-void File::writeln(std::string buf)
-{
+void File::writeln(std::string buf) {
 	buf.push_back('\n');
 	file.write(buf.c_str(), buf.length());
 }
 
-std::string File::read()
-{
+std::string File::read() {
 	std::string contents;
 	std::string line;
 	while (file) contents.push_back(file.get());
@@ -32,10 +27,8 @@ std::string File::read()
 	return contents;
 }
 
-std::string File::readline()
-{
-	if (file)
-	{
+std::string File::readline() {
+	if (file) {
 		std::string line;
 		std::getline(file, line);
 		return line;
@@ -43,8 +36,7 @@ std::string File::readline()
 	else return "";
 }
 
-bool File::exists()
-{
+bool File::exists() {
 	if (!file)
 		return false;
 	return true;

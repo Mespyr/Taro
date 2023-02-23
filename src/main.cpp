@@ -13,10 +13,8 @@
 
 #define exit_on_error(exit_code) if (exit_code != 0) exit(exit_code);
 
-int main(int argc, char* argv[])
-{
-	if (argc < 2)
-	{
+int main(int argc, char* argv[]) {
+	if (argc < 2) {
 		std::cerr << "Error: No file provided for compilation" << std::endl;
 		return 1;
 	}
@@ -33,25 +31,20 @@ int main(int argc, char* argv[])
 	Program program = parse_tokens(tokens);
 
 	#ifdef DEBUG_PARSER
-		for (std::pair<std::string, Function> func : program.functions)
-		{
+		for (std::pair<std::string, Function> func : program.functions) {
 			std::cout << "FUNCTION INFO:" << std::endl;
 			std::cout << "'" << func.first << "' args: " << func.second.arg_stack.size() << " ret: " << func.second.ret_stack.size() << std::endl;
 			std::cout << "\t ops: " << func.second.ops.size() << " addr: " << func.second.addr << std::endl;
 		}
 
-		for (std::pair<std::string, Struct> struct_ : program.structs)
-		{
+		for (std::pair<std::string, Struct> struct_ : program.structs) {
 			std::cout << "STRUCTS:" << std::endl;
 			std::cout << "  " << struct_.first << " " << struct_.second.size << std::endl;
 			for (std::pair<std::string, std::pair<LCPType, int>> member : struct_.second.members)
-			{
 				std::cout << "   - " << member.first << " " << human_readable_type(member.second.first) << " " << member.second.second << std::endl;
-			}
 		}
 
-		for (std::pair<std::string, Function> func : program.functions)
-		{
+		for (std::pair<std::string, Function> func : program.functions) {
 			std::cout << "FUNCTION VAR OFFSETS:" << std::endl;
 			std::cout << "  " << func.first << std::endl;
 			for (std::pair<std::string, std::pair<LCPType, int>> var_offset : func.second.var_offsets)

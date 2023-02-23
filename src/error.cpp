@@ -1,24 +1,20 @@
 #include "include/error.h"
 
-void print_error(std::string message)
-{
+void print_error(std::string message) {
 	std::cerr << "ERROR: " << message << std::endl;
 }
 
-void print_error_at_loc(Location loc, std::string message)
-{
+void print_error_at_loc(Location loc, std::string message) {
 	std::cerr << loc.file_location << ":" << loc.line_number << ":" << loc.column_number_start << ": " << message << std::endl;
 	std::cerr << loc.line << std::endl;
 
-	for (long unsigned int i = 0; i < loc.column_number_start; i++)
-	{
+	for (long unsigned int i = 0; i < loc.column_number_start; i++) {
 		if (loc.line.at(i) == '\t')
 			std::cerr << "\t";
 		else std::cerr << " ";
 	}
 
-	for (long unsigned int i = loc.column_number_start; i < loc.column_number_end; i++)
-	{
+	for (long unsigned int i = loc.column_number_start; i < loc.column_number_end; i++) {
 		if (loc.line.at(i) == '\t')
 			std::cerr << "\t";
 		else std::cerr << "^";
@@ -27,20 +23,17 @@ void print_error_at_loc(Location loc, std::string message)
 	std::cerr << std::endl;
 }
 
-void print_note_at_loc(Location loc, std::string message)
-{
+void print_note_at_loc(Location loc, std::string message) {
 	std::cerr << loc.file_location << ":" << loc.line_number << ":" << loc.column_number_start << ": note: " << message << std::endl;
 	std::cerr << loc.line << std::endl;
 
-	for (long unsigned int i = 0; i < loc.column_number_start; i++)
-	{
+	for (long unsigned int i = 0; i < loc.column_number_start; i++) {
 		if (loc.line.at(i) == '\t')
 			std::cerr << "\t";
 		else std::cerr << " ";
 	}
 
-	for (long unsigned int i = loc.column_number_start; i < loc.column_number_end; i++)
-	{
+	for (long unsigned int i = loc.column_number_start; i < loc.column_number_end; i++) {
 		if (loc.line.at(i) == '\t')
 			std::cerr << "^^^^";
 		else std::cerr << "^";
@@ -49,8 +42,7 @@ void print_note_at_loc(Location loc, std::string message)
 	std::cerr << std::endl;
 }
 
-void print_not_enough_arguments_error(Location loc, int expected, int actual, std::string name, std::string fullname, bool is_func)
-{
+void print_not_enough_arguments_error(Location loc, int expected, int actual, std::string name, std::string fullname, bool is_func) {
 		if (is_func) 
 			// not enough items on stack for function 'name' (expected 'expected', got 'actual')
 			print_error_at_loc(loc, "not enough items on stack for function '" + name + "' (expected " + std::to_string(expected) + ", got " + std::to_string(actual) + ")");
@@ -62,8 +54,7 @@ void print_not_enough_arguments_error(Location loc, int expected, int actual, st
 			print_error_at_loc(loc, "not enough items on stack for operation '" + name + "' (" + fullname + ") (expected " + std::to_string(expected) + ", got " + std::to_string(actual) + ")");
 }
 
-void print_invalid_combination_of_types_error(Location loc, std::vector<LCPType> types, std::string name, std::string fullname, bool is_func)
-{
+void print_invalid_combination_of_types_error(Location loc, std::vector<LCPType> types, std::string name, std::string fullname, bool is_func) {
 	// ex: 'int, int, ptr, int'
 	std::string types_str;
 	for (unsigned long int i = 0; i < types.size() - 1; i++)
@@ -81,8 +72,7 @@ void print_invalid_combination_of_types_error(Location loc, std::vector<LCPType>
 		print_error_at_loc(loc, "invalid types for operation '" + name + "' (" + fullname + ") (" + types_str + ")");
 }
 
-void print_invalid_type_error(Location loc, std::string expected, std::string actual, std::string name, std::string fullname, bool is_func)
-{
+void print_invalid_type_error(Location loc, std::string expected, std::string actual, std::string name, std::string fullname, bool is_func) {
 	if (is_func)
 		// invalid argument type for function 'name' (expected 'expected', got 'actual')
 		print_error_at_loc(loc, "invalid type for function '" + name + "' (expected " + expected + ", got " + actual + ")");

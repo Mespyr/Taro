@@ -4,8 +4,7 @@
 #include "program.h"
 #include "parser.h"
 
-struct ConstExpr
-{
+struct ConstExpr {
 	long long value;
 	long unsigned int i;
 };

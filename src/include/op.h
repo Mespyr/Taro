@@ -6,8 +6,7 @@
 #include "location.h"
 #include "token.h"
 
-enum OpCodeMode
-{
+enum OpCodeMode {
 	MODE_8BIT,
 	MODE_64BIT,
 	MODE_STRUCT,
@@ -15,8 +14,7 @@ enum OpCodeMode
 	MODE_COUNT
 };
 
-enum OpType
-{
+enum OpType {
 	// debugging
 	OP_DUMP,
 	// arithmetics
@@ -89,10 +87,9 @@ enum OpType
 	OP_COUNT
 };
 
-class Op
-{
+class Op {
 public:
-	Op( Location loc, OpType type) : 
+	Op( Location loc, OpType type) :
 		loc(loc),
 		type(type)
 	{}
@@ -118,6 +115,10 @@ public:
 	long long int_operand_2;
 	std::string str_operand;
 	OpCodeMode mode;
+	// stores the amount of items to pop from the stack, to be equivilant
+	// for example, if there is a tuple with 3 items, and there is 5 items on the stack,
+	// then we actually have to pop off 8 in the compiler
+	std::vector<int> pop_stack_count;
 };
 
 bool is_builtin_word(std::string word);

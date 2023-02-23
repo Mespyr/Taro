@@ -7,18 +7,22 @@
 #include "location.h"
 #include "op.h"
 
-enum LCPPrimType
-{
-	TYPE_I64,
+enum LCPPrimType {
 	TYPE_I8,
+	TYPE_I64,
 	PRIM_TYPES_COUNT
 };
 
-class LCPType
-{
+enum StackSizeType {
+	STACK_SIZE_SINGLE,
+	STACK_SIZE_TUPLE,
+	STACK_SIZE_COUNT
+};
+
+class LCPType {
 public:
-	LCPType(Location loc) : 
-		loc(loc) 
+	LCPType(Location loc) :
+		loc(loc)
 	{}
 	LCPType(Location loc, std::string type_str);
 	LCPType(Location loc, std::string base_type, int ptr_to_trace) :
@@ -32,13 +36,13 @@ public:
 	std::string base_type;
 	// the amount of pointers to the type (ex: ^^int is a pointer to a pointer to an int, so it would be 2)
 	int ptr_to_trace = 0;
+	StackSizeType stack_type = STACK_SIZE_SINGLE;
 };
 
 #include "error.h" // error.h needs that LCPType class
 
 // struct types
-class Struct
-{
+class Struct {
 public:
 	Struct(Location loc, std::map<std::string, std::pair<LCPType, int>> members, int size) :
 		loc(loc), members(members), size(size)

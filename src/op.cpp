@@ -1,7 +1,6 @@
 #include "include/op.h"
 
-bool Op::is_prim_type_mode()
-{
+bool Op::is_prim_type_mode() {
 	static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in Op::is_prim_type_mode()");
 
 	if (mode == MODE_8BIT ||
@@ -12,8 +11,7 @@ bool Op::is_prim_type_mode()
 }
 
 
-bool is_builtin_word(std::string word)
-{
+bool is_builtin_word(std::string word) {
 	static_assert(OP_COUNT == 56, "unhandled op types in type_check_program()");
 	std::vector<std::string> builtin_words = {
 		"dump",

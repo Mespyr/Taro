@@ -8,8 +8,7 @@
 #include "types.h"
 
 // stores constant values
-class Const
-{
+class Const {
 public:
 	Const(Location loc, long long value) :
 		loc(loc),
@@ -21,8 +20,7 @@ public:
 };
 
 // stores ops for a function
-class Function
-{
+class Function {
 public:
 	Function(Location loc, int addr, std::vector<LCPType> arg_stack, std::vector<LCPType> ret_stack) :
 		loc(loc), addr(addr), arg_stack(arg_stack), ret_stack(ret_stack)
@@ -37,8 +35,7 @@ public:
 	int memory_capacity;
 };
 
-class Program
-{
+class Program {
 public:
 	std::map<std::string, Function> functions;
 	std::map<std::string, Const> consts;

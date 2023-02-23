@@ -4,14 +4,12 @@
 #include <string>
 #include <iostream>
 
-enum FILE_MODE
-{
+enum FILE_MODE {
 	FILE_READ,
 	FILE_WRITE
 };
 
-class File
-{
+class File {
 public:
 	File(std::string filename, FILE_MODE mode);
 	~File();
