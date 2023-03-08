@@ -5,6 +5,6 @@ STDOUT:
 [note] type-checking program
 
 STDERR:
-test/pass_struct_arg_error.lcp:10:4: invalid type for function 'print' (expected ^String, got i64)
+test/pass_struct_arg_error.rmbt:10:4: invalid type for function 'print' (expected ^String, got i64)
 	12 print
 	   ^^^^^

@@ -19,6 +19,7 @@ STDERR:
 {comp_proc.stderr}"""
 
 def main():
+	os.system("make")
 	test_files = os.listdir("test")
 	expected_output_files = os.listdir("test/output")
 
@@ -30,8 +31,8 @@ def main():
 	for test in test_files:
 		# generate output based off of test code
 		genfile = ""
-		test_base_name = test.removesuffix(".lcp")
-		comp_proc = sp.run(["./lcp", "test/" + test], text = True, stdout = sp.PIPE, stderr = sp.PIPE)
+		test_base_name = test.removesuffix(".rmbt")
+		comp_proc = sp.run(["./rambutan", "test/" + test], text = True, stdout = sp.PIPE, stderr = sp.PIPE)
 		# run compiled test code
 		if comp_proc.returncode == 0:
 			run_proc = sp.run("./out", text = True, stdout = sp.PIPE, stderr = sp.PIPE)
@@ -67,6 +68,7 @@ def main():
 			else: not_saved += 1
 
 	print(f"\033[1;32m{passed} passed, \033[1;31m{failed} failed, \033[1;33m{new} new, \033[1;35m{not_saved} not saved")
+	os.system("make clean")
 
 if __name__ == "__main__":
 	main()

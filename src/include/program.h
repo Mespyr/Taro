@@ -22,16 +22,16 @@ public:
 // stores ops for a function
 class Function {
 public:
-	Function(Location loc, int addr, std::vector<LCPType> arg_stack, std::vector<LCPType> ret_stack) :
+	Function(Location loc, int addr, std::vector<RambutanType> arg_stack, std::vector<RambutanType> ret_stack) :
 		loc(loc), addr(addr), arg_stack(arg_stack), ret_stack(ret_stack)
 	{}
 
 	Location loc;
 	int addr;
-	std::vector<LCPType> arg_stack;
-	std::vector<LCPType> ret_stack;
+	std::vector<RambutanType> arg_stack;
+	std::vector<RambutanType> ret_stack;
 	std::vector<Op> ops;
-	std::map<std::string, std::pair<LCPType, int>> var_offsets;
+	std::map<std::string, std::pair<RambutanType, int>> var_offsets;
 	int memory_capacity;
 };
 

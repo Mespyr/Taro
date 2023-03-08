@@ -8,7 +8,7 @@ INCLUDE_DIR=src/include
 SRC_FILES=$(wildcard $(SRC_DIR)/*.cpp)
 OBJ_FILES=$(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRC_FILES))
 HDR_FILES=$(wildcard $(INCLUDE_DIR)/*.h)
-BIN=lcp
+BIN=rambutan
 
 all: $(BIN)
 

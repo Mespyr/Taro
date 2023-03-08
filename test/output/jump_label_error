@@ -5,6 +5,6 @@ STDOUT:
 [note] type-checking program
 
 STDERR:
-test/jump_label_error.lcp:4:8: different types on stack then what was expected at the label.
+test/jump_label_error.rmbt:4:8: different types on stack then what was expected at the label.
 		10 10 cjmpet loop # push extra int onto stack here
 		      ^^^^^^

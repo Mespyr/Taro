@@ -4,6 +4,6 @@ STDOUT:
 [note] parsing tokens
 
 STDERR:
-test/parser.lcp:9:1: unknown word 'qwekdjqwklejqklwe'
+test/parser.rmbt:9:1: unknown word 'qwekdjqwklejqklwe'
 	qwekdjqwklejqklwe
 	^^^^^^^^^^^^^^^^^

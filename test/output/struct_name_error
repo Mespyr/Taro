@@ -4,6 +4,6 @@ STDOUT:
 [note] parsing tokens
 
 STDERR:
-test/struct_name_error.lcp:3:7: illegal name for struct
+test/struct_name_error.rmbt:3:7: illegal name for struct
 struct Epic.Cap
        ^^^^^^^^

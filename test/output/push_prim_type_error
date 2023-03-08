@@ -5,12 +5,12 @@ STDOUT:
 [note] type-checking program
 
 STDERR:
-test/push_prim_type_error.lcp:6:6: invalid types for operation '=' (equal to) (^i64, i64)
+test/push_prim_type_error.rmbt:6:6: invalid types for operation '=' (equal to) (^i64, i64)
 	n 12 = dump
 	     ^
-test/push_prim_type_error.lcp:6:1: note: first argument found here (^i64)
+test/push_prim_type_error.rmbt:6:1: note: first argument found here (^i64)
 	n 12 = dump
 	^
-test/push_prim_type_error.lcp:6:3: note: second argument found here (i64)
+test/push_prim_type_error.rmbt:6:3: note: second argument found here (i64)
 	n 12 = dump
 	  ^^

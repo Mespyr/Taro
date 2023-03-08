@@ -53,7 +53,7 @@ std::string add_escapes_to_string(std::string str) {
 	return ret;
 }
 
-Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pair<LCPType, int>> var_offsets) {
+Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pair<RambutanType, int>> var_offsets) {
 	static_assert(OP_COUNT == 56, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
@@ -269,8 +269,8 @@ Program parse_tokens(std::vector<Token> tokens) {
 			}
 			i++;
 
-			std::vector<LCPType> arg_stack;
-			std::vector<LCPType> ret_stack;
+			std::vector<RambutanType> arg_stack;
+			std::vector<RambutanType> ret_stack;
 
 			// parse arguments of function
 			while (tokens.at(i).value != ")") {
@@ -281,7 +281,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 					print_error_at_loc(tok.loc, "unknown argument type '" + tok.value + "'");
 					exit(1);
 				}
-				arg_stack.push_back(LCPType(tok.loc, tok.value));
+				arg_stack.push_back(RambutanType(tok.loc, tok.value));
 
 				i++;
 				if (i > tokens.size() - 1) {
@@ -308,7 +308,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 						print_error_at_loc(tok.loc, "unknown return type '" + tok.value + "'");
 						exit(1);
 					}
-					ret_stack.push_back(LCPType(tok.loc, tok.value));
+					ret_stack.push_back(RambutanType(tok.loc, tok.value));
 
 					i++;
 					if (i > tokens.size() - 1) {
@@ -326,7 +326,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 
 			std::vector<Op> function_ops;
 			std::map<std::string, std::pair<int, int>> labels;
-			std::map<std::string, std::pair<LCPType, int>> var_offsets;
+			std::map<std::string, std::pair<RambutanType, int>> var_offsets;
 			int offset = 0;
 			bool found_function_end = false;
 			// recursion
@@ -405,7 +405,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 					}
 
 					var_offsets.insert({var_name_tok.value,
-						{LCPType(var_name_tok.loc, f_op.str_operand), offset}
+						{RambutanType(var_name_tok.loc, f_op.str_operand), offset}
 					});
 
 					offset += sizeof_type(f_op.str_operand, program.structs);
@@ -414,7 +414,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 					// if setting a variable
 					if (var_offsets.count(f_op.str_operand)) {
 						static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in parse_tokens()");
-						LCPType type = var_offsets.at(f_op.str_operand).first;
+						RambutanType type = var_offsets.at(f_op.str_operand).first;
 						if (is_prim_type(type.base_type) || is_pointer(type)) {
 							// 8bit values
 							if (sizeof_type(type) == 1)
@@ -470,7 +470,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 						
 						// if setting pointer member
 						if (program.structs.count(split_cmd.front())) {
-							std::pair<LCPType, int> member_type_offset = struct_member_offset(f_op, program.structs);
+							std::pair<RambutanType, int> member_type_offset = struct_member_offset(f_op, program.structs);
 							f_op.type = OP_SET_PTR_STRUCT_MEMBER;
 							if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
 								f_op.mode = MODE_64BIT;
@@ -490,7 +490,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 						// if setting variable member
 						else
 						{
-							std::pair<LCPType, int> member_type_offset = variable_member_offset(f_op, var_offsets, program.structs);
+							std::pair<RambutanType, int> member_type_offset = variable_member_offset(f_op, var_offsets, program.structs);
 							if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
 								f_op.mode = MODE_64BIT;
 							else if (program.structs.count(member_type_offset.first.base_type))
@@ -511,7 +511,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 				else if (f_op.type == OP_READ) {
 					// if reading a variable
 					if (var_offsets.count(f_op.str_operand)) {
-						LCPType type = var_offsets.at(f_op.str_operand).first;
+						RambutanType type = var_offsets.at(f_op.str_operand).first;
 						if (!is_prim_type(type) && !is_pointer(type)) {
 							print_error_at_loc(f_op.loc, "Can't read whole variable for a non-primitive type (type " + human_readable_type(type) + ")");
 							exit(1);
@@ -555,7 +555,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 						
 						// if reading pointer member
 						if (program.structs.count(split_cmd.front())) {
-							std::pair<LCPType, int> member_type_offset = struct_member_offset(f_op, program.structs);
+							std::pair<RambutanType, int> member_type_offset = struct_member_offset(f_op, program.structs);
 							f_op.type = OP_READ_PTR_STRUCT_MEMBER;
 
 							if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
@@ -575,7 +575,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 						}
 						// if reading variable member
 						else {
-							std::pair<LCPType, int> member_type_offset = variable_member_offset(f_op, var_offsets, program.structs);
+							std::pair<RambutanType, int> member_type_offset = variable_member_offset(f_op, var_offsets, program.structs);
 							if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
 								f_op.mode = MODE_64BIT;
 							else if (program.structs.count(member_type_offset.first.base_type))
@@ -655,7 +655,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 				exit(1);
 			}
 
-			std::map<std::string, std::pair<LCPType, int>> members;
+			std::map<std::string, std::pair<RambutanType, int>> members;
 			int offset = 0;
 			while (tokens.at(i).value != "end") {
 				// get type of next member
@@ -687,7 +687,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 
 				// set variable type and relative offset
 				members.insert({member_name_tok.value, {
-					LCPType(member_name_tok.loc, type_tok.value), offset
+					RambutanType(member_name_tok.loc, type_tok.value), offset
 				}});
 
 				// increase offset by size of type

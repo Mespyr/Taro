@@ -54,7 +54,7 @@ void print_not_enough_arguments_error(Location loc, int expected, int actual, st
 			print_error_at_loc(loc, "not enough items on stack for operation '" + name + "' (" + fullname + ") (expected " + std::to_string(expected) + ", got " + std::to_string(actual) + ")");
 }
 
-void print_invalid_combination_of_types_error(Location loc, std::vector<LCPType> types, std::string name, std::string fullname, bool is_func) {
+void print_invalid_combination_of_types_error(Location loc, std::vector<RambutanType> types, std::string name, std::string fullname, bool is_func) {
 	// ex: 'int, int, ptr, int'
 	std::string types_str;
 	for (unsigned long int i = 0; i < types.size() - 1; i++)
