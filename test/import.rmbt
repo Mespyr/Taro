@@ -1,0 +1,5 @@
+import "test/test_lib/print.rmbt"
+
+fun main()
+	"Hello World!\n" print
+end

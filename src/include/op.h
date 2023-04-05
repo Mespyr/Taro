@@ -43,6 +43,7 @@ enum OpType {
 	OP_END,
 	OP_STRUCT,
 	OP_CONST,
+	OP_IMPORT,
 	// variables
 	OP_DEFINE_VAR,
 	OP_SET,
@@ -115,10 +116,6 @@ public:
 	long long int_operand_2;
 	std::string str_operand;
 	OpCodeMode mode;
-	// stores the amount of items to pop from the stack, to be equivilant
-	// for example, if there is a tuple with 3 items, and there is 5 items on the stack,
-	// then we actually have to pop off 8 in the compiler
-	std::vector<int> pop_stack_count;
 };
 
 bool is_builtin_word(std::string word);

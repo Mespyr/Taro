@@ -1,5 +1,4 @@
 #include "include/parser.h"
-#include "include/eval.h"
 
 bool is_legal_name(Token token_name) {
 	// if token is an integer or string
@@ -54,7 +53,7 @@ std::string add_escapes_to_string(std::string str) {
 }
 
 Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pair<RambutanType, int>> var_offsets) {
-	static_assert(OP_COUNT == 56, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 57, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -108,6 +107,8 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 			return Op(tok.loc, OP_END);
 		else if (tok.value == "struct")
 			return Op(tok.loc, OP_STRUCT);
+		else if (tok.value == "import")
+			return Op(tok.loc, OP_IMPORT);
 		else if (tok.value == "jmp")
 			return Op(tok.loc, OP_JMP);
 		else if (tok.value == "cjmpf")
@@ -198,7 +199,7 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 }
 
 std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels) {
-	static_assert(OP_COUNT == 56, "unhandled op types in link_ops()");
+	static_assert(OP_COUNT == 57, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++) {
 		Op current_op = ops.at(i);
@@ -222,14 +223,15 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<in
 }
 
 Program parse_tokens(std::vector<Token> tokens) {
-	static_assert(OP_COUNT == 56, "unhandled op types in parse_tokens()");
+	static_assert(OP_COUNT == 57, "unhandled op types in parse_tokens()");
 
 	Program program;
 	long unsigned int i = 0;
 	int function_addr = 0;
+	std::vector<std::string> include_paths;
 
 	while (i < tokens.size()) {
-	Op current_op = convert_token_to_op(tokens.at(i), program);
+		Op current_op = convert_token_to_op(tokens.at(i), program);
 		
 		if (current_op.type == OP_FUN) {
 			i++;
@@ -704,6 +706,32 @@ Program parse_tokens(std::vector<Token> tokens) {
 			program.structs.insert({struct_name, 
 				Struct(current_op.loc, members, (offset + 7) / 8 * 8)
 			});
+		}
+		else if (current_op.type == OP_IMPORT) {
+			if (i++ == tokens.size()) {
+				print_error_at_loc(current_op.loc, "Unexpected 'import' keyword found while parsing");
+				exit(1);
+			}
+
+			Token include_file_token = tokens.at(i);
+			if (include_file_token.type != TOKEN_STRING) {
+				print_error_at_loc(include_file_token.loc, "Was expecting token of type string after 'import' statement");
+				exit(1);
+			}
+
+			std::string file_path = include_file_token.value.substr(1,include_file_token.value.length() - 2);
+			File file(file_path, FILE_READ);
+			if (!file.exists()) {
+				print_error_at_loc(include_file_token.loc, "No such file or directory, '" + file_path + "'");
+				exit(1);
+			}
+
+			if (std::find(include_paths.begin(), include_paths.end(), file_path) == include_paths.end())
+			{
+				std::vector<Token> include_file_tokens = tokenize_file(file_path);
+				tokens.insert(tokens.begin() + i + 1, include_file_tokens.begin(), include_file_tokens.end());
+				include_paths.push_back(file_path);
+			}
 		}
 		else if (current_op.type == OP_CONST) {
 			i++;

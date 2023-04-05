@@ -1,7 +1,7 @@
 #include "include/compiler.h"
 
 void compile_to_asm(Program program, std::string output_filename) {
-	static_assert(OP_COUNT == 56, "unhandled op types in compile_to_asm()");
+	static_assert(OP_COUNT == 57, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
 

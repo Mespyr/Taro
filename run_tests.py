@@ -20,7 +20,12 @@ STDERR:
 
 def main():
 	os.system("make")
-	test_files = os.listdir("test")
+	_test_files = os.listdir("test")
+	test_files = []
+	for i in _test_files:
+		if i.endswith(".rmbt"):
+			test_files.append(i)
+
 	expected_output_files = os.listdir("test/output")
 
 	passed = 0

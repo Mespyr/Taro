@@ -1,4 +1,5 @@
 #include "include/checks.h"
+#include "include/op.h"
 #include "include/types.h"
 
 void verify_program(Program program) {
@@ -31,7 +32,7 @@ bool compare_type_stacks(std::vector<RambutanType> type_stack_1, std::vector<Ram
 }
 
 void type_check_program(Program &program) {
-	static_assert(OP_COUNT == 56, "unhandled op types in type_check_program()");
+	static_assert(OP_COUNT == 57, "unhandled op types in type_check_program()");
 	static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++) {
@@ -817,7 +818,7 @@ void type_check_program(Program &program) {
 			}
 
 			// unreachable
-			else if (op.type == OP_FUN || op.type == OP_END || op.type == OP_COUNT || op.type == OP_STRUCT || op.type == OP_DEFINE_VAR || op.type == OP_CONST) {
+			else if (op.type == OP_FUN || op.type == OP_END || op.type == OP_COUNT || op.type == OP_STRUCT || op.type == OP_DEFINE_VAR || op.type == OP_CONST || op.type == OP_IMPORT) {
 				print_error_at_loc(op.loc, "unreachable: op should be handled in the parsing step. This is probably a bug.");
 				exit(1);
 			}

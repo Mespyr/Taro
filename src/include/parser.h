@@ -3,11 +3,15 @@
 #include <vector>
 #include <assert.h>
 #include <map>
+#include <algorithm>
 #include "token.h"
 #include "op.h"
 #include "program.h"
 #include "error.h"
 #include "types.h"
+#include "file.h"
+#include "lexer.h"
+#include "eval.h"
 
 bool is_legal_name(Token token_name);
 std::string add_escapes_to_string(std::string str);
