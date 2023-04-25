@@ -5,12 +5,12 @@ STDOUT:
 [note] type-checking program
 
 STDERR:
-test/invalid_addition.rmbt:8:5: invalid types for operation '+' (addition) (^Str, i64)
-	s 8 +
-	    ^
-test/invalid_addition.rmbt:8:1: note: first value pushed here (^Str)
-	s 8 +
-	^
-test/invalid_addition.rmbt:8:3: note: second value pushed here (i64)
-	s 8 +
-	  ^
+┌[test/invalid_addition.rmbt:8:5]
+│ 	s 8 +
+└ 	    ^ invalid types for operation '+' (addition) (^Str, i64)
+┌[test/invalid_addition.rmbt:8:1]
+│ 	s 8 +
+└ 	^ NOTE: first value pushed here (^Str)
+┌[test/invalid_addition.rmbt:8:3]
+│ 	s 8 +
+└ 	  ^ NOTE: second value pushed here (i64)

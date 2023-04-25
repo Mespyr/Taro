@@ -25,75 +25,44 @@ Source files for Rambutan end in the `.rmbt` file extension.
 	- [x] making struct veriables
 	- [x] setting variable types to primitive types
 	- [x] changing between setting variable form variable on stack and value on stack (a pointer vs the primitive type)
-- [ ] allow pushing of different type integers onto the stack (ex: i8, i16, i32, i64)
-	- [ ] passing those values into functions with size in mind (you can pass i8, i16, and i32 integers into functions that require i64, but you cant pass i64 into a function with i8)
-	- [ ] allow type notation when pushing integers onto the stack (ex: specify that 5 be pushed as an i64 instead of an i8)
+- [ ] type casting
+- [ ] unsafe and safe mode
+    - [ ] allow for addition on pointers in unsafe mode, which produces an 'unsafe pointer'
+	- [ ] allow for unsafe pointer to be used as a type in variables, struct members and function signatures
+	- [ ] unsafe pointer can be on its own (ie: a malloc implementation can return an 'unsafe pointer' with no type)
 - [x] allow modifying values stored at pointers on the stack
 	- [x] access members of structs pushed onto the stack
 	- [x] write and read values to pointers of primitive types
-- [ ] Arrays
 - [x] Constants (const keyword)
-- [ ] Tuples (sorta?).
+- [x] Importing files
 - [ ] write code to generate a [prime spiral](https://mathimages.swarthmore.edu/index.php/Prime_spiral_(Ulam_spiral)) also known as a Ulam spiral.
+- [ ] SEXP (switch expressions)
 
-#### Arrays Ideal Design
-```python
-struct String
-  i64 size
-  ^i8 data
-end
 
-struct Op
-  String value
-  i64 type
-end
-
-fun debug_ops(Op:array i64)
-  # do something to ops
+### SEXP Ideal Design
+```
+fun factorial(i64) [i64]
+  sexp
+    0 => pop 1,
+	_ => dup 1 - factorial *,
+  end
 end
 
 fun main()
-  Op:100 ops
-  ops 10 debug_ops
+  12 factorial dump
 end
 ```
-Arrays are defined as the type + ':' + the size of the array, like so: `i64:3` defines an array of three 64-bit integers.
-You can use arrays with consts too:
-```python
-struct Op
-  i64 type
-  String value
-end
-const OP_ARRAY_MAX 1024 end
-
-fun main()
-  # define op array of size OP_ARRAY_MAX
-  Op:OP_ARRAY_MAX ops
-end
-```
-
-### Tuples Ideal Design
-Tuples are just sections of data on the stack, acting as one item
-You can pass it into functions and create it on the fly.
-```python
-fun add3({i64 i64 i64}) [i64]
-  <-> # expand tuple into 3 ints
-  + +
-end
-
-fun main()
-  1 2 3
-  {3} add3 dump
-end
-```
-
-You can also have multiple different types in the tuple
-```python
-fun print({i64 ^i8})
-  <-> 1 1 call3 pop
-end
-
-fun main()
-  "Hello" {2} print
+SEXP works by taking the top integer on the stack, and comparing it to a bunch of different other values. If it is, then it executes that section of code up to the `,`. 
+The integer is not consumed by the operation unless removed by the expression, and all expressions must return the same types onto the stack for it to pass with the type checker.
+Here's another example
+``` 
+fun fib(i64) [i64]
+  sexp
+    0 => pop 1,
+    1 => pop 1,
+    _ =>
+      dup 1 - fib
+      swp 2 - fib +,
+  end
 end
 ```

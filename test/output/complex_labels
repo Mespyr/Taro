@@ -5,9 +5,9 @@ STDOUT:
 [note] type-checking program
 
 STDERR:
-test/complex_labels.rmbt:4:4: unhandled data on the stack (expected 0 items, got 1)
-fun main()
-    ^^^^
-test/complex_labels.rmbt:6:4: note: excess data pushed here (i64)
-		1 -
-		  ^
+┌[test/complex_labels.rmbt:4:4]
+│ fun main()
+└     ^^^^ unhandled data on the stack (expected 0 items, got 1)
+┌[test/complex_labels.rmbt:6:4]
+│ 		1 -
+└ 		  ^ NOTE: excess data pushed here (i64)

@@ -5,12 +5,12 @@ STDOUT:
 [note] type-checking program
 
 STDERR:
-test/push_var.rmbt:8:5: invalid types for operation '=' (equal to) (^String, i64)
-	s 1 = dump
-	    ^
-test/push_var.rmbt:8:1: note: first argument found here (^String)
-	s 1 = dump
-	^
-test/push_var.rmbt:8:3: note: second argument found here (i64)
-	s 1 = dump
-	  ^
+┌[test/push_var.rmbt:8:5]
+│ 	s 1 = dump
+└ 	    ^ invalid types for operation '=' (equal to) (^String, i64)
+┌[test/push_var.rmbt:8:1]
+│ 	s 1 = dump
+└ 	^ NOTE: first argument found here (^String)
+┌[test/push_var.rmbt:8:3]
+│ 	s 1 = dump
+└ 	  ^ NOTE: second argument found here (i64)

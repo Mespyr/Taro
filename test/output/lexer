@@ -4,6 +4,6 @@ STDOUT:
 [note] parsing tokens
 
 STDERR:
-test/lexer.rmbt:3:9: unknown word 'print'
-	12 13 + print "Helllo WOrld"
-	        ^^^^^
+┌[test/lexer.rmbt:3:9]
+│ 	12 13 + print "Helllo WOrld"
+└ 	        ^^^^^ unknown word 'print'

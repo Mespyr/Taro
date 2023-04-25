@@ -5,12 +5,12 @@ STDOUT:
 [note] type-checking program
 
 STDERR:
-test/different_int_types_error.rmbt:6:16: invalid types for function 'print' (i64, ^i8)
-	"Hello World!" print
-	               ^^^^^
-test/different_int_types_error.rmbt:6:1: note: argument pushed here (i64)
-	"Hello World!" print
-	^^^^^^^^^^^^^^
-test/different_int_types_error.rmbt:6:1: note: argument pushed here (^i8)
-	"Hello World!" print
-	^^^^^^^^^^^^^^
+┌[test/different_int_types_error.rmbt:6:16]
+│ 	"Hello World!" print
+└ 	               ^^^^^ invalid types for function 'print' (i64, ^i8)
+┌[test/different_int_types_error.rmbt:6:1]
+│ 	"Hello World!" print
+└ 	^^^^^^^^^^^^^^ NOTE: argument pushed here (i64)
+┌[test/different_int_types_error.rmbt:6:1]
+│ 	"Hello World!" print
+└ 	^^^^^^^^^^^^^^ NOTE: argument pushed here (^i8)

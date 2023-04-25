@@ -5,12 +5,12 @@ STDOUT:
 [note] type-checking program
 
 STDERR:
-test/read_struct_in_struct.rmbt:13:13: invalid types for operation '=' (equal to) (^String, i64)
-	&row1.row 1 = dump # should put a type ^String on the stack
-	            ^
-test/read_struct_in_struct.rmbt:13:1: note: first argument found here (^String)
-	&row1.row 1 = dump # should put a type ^String on the stack
-	^^^^^^^^^
-test/read_struct_in_struct.rmbt:13:11: note: second argument found here (i64)
-	&row1.row 1 = dump # should put a type ^String on the stack
-	          ^
+┌[test/read_struct_in_struct.rmbt:13:13]
+│ 	&row1.row 1 = dump # should put a type ^String on the stack
+└ 	            ^ invalid types for operation '=' (equal to) (^String, i64)
+┌[test/read_struct_in_struct.rmbt:13:1]
+│ 	&row1.row 1 = dump # should put a type ^String on the stack
+└ 	^^^^^^^^^ NOTE: first argument found here (^String)
+┌[test/read_struct_in_struct.rmbt:13:11]
+│ 	&row1.row 1 = dump # should put a type ^String on the stack
+└ 	          ^ NOTE: second argument found here (i64)

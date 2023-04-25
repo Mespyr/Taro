@@ -5,8 +5,8 @@ void print_error(std::string message) {
 }
 
 void print_error_at_loc(Location loc, std::string message) {
-	std::cerr << loc.file_location << ":" << loc.line_number << ":" << loc.column_number_start << ": " << message << std::endl;
-	std::cerr << loc.line << std::endl;
+	std::cerr << "┌[" << loc.file_location << ":" << loc.line_number << ":" << loc.column_number_start << "]\n";
+	std::cerr << "│ " << loc.line << "\n└ ";
 
 	for (long unsigned int i = 0; i < loc.column_number_start; i++) {
 		if (loc.line.at(i) == '\t')
@@ -20,12 +20,12 @@ void print_error_at_loc(Location loc, std::string message) {
 		else std::cerr << "^";
 	}
 
-	std::cerr << std::endl;
+	std::cerr << " " << message << std::endl;
 }
 
 void print_note_at_loc(Location loc, std::string message) {
-	std::cerr << loc.file_location << ":" << loc.line_number << ":" << loc.column_number_start << ": note: " << message << std::endl;
-	std::cerr << loc.line << std::endl;
+	std::cerr << "┌[" << loc.file_location << ":" << loc.line_number << ":" << loc.column_number_start << "]\n";
+	std::cerr << "│ " << loc.line << "\n└ ";
 
 	for (long unsigned int i = 0; i < loc.column_number_start; i++) {
 		if (loc.line.at(i) == '\t')
@@ -35,11 +35,11 @@ void print_note_at_loc(Location loc, std::string message) {
 
 	for (long unsigned int i = loc.column_number_start; i < loc.column_number_end; i++) {
 		if (loc.line.at(i) == '\t')
-			std::cerr << "^^^^";
+			std::cerr << "\t";
 		else std::cerr << "^";
 	}
 
-	std::cerr << std::endl;
+	std::cerr << " NOTE: " << message << std::endl;
 }
 
 void print_not_enough_arguments_error(Location loc, int expected, int actual, std::string name, std::string fullname, bool is_func) {
