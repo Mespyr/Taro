@@ -1,7 +1,9 @@
 #include "include/compiler.h"
+#include "include/op.h"
+#include <string>
 
 void compile_to_asm(Program program, std::string output_filename) {
-	static_assert(OP_COUNT == 57, "unhandled op types in compile_to_asm()");
+	static_assert(OP_COUNT == 58, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
 
@@ -527,10 +529,23 @@ void compile_to_asm(Program program, std::string output_filename) {
 				outfile.writeln("\tpush str_" + std::to_string(strings.size()-1));
 			}
 			else if (op.type == OP_PUSH_TYPE_INSTANCE) {
-				outfile.writeln("\t; OP_PUSH_TYPE_INSTANCE offset:" + std::to_string(op.int_operand));
-				outfile.writeln("\tmov rax, [ret_stack_rsp]");
-				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
+				outfile.writeln("\t; OP_PUSH_TYPE_INSTANCE size:" + std::to_string(op.int_operand));
+				outfile.writeln("\tmov rax, 9");
+				outfile.writeln("\tmov rdi, 0");
+				outfile.writeln("\tmov rsi, " + std::to_string(op.int_operand));
+				outfile.writeln("\tmov rdx, 3");
+				outfile.writeln("\tmov r10, 33");
+				outfile.writeln("\tmov r8, -1");
+				outfile.writeln("\tmov r9, 0");
+				outfile.writeln("\tsyscall");
 				outfile.writeln("\tpush rax");
+			}
+			else if (op.type == OP_DELETE_PTR) {
+				outfile.writeln("\t; OP_DELETE_PTR size:" + std::to_string(op.int_operand));
+				outfile.writeln("\tmov rax, 11");
+				outfile.writeln("\tpop rdi");
+				outfile.writeln("\tmov rsi, " + std::to_string(op.int_operand));
+				outfile.writeln("\tsyscall");
 			}
 			else if (op.type == OP_FUNCTION_CALL) {
 				outfile.writeln("\t; OP_FUNCTION_CALL " + op.str_operand);

@@ -5,7 +5,7 @@ STDOUT:
 [note] type-checking program
 [note] compiling to assembly
 [cmd] fasm out.asm
-flat assembler  version 1.73.30  (16384 kilobytes memory, x64)
+flat assembler  version 1.73.31  (16384 kilobytes memory, x64)
 3 passes, 440 bytes.
 
 STDERR:

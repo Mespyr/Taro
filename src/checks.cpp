@@ -1,6 +1,8 @@
 #include "include/checks.h"
 #include "include/op.h"
 #include "include/types.h"
+#include <cstdlib>
+#include <error.h>
 
 void verify_program(Program program) {
 	if (!program.functions.count("main")) {
@@ -32,7 +34,7 @@ bool compare_type_stacks(std::vector<RambutanType> type_stack_1, std::vector<Ram
 }
 
 void type_check_program(Program &program) {
-	static_assert(OP_COUNT == 57, "unhandled op types in type_check_program()");
+	static_assert(OP_COUNT == 58, "unhandled op types in type_check_program()");
 	static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++) {
@@ -783,6 +785,19 @@ void type_check_program(Program &program) {
 				RambutanType t(op.loc, op.str_operand);
 				t.ptr_to_trace++;
 				type_stack.push_back(t);
+			}
+			else if (op.type == OP_DELETE_PTR) {
+				if (type_stack.size() < 1) {
+					print_not_enough_arguments_error(op.loc, 1, 0, "delete", "delete pointer");
+					exit(1);
+				}
+				RambutanType t = type_stack.back(); type_stack.pop_back();
+				if (t.ptr_to_trace == 0) {
+					print_error_at_loc(op.loc, "Can't delete a non-pointer");
+					exit(1);
+				}
+				op.int_operand = sizeof_type(t, program.structs);
+				program.functions.at(func_name).ops.at(i) = op;
 			}
 			else if (op.type == OP_FUNCTION_CALL) {
 				assert(program.functions.count(op.str_operand));

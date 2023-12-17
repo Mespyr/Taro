@@ -1,4 +1,5 @@
 #include "include/parser.h"
+#include "include/op.h"
 
 bool is_legal_name(Token token_name) {
 	// if token is an integer or string
@@ -53,7 +54,7 @@ std::string add_escapes_to_string(std::string str) {
 }
 
 Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pair<RambutanType, int>> var_offsets) {
-	static_assert(OP_COUNT == 57, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 58, "unhandled op types in convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -146,6 +147,9 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 			}
 			return Op(tok.loc, OP_PUSH_TYPE_INSTANCE, push_struct_name);
 		}
+		// OP_DELETE_PTR
+		else if (tok.value == "delete")
+			return Op(tok.loc, OP_DELETE_PTR);
 		// OP_FUNCTION_CALL
 		else if (program.functions.count(tok.value))
 			return Op(tok.loc, OP_FUNCTION_CALL, tok.value);
@@ -199,7 +203,7 @@ Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pa
 }
 
 std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels) {
-	static_assert(OP_COUNT == 57, "unhandled op types in link_ops()");
+	static_assert(OP_COUNT == 58, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++) {
 		Op current_op = ops.at(i);
@@ -223,7 +227,7 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<in
 }
 
 Program parse_tokens(std::vector<Token> tokens) {
-	static_assert(OP_COUNT == 57, "unhandled op types in parse_tokens()");
+	static_assert(OP_COUNT == 58, "unhandled op types in parse_tokens()");
 
 	Program program;
 	long unsigned int i = 0;
@@ -608,8 +612,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 					function_ops.push_back(f_op);
 				}
 				else if (f_op.type == OP_PUSH_TYPE_INSTANCE) {
-					f_op.int_operand = offset;
-					offset += sizeof_type(f_op.str_operand, program.structs);
+					f_op.int_operand = sizeof_type(f_op.str_operand, program.structs);
 					function_ops.push_back(f_op);
 				}
 				else function_ops.push_back(f_op);

@@ -6,12 +6,12 @@ STDOUT:
 [note] compiling to assembly
 [cmd] fasm out.asm
 flat assembler  version 1.73.31  (16384 kilobytes memory, x64)
-3 passes, 515 bytes.
+3 passes, 652 bytes.
 
 STDERR:
 
 RUN: 0
 STDOUT:
-Ben Dover69
+Hello World
 
 STDERR:
