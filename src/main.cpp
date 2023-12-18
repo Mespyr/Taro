@@ -20,15 +20,17 @@ int main(int argc, char* argv[]) {
 	}
 
 	std::cout << "[note] tokenizing file" << std::endl;
-	std::vector<Token> tokens = tokenize_file(argv[1]);
+	Lexer lexer;
+	lexer.set_file(argv[1]);
+	lexer.tokenize();
 
 	#ifdef DEBUG_LEXER
-		for (Token t : tokens)
+		for (Token t : lexer.tokens)
 			std::cout << "value: " << t.value << " | line number: " << t.loc.line_number << std::endl;
 	#endif
 
 	std::cout << "[note] parsing tokens" << std::endl;
-	Program program = parse_tokens(tokens);
+	Program program = parse_tokens(lexer.tokens);
 
 	#ifdef DEBUG_PARSER
 		for (std::pair<std::string, Function> func : program.functions) {

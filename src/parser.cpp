@@ -731,8 +731,10 @@ Program parse_tokens(std::vector<Token> tokens) {
 
 			if (std::find(include_paths.begin(), include_paths.end(), file_path) == include_paths.end())
 			{
-				std::vector<Token> include_file_tokens = tokenize_file(file_path);
-				tokens.insert(tokens.begin() + i + 1, include_file_tokens.begin(), include_file_tokens.end());
+				Lexer include_file_lexer;
+				include_file_lexer.set_file(file_path);
+				include_file_lexer.tokenize();
+				tokens.insert(tokens.begin() + i + 1, include_file_lexer.tokens.begin(), include_file_lexer.tokens.end());
 				include_paths.push_back(file_path);
 			}
 		}
