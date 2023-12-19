@@ -19,7 +19,6 @@ STDERR:
 {comp_proc.stderr}"""
 
 def main():
-	os.system("make")
 	_test_files = os.listdir("test")
 	test_files = []
 	for i in _test_files:

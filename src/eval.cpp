@@ -1,10 +1,10 @@
 #include "include/eval.h"
 
-ConstExpr eval_const_expression(Program program, std::vector<Token> tokens, long unsigned int i, Location definition_loc) {
+ConstExpr eval_const_expression(Parser* parser, long unsigned int i, Location definition_loc) {
 	std::vector<long long> stack;
 
-	while (tokens.at(i).value != "end") {
-		Op op = convert_token_to_op(tokens.at(i), program);
+	while (parser->tokens.at(i).value != "end") {
+		Op op = parser->convert_token_to_op(parser->tokens.at(i));
 
 		if (op.type == OP_PUSH_INT)
 			stack.push_back(op.int_operand);
@@ -71,8 +71,8 @@ ConstExpr eval_const_expression(Program program, std::vector<Token> tokens, long
 		}
 
 		i++;
-		if (i > tokens.size() - 1) {
-			print_error_at_loc(tokens.at(i - 1).loc, "unexpected EOF found while parsing");
+		if (i > parser->tokens.size() - 1) {
+			print_error_at_loc(parser->tokens.at(i - 1).loc, "unexpected EOF found while parsing");
 			exit(1);
 		}
 	}

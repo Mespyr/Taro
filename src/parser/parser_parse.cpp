@@ -1,208 +1,6 @@
-#include "include/parser.h"
-#include "include/op.h"
+#include "../include/parser.h"
 
-bool is_legal_name(Token token_name) {
-	// if token is an integer or string
-	if (token_name.type == TOKEN_INT || token_name.type == TOKEN_STRING) return false;
-	// any illegal characters in names
-	if (token_name.value.find('"') != std::string::npos) return false;
-	if (token_name.value.find('^') != std::string::npos) return false;
-	if (token_name.value.find('@') != std::string::npos) return false;
-	if (token_name.value.find('&') != std::string::npos) return false;
-	if (token_name.value.find('.') != std::string::npos) return false;
-	if (token_name.value.front() == '<' || token_name.value.back() == '>') return false;
-	// if token is builtin word or type name
-	if (is_builtin_word(token_name.value)) return false;
-	if (is_prim_type(token_name.value)) return false;
-
-	return true;
-}
-
-std::string add_escapes_to_string(std::string str) {
-	std::string buf;
-	std::string ret;
-	long unsigned int i = 0;
-
-	// can't get 2 chars if string is 1 or 0 chars
-	if (str.length() < 2) return str;
-
-	while (i < str.length()) {
-		buf = str.substr(i, 2);
-
-		if (buf == "\\a")       ret.push_back('\a');
-		else if (buf == "\\b")  ret.push_back('\b');
-		else if (buf == "\\f")  ret.push_back('\f');
-		else if (buf == "\\n")  ret.push_back('\n');
-		else if (buf == "\\r")  ret.push_back('\r');
-		else if (buf == "\\t")  ret.push_back('\t');
-		else if (buf == "\\v")  ret.push_back('\v');
-		else if (buf == "\\\\") ret.push_back('\\');
-		else if (buf == "\\'")  ret.push_back('\'');
-		else if (buf == "\\\"") ret.push_back('\"');
-		else if (buf == "\\\?") ret.push_back('\?');
-		else if (buf == "\\0")  ret.push_back('\0');
-		else {
-			// if escape sequence not found, shift buffer over by one char to next section
-			ret.push_back(buf.at(0));
-			i++;
-			continue;
-		}
-		// skip both chars if escape sequence found in buffer
-		i+=2;
-	}
-	return ret;
-}
-
-Op convert_token_to_op(Token tok, Program program, std::map<std::string, std::pair<RambutanType, int>> var_offsets) {
-	static_assert(OP_COUNT == 58, "unhandled op types in convert_token_to_op()");
-
-	if (tok.type == TOKEN_WORD)
-	{
-		if (tok.value == "dump")
-			return Op(tok.loc, OP_DUMP);
-		// arithmetic
-		else if (tok.value == "+")
-			return Op(tok.loc, OP_PLUS);
-		else if (tok.value == "-")
-			return Op(tok.loc, OP_MINUS);
-		else if (tok.value == "*")
-			return Op(tok.loc, OP_MUL);
-		else if (tok.value == "/")
-			return Op(tok.loc, OP_DIV);
-		// comparisons
-		else if (tok.value == "=")
-			return Op(tok.loc, OP_EQUAL);
-		else if (tok.value == ">")
-			return Op(tok.loc, OP_GREATER);
-		else if (tok.value == "<")
-			return Op(tok.loc, OP_LESS);
-		else if (tok.value == ">=")
-			return Op(tok.loc, OP_GREATER_EQ);
-		else if (tok.value == "<=")
-			return Op(tok.loc, OP_LESS_EQ);
-		else if (tok.value == "!=")
-			return Op(tok.loc, OP_NOT_EQ);
-		else if (tok.value == "not")
-			return Op(tok.loc, OP_NOT);
-		else if (tok.value == "and")
-			return Op(tok.loc, OP_AND);
-		else if (tok.value == "or")
-			return Op(tok.loc, OP_OR);
-		// stack manipulation
-		else if (tok.value == "pop")
-			return Op(tok.loc, OP_POP);
-		else if (tok.value == "dup")
-			return Op(tok.loc, OP_DUP);
-		else if (tok.value == "swp")
-			return Op(tok.loc, OP_SWP);
-		else if (tok.value == "rot")
-			return Op(tok.loc, OP_ROT);
-		else if (tok.value == "over")
-			return Op(tok.loc, OP_OVER);
-		// keywords
-		else if (tok.value == "fun")
-			return Op(tok.loc, OP_FUN);
-		else if (tok.value == "const")
-			return Op(tok.loc, OP_CONST);
-		else if (tok.value == "end")
-			return Op(tok.loc, OP_END);
-		else if (tok.value == "struct")
-			return Op(tok.loc, OP_STRUCT);
-		else if (tok.value == "import")
-			return Op(tok.loc, OP_IMPORT);
-		else if (tok.value == "jmp")
-			return Op(tok.loc, OP_JMP);
-		else if (tok.value == "cjmpf")
-			return Op(tok.loc, OP_CJMPF);
-		else if (tok.value == "cjmpt")
-			return Op(tok.loc, OP_CJMPT);
-		else if (tok.value == "jmpe")
-			return Op(tok.loc, OP_JMPE);
-		else if (tok.value == "cjmpef")
-			return Op(tok.loc, OP_CJMPEF);
-		else if (tok.value == "cjmpet")
-			return Op(tok.loc, OP_CJMPET);
-		// syscalls
-		else if (tok.value == "call0")
-			return Op(tok.loc, OP_SYSCALL0);
-		else if (tok.value == "call1")
-			return Op(tok.loc, OP_SYSCALL1);
-		else if (tok.value == "call2")
-			return Op(tok.loc, OP_SYSCALL2);
-		else if (tok.value == "call3")
-			return Op(tok.loc, OP_SYSCALL3);
-		else if (tok.value == "call4")
-			return Op(tok.loc, OP_SYSCALL4);
-		else if (tok.value == "call5")
-			return Op(tok.loc, OP_SYSCALL5);
-		else if (tok.value == "call6")
-			return Op(tok.loc, OP_SYSCALL6);
-		// other
-		// OP_PUSH_TYPE_INST
-		else if (tok.value.front() == '<' && tok.value.back() == '>') {
-			std::string push_struct_name = parse_type_str(tok.value.substr(1, tok.value.size() - 2)).first;
-			if (!program.structs.count(push_struct_name) && !is_prim_type(push_struct_name)) {
-				print_error_at_loc(tok.loc, "unknown type in 'push type instance' (<...>), '" + push_struct_name + "'");
-				exit(1);
-			}
-			return Op(tok.loc, OP_PUSH_TYPE_INSTANCE, push_struct_name);
-		}
-		// OP_DELETE_PTR
-		else if (tok.value == "delete")
-			return Op(tok.loc, OP_DELETE_PTR);
-		// OP_FUNCTION_CALL
-		else if (program.functions.count(tok.value))
-			return Op(tok.loc, OP_FUNCTION_CALL, tok.value);
-		else if (program.consts.count(tok.value))
-			return Op(tok.loc, OP_PUSH_INT, program.consts.at(tok.value).value);
-		// OP_LABEL
-		else if (tok.value.back() == ':') {
-			if (tok.value.size() == 1) {
-				print_error_at_loc(tok.loc, "unexpected ':' char found while parsing");
-				exit(1);
-			}
-			tok.value.pop_back();
-			return Op(tok.loc, OP_LABEL, tok.value);
-		}
-		// OP_SET
-		else if (tok.value.front() == '@') {
-			if (tok.value.size() == 1) {
-				print_error_at_loc(tok.loc, "unexpected '@' char found while parsing");
-				exit(1);
-			}
-			return Op(tok.loc, OP_SET, tok.value.substr(1));
-		}
-		// OP_READ
-		else if (tok.value.front() == '&') {
-			if (tok.value.size() == 1) {
-				print_error_at_loc(tok.loc, "unexpected '&' char found while parsing");
-				exit(1);
-			}
-			return Op(tok.loc, OP_READ, tok.value.substr(1));
-		}
-
-		// OP_DEFINE_VAR
-		else if (is_prim_type(tok.value) || program.structs.count(tok.value) || is_pointer(tok.value))
-			return Op(tok.loc, OP_DEFINE_VAR, tok.value);
-		// OP_PUSH_VAR
-		else if (var_offsets.count(tok.value))
-			return Op(tok.loc, OP_PUSH_VAR, tok.value);
-
-		else if (tok.value == "[" || tok.value == "]" || tok.value == "(" || tok.value == ")") {
-			print_error_at_loc(tok.loc, "unexpected '" + tok.value + "' char found while parsing");
-			exit(1);
-		}
-	}
-	else if (tok.type == TOKEN_INT)
-		return Op(tok.loc, OP_PUSH_INT, atol(tok.value.c_str()));
-	else if (tok.type == TOKEN_STRING)
-		return Op(tok.loc, OP_PUSH_STR, add_escapes_to_string(tok.value.substr(1, tok.value.length() - 2)));
-
-	print_error_at_loc(tok.loc, "unknown word '" + tok.value + "'");
-	exit(1);
-}
-
-std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels) {
+std::vector<Op> Parser::link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels) {
 	static_assert(OP_COUNT == 58, "unhandled op types in link_ops()");
 
 	for (long unsigned int i = 0; i < ops.size(); i++) {
@@ -226,16 +24,15 @@ std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<in
 	return ops;
 }
 
-Program parse_tokens(std::vector<Token> tokens) {
+void Parser::parse() {
 	static_assert(OP_COUNT == 58, "unhandled op types in parse_tokens()");
 
-	Program program;
 	long unsigned int i = 0;
 	int function_addr = 0;
 	std::vector<std::string> include_paths;
 
 	while (i < tokens.size()) {
-		Op current_op = convert_token_to_op(tokens.at(i), program);
+		Op current_op = convert_token_to_op(tokens.at(i));
 		
 		if (current_op.type == OP_FUN) {
 			i++;
@@ -341,7 +138,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 		
 			// parse tokens in function
 			while (i < tokens.size()) {
-				Op f_op = convert_token_to_op(tokens.at(i), program, var_offsets);
+				Op f_op = convert_token_to_op(tokens.at(i), var_offsets);
 				
 				if (f_op.type == OP_FUN) {
 					print_error_at_loc(f_op.loc, "unexpected 'fun' keyword found inside function definition");
@@ -731,10 +528,9 @@ Program parse_tokens(std::vector<Token> tokens) {
 
 			if (std::find(include_paths.begin(), include_paths.end(), file_path) == include_paths.end())
 			{
-				Lexer include_file_lexer;
-				include_file_lexer.set_file(file_path);
-				include_file_lexer.tokenize();
-				tokens.insert(tokens.begin() + i + 1, include_file_lexer.tokens.begin(), include_file_lexer.tokens.end());
+				lexer->set_file(file_path);
+				lexer->tokenize();
+				tokens.insert(tokens.begin() + i + 1, lexer->tokens.begin(), lexer->tokens.end());
 				include_paths.push_back(file_path);
 			}
 		}
@@ -770,7 +566,7 @@ Program parse_tokens(std::vector<Token> tokens) {
 				exit(1);
 			}
 
-			ConstExpr eval = eval_const_expression(program, tokens, i, name_token.loc);
+			ConstExpr eval = eval_const_expression(this, i, name_token.loc);
 			i = eval.i;
 			program.consts.insert({const_name, Const(name_token.loc, eval.value)});
 		}
@@ -781,5 +577,4 @@ Program parse_tokens(std::vector<Token> tokens) {
 
 		i++;
 	}
-	return program;
 }

@@ -2,11 +2,8 @@
 
 bool Op::is_prim_type_mode() {
 	static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in Op::is_prim_type_mode()");
-
-	if (mode == MODE_8BIT ||
-		mode == MODE_64BIT
-	) return true;
-
+	if (mode == MODE_8BIT || mode == MODE_64BIT)
+		return true;
 	return false;
 }
 
@@ -21,10 +18,7 @@ bool is_builtin_word(std::string word) {
 		"call0", "call1", "call2", "call3", "call4", "call5", "call6",
 		"fun", "const", "end", "struct", "import", "jmp", "cjmpt", "cjmpf", "jmpe", "cjmpet", "cjmpef", "delete"
 	};
-
 	for (std::string w : builtin_words)
-		if (w == word)
-			return true;
-
+		if (w == word) return true;
 	return false;
 };

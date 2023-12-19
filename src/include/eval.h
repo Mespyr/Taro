@@ -9,4 +9,4 @@ struct ConstExpr {
 	long unsigned int i;
 };
 
-ConstExpr eval_const_expression(Program program, std::vector<Token> tokens, long unsigned int i, Location definition_loc);
+ConstExpr eval_const_expression(Parser *parser, long unsigned int i, Location definition_loc);
