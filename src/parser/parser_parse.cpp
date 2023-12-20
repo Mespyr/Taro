@@ -27,7 +27,6 @@ std::vector<Op> Parser::link_ops(std::vector<Op> ops, std::map<std::string, std:
 void Parser::parse() {
 	static_assert(OP_COUNT == 58, "unhandled op types in parse_tokens()");
 
-	long unsigned int i = 0;
 	int function_addr = 0;
 	std::vector<std::string> include_paths;
 
@@ -566,9 +565,8 @@ void Parser::parse() {
 				exit(1);
 			}
 
-			ConstExpr eval = eval_const_expression(this, i, name_token.loc);
-			i = eval.i;
-			program.consts.insert({const_name, Const(name_token.loc, eval.value)});
+			long long eval = eval_const_expression(name_token.loc);
+			program.consts.insert({const_name, Const(name_token.loc, eval)});
 		}
 		else {
 			print_error_at_loc(current_op.loc, "Unexpected token found while parsing");

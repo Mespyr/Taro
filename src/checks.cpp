@@ -712,6 +712,9 @@ void type_check_program(Program &program) {
 			else if (op.type == OP_JMP) {
 				jump_op_stack_states.push_back({op, type_stack});
 			}
+			else if (op.type == OP_JMPE) {
+				jump_op_stack_states.push_back({op, type_stack});
+			}
 			else if (op.type == OP_CJMPT) {
 				if (type_stack.size() < 1) {
 					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpt", "conditional jump if true");
@@ -884,7 +887,6 @@ void type_check_program(Program &program) {
 				exit(1);
 			}
 
-			// throw error if stack doesn't match up
 			if (!compare_type_stacks(op_stack_state, label_stack_states.at(op.str_operand))) {
 				print_error_at_loc(op.loc, "different types on stack then what was expected at the label.");
 				exit(1);

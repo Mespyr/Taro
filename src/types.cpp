@@ -1,4 +1,5 @@
 #include "include/types.h"
+#include <cstdlib>
 
 RambutanType::RambutanType(Location loc, std::string type_str) : loc(loc) {
 	std::pair<std::string, int> pair = parse_type_str(type_str);
@@ -85,7 +86,10 @@ std::pair<RambutanType, int> variable_member_offset(Op op, std::map<std::string,
 			print_error_at_loc(op.loc, "member name wasn't provided in the 'set struct member' intrinsic");
 			exit(1);
 		}
-
+		if (var_offsets.at(var_name).first.ptr_to_trace > 0) {
+			print_error_at_loc(op.loc, "cannot access struct members from a variable saved as a pointer to the struct");
+			exit(1);
+		}
 		std::map<std::string, std::pair<RambutanType, int>> struct_members = structs.at(var_offsets.at(var_name).first.base_type).members;
 		int offset = var_offsets.at(var_name).second; // set offset to start of variable
 		unsigned long int current_member_idx = 1;
