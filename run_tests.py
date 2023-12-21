@@ -72,6 +72,7 @@ def main():
 			else: not_saved += 1
 
 	print(f"\033[1;32m{passed} passed, \033[1;31m{failed} failed, \033[1;33m{new} new, \033[1;35m{not_saved} not saved")
+	os.system("tput sgr0")
 	os.system("make clean")
 
 if __name__ == "__main__":
