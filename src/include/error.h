@@ -2,7 +2,7 @@
 
 #include "location.h"
 #include "token.h"
-#include "types.h"
+#include "program.h"
 #include <iostream>
 #include <string>
 #include <vector>

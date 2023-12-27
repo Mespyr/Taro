@@ -1,5 +1,4 @@
-#include "include/types.h"
-#include <cstdlib>
+#include "include/program.h"
 
 RambutanType::RambutanType(Location loc, std::string type_str) : loc(loc) {
 	std::pair<std::string, int> pair = parse_type_str(type_str);

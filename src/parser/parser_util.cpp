@@ -1,10 +1,5 @@
 #include "../include/parser.h"
 
-Parser::Parser(Lexer *l) {
-	lexer = l;
-	tokens = l->tokens;
-}
-
 bool Parser::is_legal_name(Token token_name) {
 	// if token is an integer or string
 	if (token_name.type == TOKEN_INT || token_name.type == TOKEN_STRING) return false;
