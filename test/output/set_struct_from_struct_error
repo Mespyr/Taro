@@ -1,8 +1,5 @@
 COMPILE: 1
 STDOUT:
-[note] tokenizing file
-[note] parsing tokens
-[note] type-checking program
 
 STDERR:
 ┌[test/set_struct_from_struct_error.rmbt:9:4]

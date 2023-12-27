@@ -1,8 +1,5 @@
 COMPILE: 1
 STDOUT:
-[note] tokenizing file
-[note] parsing tokens
-[note] type-checking program
 
 STDERR:
 ┌[test/jump_label_error.rmbt:4:8]

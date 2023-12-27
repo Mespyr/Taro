@@ -1,8 +1,5 @@
 COMPILE: 1
 STDOUT:
-[note] tokenizing file
-[note] parsing tokens
-[note] type-checking program
 
 STDERR:
 ┌[test/basic_struct_error.rmbt:8:8]

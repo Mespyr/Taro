@@ -1,7 +1,5 @@
 COMPILE: 1
 STDOUT:
-[note] tokenizing file
-[note] parsing tokens
 
 STDERR:
 ┌[test/parser.rmbt:9:1]

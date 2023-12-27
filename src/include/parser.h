@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utility>
 #include <vector>
 #include <assert.h>
 #include <map>
@@ -30,5 +31,8 @@ private:
 
 	Op convert_token_to_op(Token tok, std::map<std::string, std::pair<RambutanType, int>> var_offsets = {});
 	std::vector<Op> link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels);
+
 	void parse_function(Op current_op);
+	std::pair<std::vector<RambutanType>, std::vector<RambutanType>> parse_func_signature();
+	Function parse_func_body(Location loc, std::vector<RambutanType> arg_stack, std::vector<RambutanType> ret_stack);
 };
