@@ -20,7 +20,6 @@ int main(int argc, char* argv[]) {
 	Parser parser(&lexer);
 	parser.parse();
 
-	std::cout << "[note] type-checking program" << std::endl;
 	TypeChecker type_checker(parser.program);
 	type_checker.verify();
 	type_checker.perform_checks();
