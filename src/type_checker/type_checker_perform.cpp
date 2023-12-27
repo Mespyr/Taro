@@ -1,39 +1,6 @@
-#include "include/checks.h"
-#include "include/op.h"
-#include "include/types.h"
-#include <cstdlib>
-#include <error.h>
+#include "../include/type_checker.h"
 
-void verify_program(Program program) {
-	if (!program.functions.count("main")) {
-		print_error("no entry point found in program (no 'main' function)");
-		exit(1);
-	}
-
-	Function main_func = program.functions.at("main");
-	if (main_func.arg_stack.size() > 0) {
-		print_error_at_loc(main_func.loc, "'main' function must not pass any arguments");
-		exit(1);
-	}
-
-	if (main_func.ret_stack.size() > 0) {
-		print_error_at_loc(main_func.loc, "'main' function must not have any return values");
-		exit(1);
-	}
-}
-
-bool compare_type_stacks(std::vector<RambutanType> type_stack_1, std::vector<RambutanType> type_stack_2) {
-	if (type_stack_1.size() != type_stack_2.size())
-		return false;
-
-	for (long unsigned int i = 0; i < type_stack_1.size(); i++)
-		if (!types_equal(type_stack_1.at(i), type_stack_2.at(i)))
-			return false;
-
-	return true;
-}
-
-void type_check_program(Program &program) {
+void TypeChecker::perform_checks() {
 	static_assert(OP_COUNT == 58, "unhandled op types in type_check_program()");
 	static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 

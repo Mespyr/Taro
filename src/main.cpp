@@ -1,5 +1,5 @@
 #include <iostream>
-#include "include/checks.h"
+#include "include/type_checker.h"
 #include "include/token.h"
 #include "include/lexer.h"
 #include "include/parser.h"
@@ -13,21 +13,20 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	std::cout << "[note] tokenizing file" << std::endl;
 	Lexer lexer;
 	lexer.set_file(argv[1]);
 	lexer.tokenize();
 
-	std::cout << "[note] parsing tokens" << std::endl;
 	Parser parser(&lexer);
 	parser.parse();
 
 	std::cout << "[note] type-checking program" << std::endl;
-	verify_program(parser.program);
-	type_check_program(parser.program);
+	TypeChecker type_checker(parser.program);
+	type_checker.verify();
+	type_checker.perform_checks();
 
 	std::cout << "[note] compiling to assembly" << std::endl;
-	compile_to_asm(parser.program, "out.asm");
+	compile_to_asm(type_checker.program, "out.asm");
 
 	std::cout << "[cmd] fasm out.asm" << std::endl;
 	exit_on_error(std::system("fasm out.asm"));	
