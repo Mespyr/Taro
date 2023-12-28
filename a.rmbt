@@ -1,0 +1,12 @@
+struct String
+  i64 size
+  ^i8 data
+end
+
+fun String |> print()
+  &self.size &self.data 1 1 call3 pop
+end
+
+def main()
+  1 dump
+end

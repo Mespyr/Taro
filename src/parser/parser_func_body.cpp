@@ -1,7 +1,7 @@
 #include "../include/parser.h"
 
-Function Parser::parse_func_body(Location loc, std::vector<RambutanType> arg_stack, std::vector<RambutanType> ret_stack) {
-	Function func(loc, function_addr, arg_stack, ret_stack);
+Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
+	Function func(loc, function_addr, signature);
 
 	std::vector<Op> function_ops;
 	std::map<std::string, std::pair<int, int>> labels;

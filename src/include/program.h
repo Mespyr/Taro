@@ -14,12 +14,6 @@ enum RambutanPrimType {
 	PRIM_TYPES_COUNT
 };
 
-enum StackSizeType {
-	STACK_SIZE_SINGLE,
-	STACK_SIZE_TUPLE,
-	STACK_SIZE_COUNT
-};
-
 class RambutanType {
 public:
 	RambutanType(Location loc) :
@@ -37,7 +31,6 @@ public:
 	std::string base_type;
 	// the amount of pointers to the type (ex: ^^int is a pointer to a pointer to an int, so it would be 2)
 	int ptr_to_trace = 0;
-	StackSizeType stack_type = STACK_SIZE_SINGLE;
 };
 
 #include "error.h"
@@ -55,16 +48,20 @@ public:
 	long long value;
 };
 
+struct FunctionSignature {
+	std::vector<RambutanType> argument_stack;
+	std::vector<RambutanType> return_stack;
+};
+
 class Function {
 public:
-	Function(Location loc, int addr, std::vector<RambutanType> arg_stack, std::vector<RambutanType> ret_stack) :
-		loc(loc), addr(addr), arg_stack(arg_stack), ret_stack(ret_stack)
+	Function(Location loc, int addr, FunctionSignature signature) :
+		loc(loc), addr(addr), signature(signature) 
 	{}
 
 	Location loc;
 	int addr;
-	std::vector<RambutanType> arg_stack;
-	std::vector<RambutanType> ret_stack;
+	FunctionSignature signature;
 	std::vector<Op> ops;
 	std::map<std::string, std::pair<RambutanType, int>> var_offsets;
 	int memory_capacity;

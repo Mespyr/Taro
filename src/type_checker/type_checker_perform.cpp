@@ -15,7 +15,7 @@ void TypeChecker::perform_checks() {
 		// get all type_stack snapshots of all label sections
 		std::vector<RambutanType> type_stack;
 		
-		for (RambutanType t : function.arg_stack)
+		for (RambutanType t : function.signature.argument_stack)
 			type_stack.push_back(t);
 
 		// type check all ops
@@ -774,22 +774,22 @@ void TypeChecker::perform_checks() {
 
 				Function call_func = program.functions.at(op.str_operand);
 
-				if (type_stack.size() < call_func.arg_stack.size()) {
-					print_not_enough_arguments_error(op.loc, call_func.arg_stack.size(), type_stack.size(), op.str_operand, "", true);
+				if (type_stack.size() < call_func.signature.argument_stack.size()) {
+					print_not_enough_arguments_error(op.loc, call_func.signature.argument_stack.size(), type_stack.size(), op.str_operand, "", true);
 					exit(1);
 				}
 
 				std::vector<RambutanType> args;
-				for (unsigned long int i = call_func.arg_stack.size(); i > 0; i--) {
+				for (unsigned long int i = call_func.signature.argument_stack.size(); i > 0; i--) {
 					args.push_back(type_stack.back());
 					type_stack.pop_back();
 				}
 				std::reverse(args.begin(), args.end());
 
-				bool args_match_types = compare_type_stacks(args, call_func.arg_stack);
+				bool args_match_types = compare_type_stacks(args, call_func.signature.argument_stack);
 				if (!args_match_types) {
-					if (call_func.arg_stack.size() == 1)
-						print_invalid_type_error(op.loc, human_readable_type(call_func.arg_stack.at(0)), human_readable_type(args.at(0)), op.str_operand, "", true);
+					if (call_func.signature.argument_stack.size() == 1)
+						print_invalid_type_error(op.loc, human_readable_type(call_func.signature.argument_stack.at(0)), human_readable_type(args.at(0)), op.str_operand, "", true);
 					else {
 						print_invalid_combination_of_types_error(op.loc, args, op.str_operand, "", true);
 						for (RambutanType t : args)
@@ -798,7 +798,7 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 
-				for (RambutanType t : call_func.ret_stack)
+				for (RambutanType t : call_func.signature.return_stack)
 					type_stack.push_back(t);
 			}
 
@@ -810,13 +810,13 @@ void TypeChecker::perform_checks() {
 		}
 
 		// make sure return values match up with what is specified in the function definition and throw error if not
-		if (!compare_type_stacks(type_stack, function.ret_stack)) {
+		if (!compare_type_stacks(type_stack, function.signature.return_stack)) {
 			// main cannot have excess data on stack
-			if (function.ret_stack.size() < type_stack.size()) {
-				print_error_at_loc(function.loc, "unhandled data on the stack (expected " + std::to_string(function.ret_stack.size()) + " items, got " + std::to_string(type_stack.size()) + ")");
+			if (function.signature.return_stack.size() < type_stack.size()) {
+				print_error_at_loc(function.loc, "unhandled data on the stack (expected " + std::to_string(function.signature.return_stack.size()) + " items, got " + std::to_string(type_stack.size()) + ")");
 
 				std::vector<RambutanType> excess_stack;
-				for (unsigned long int i = type_stack.size() - function.ret_stack.size(); i > 0; i--) {
+				for (unsigned long int i = type_stack.size() - function.signature.return_stack.size(); i > 0; i--) {
 					excess_stack.push_back(type_stack.back());
 					type_stack.pop_back();
 				}
@@ -826,8 +826,8 @@ void TypeChecker::perform_checks() {
 					print_note_at_loc(t.loc, "excess data pushed here (" + human_readable_type(t) + ")");
 			}
 
-			else if (function.ret_stack.size() > type_stack.size())
-				print_error_at_loc(function.loc, "not enough data on the stack (expected " + std::to_string(function.ret_stack.size()) + " items, got " + std::to_string(type_stack.size()) + ")");
+			else if (function.signature.return_stack.size() > type_stack.size())
+				print_error_at_loc(function.loc, "not enough data on the stack (expected " + std::to_string(function.signature.return_stack.size()) + " items, got " + std::to_string(type_stack.size()) + ")");
 
 			else if (type_stack.size() > 1) {
 				print_invalid_combination_of_types_error(function.loc, type_stack, func_name, "", true);
@@ -836,7 +836,7 @@ void TypeChecker::perform_checks() {
 			}
 
 			else {
-				print_invalid_type_error(function.loc, human_readable_type(function.ret_stack.at(0)), human_readable_type(type_stack.at(0)), func_name, "", true);
+				print_invalid_type_error(function.loc, human_readable_type(function.signature.return_stack.at(0)), human_readable_type(type_stack.at(0)), func_name, "", true);
 				print_note_at_loc(type_stack.at(0).loc, "value pushed here (" + human_readable_type(type_stack.at(0)) + ")");
 			}
 

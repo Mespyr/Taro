@@ -1,14 +1,13 @@
 #include "../include/parser.h"
 
-std::pair<std::vector<RambutanType>, std::vector<RambutanType>> Parser::parse_func_signature() {
+FunctionSignature Parser::parse_func_signature() {
 	if (tokens.at(i).value != "(") {
 		print_error_at_loc(tokens.at(i).loc, "unexpected '" + tokens.at(i).value + "' found while parsing function definition");
 		exit(1);
 	}
 	i++;
 
-	std::vector<RambutanType> arg_stack;
-	std::vector<RambutanType> ret_stack;
+	FunctionSignature signature;
 
 	// parse arguments of function
 	while (tokens.at(i).value != ")") {
@@ -19,7 +18,7 @@ std::pair<std::vector<RambutanType>, std::vector<RambutanType>> Parser::parse_fu
 			print_error_at_loc(tok.loc, "unknown argument type '" + tok.value + "'");
 			exit(1);
 		}
-		arg_stack.push_back(RambutanType(tok.loc, tok.value));
+		signature.argument_stack.push_back(RambutanType(tok.loc, tok.value));
 
 		i++;
 		if (i > tokens.size() - 1) {
@@ -46,7 +45,7 @@ std::pair<std::vector<RambutanType>, std::vector<RambutanType>> Parser::parse_fu
 				print_error_at_loc(tok.loc, "unknown return type '" + tok.value + "'");
 				exit(1);
 			}
-			ret_stack.push_back(RambutanType(tok.loc, tok.value));
+			signature.return_stack.push_back(RambutanType(tok.loc, tok.value));
 
 			i++;
 			if (i > tokens.size() - 1) {
@@ -57,5 +56,5 @@ std::pair<std::vector<RambutanType>, std::vector<RambutanType>> Parser::parse_fu
 		i++;
 	}
 
-	return {arg_stack, ret_stack};
+	return signature;
 }

@@ -32,7 +32,7 @@ void Parser::parse_function(Op current_op) {
 		exit(1);
 	}
 
-	std::pair<std::vector<RambutanType>, std::vector<RambutanType>> signature = parse_func_signature();
-	program.functions.insert({function_name, parse_func_body(name_token.loc, signature.first, signature.second)});
+	FunctionSignature signature = parse_func_signature();
+	program.functions.insert({function_name, parse_func_body(name_token.loc, signature)});
 	function_addr++;
 }
