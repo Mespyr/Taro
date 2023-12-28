@@ -24,11 +24,8 @@ int main(int argc, char* argv[]) {
 	type_checker.verify();
 	type_checker.perform_checks();
 
-	std::cout << "[note] compiling to assembly" << std::endl;
-	compile_to_asm(type_checker.program, "out.asm");
-
-	std::cout << "[cmd] fasm out.asm" << std::endl;
-	exit_on_error(std::system("fasm out.asm"));	
+	compile_to_asm(type_checker.program, "/tmp/out.asm");
+	exit_on_error(std::system("fasm /tmp/out.asm ./a.out"));	
 
 	return 0;
 }

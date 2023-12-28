@@ -39,7 +39,7 @@ def main():
 		comp_proc = sp.run(["./rambutan", "test/" + test], text = True, stdout = sp.PIPE, stderr = sp.PIPE)
 		# run compiled test code
 		if comp_proc.returncode == 0:
-			run_proc = sp.run("./out", text = True, stdout = sp.PIPE, stderr = sp.PIPE)
+			run_proc = sp.run("./a.out", text = True, stdout = sp.PIPE, stderr = sp.PIPE)
 			genfile = GENFILE_WITH_RUN_OUTPUT(comp_proc, run_proc)
 		else:
 			genfile = GENFILE_COMP_ERROR(comp_proc)

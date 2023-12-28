@@ -1,4 +1,4 @@
-CPP=g++
+CPP=clang++
 CPPFLAGS=-Wall -Wextra -pedantic
 LDFLAGS=
 
@@ -44,5 +44,5 @@ test: all
 	python3 run_tests.py
 
 clean:
-	$(RM) -r $(OBJ_DIR) *.o out *.asm
+	$(RM) -r $(OBJ_DIR) *.o a.out *.asm
 	$(RM) $(BIN)
