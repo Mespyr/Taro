@@ -64,7 +64,7 @@ public:
 	FunctionSignature signature;
 	std::vector<Op> ops;
 	std::map<std::string, std::pair<RambutanType, int>> var_offsets;
-	int memory_capacity;
+	int memory_capacity = 0;
 };
 
 class Struct {
