@@ -80,7 +80,7 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 			}
 
 			func.var_offsets.insert({var_name_tok.value,
-				{RambutanType(var_name_tok.loc, f_op.str_operand), func.memory_capacity}
+				{LangType(var_name_tok.loc, f_op.str_operand), func.memory_capacity}
 			});
 
 			func.memory_capacity += sizeof_type(f_op.str_operand, program.structs);
@@ -89,7 +89,7 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 			// if setting a variable
 			if (func.var_offsets.count(f_op.str_operand)) {
 				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in parse_tokens()");
-				RambutanType type = func.var_offsets.at(f_op.str_operand).first;
+				LangType type = func.var_offsets.at(f_op.str_operand).first;
 				if (is_prim_type(type.base_type) || is_pointer(type)) {
 					// 8bit values
 					if (sizeof_type(type) == 1)
@@ -145,7 +145,7 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 				
 				// if setting pointer member
 				if (program.structs.count(split_cmd.front())) {
-					std::pair<RambutanType, int> member_type_offset = struct_member_offset(f_op, program.structs);
+					std::pair<LangType, int> member_type_offset = struct_member_offset(f_op, program.structs);
 					f_op.type = OP_SET_PTR_STRUCT_MEMBER;
 					if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
 						f_op.mode = MODE_64BIT;
@@ -165,7 +165,7 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 				// if setting variable member
 				else
 				{
-					std::pair<RambutanType, int> member_type_offset = variable_member_offset(f_op, func.var_offsets, program.structs);
+					std::pair<LangType, int> member_type_offset = variable_member_offset(f_op, func.var_offsets, program.structs);
 					if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
 						f_op.mode = MODE_64BIT;
 					else if (program.structs.count(member_type_offset.first.base_type))
@@ -186,7 +186,7 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 		else if (f_op.type == OP_READ) {
 			// if reading a variable
 			if (func.var_offsets.count(f_op.str_operand)) {
-				RambutanType type = func.var_offsets.at(f_op.str_operand).first;
+				LangType type = func.var_offsets.at(f_op.str_operand).first;
 				if (!is_prim_type(type) && !is_pointer(type)) {
 					print_error_at_loc(f_op.loc, "Can't read whole variable for a non-primitive type (type " + human_readable_type(type) + ")");
 					exit(1);
@@ -230,7 +230,7 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 				
 				// if reading pointer member
 				if (program.structs.count(split_cmd.front())) {
-					std::pair<RambutanType, int> member_type_offset = struct_member_offset(f_op, program.structs);
+					std::pair<LangType, int> member_type_offset = struct_member_offset(f_op, program.structs);
 					f_op.type = OP_READ_PTR_STRUCT_MEMBER;
 
 					if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
@@ -250,7 +250,7 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 				}
 				// if reading variable member
 				else {
-					std::pair<RambutanType, int> member_type_offset = variable_member_offset(f_op, func.var_offsets, program.structs);
+					std::pair<LangType, int> member_type_offset = variable_member_offset(f_op, func.var_offsets, program.structs);
 					if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
 						f_op.mode = MODE_64BIT;
 					else if (program.structs.count(member_type_offset.first.base_type))

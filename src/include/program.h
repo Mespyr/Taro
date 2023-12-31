@@ -8,19 +8,19 @@
 
 // PROGRAM TYPES
 
-enum RambutanPrimType {
+enum LangPrimType {
 	TYPE_I8,
 	TYPE_I64,
 	PRIM_TYPES_COUNT
 };
 
-class RambutanType {
+class LangType {
 public:
-	RambutanType(Location loc) :
+	LangType(Location loc) :
 		loc(loc)
 	{}
-	RambutanType(Location loc, std::string type_str);
-	RambutanType(Location loc, std::string base_type, int ptr_to_trace) :
+	LangType(Location loc, std::string type_str);
+	LangType(Location loc, std::string base_type, int ptr_to_trace) :
 		loc(loc),
 		base_type(base_type),
 		ptr_to_trace(ptr_to_trace)
@@ -49,8 +49,8 @@ public:
 };
 
 struct FunctionSignature {
-	std::vector<RambutanType> argument_stack;
-	std::vector<RambutanType> return_stack;
+	std::vector<LangType> argument_stack;
+	std::vector<LangType> return_stack;
 };
 
 class Function {
@@ -63,18 +63,18 @@ public:
 	int addr;
 	FunctionSignature signature;
 	std::vector<Op> ops;
-	std::map<std::string, std::pair<RambutanType, int>> var_offsets;
+	std::map<std::string, std::pair<LangType, int>> var_offsets;
 	int memory_capacity = 0;
 };
 
 class Struct {
 public:
-	Struct(Location loc, std::map<std::string, std::pair<RambutanType, int>> members, int size) :
+	Struct(Location loc, std::map<std::string, std::pair<LangType, int>> members, int size) :
 		loc(loc), members(members), size(size)
 	{}
 
 	Location loc;
-	std::map<std::string, std::pair<RambutanType, int>> members;
+	std::map<std::string, std::pair<LangType, int>> members;
 	int size;
 };
 
@@ -89,23 +89,23 @@ public:
 
 std::vector<std::string> split_by_dot(std::string str);
 std::pair<std::string, int> parse_type_str(std::string str);
-std::string human_readable_type(RambutanType t);
+std::string human_readable_type(LangType t);
 
-std::pair<RambutanType, int> struct_member_offset(Op op, std::map<std::string, Struct> structs);
-std::pair<RambutanType, int> variable_member_offset(Op op, std::map<std::string, std::pair<RambutanType, int>> var_offsets, std::map<std::string, Struct> structs);
+std::pair<LangType, int> struct_member_offset(Op op, std::map<std::string, Struct> structs);
+std::pair<LangType, int> variable_member_offset(Op op, std::map<std::string, std::pair<LangType, int>> var_offsets, std::map<std::string, Struct> structs);
 
-std::string prim_type_name(RambutanPrimType type);
+std::string prim_type_name(LangPrimType type);
 
-int sizeof_type(RambutanType type, std::map<std::string, Struct> structs = {});
+int sizeof_type(LangType type, std::map<std::string, Struct> structs = {});
 int sizeof_type(std::string type, std::map<std::string, Struct> structs = {});
 
-bool types_equal(RambutanType a, RambutanType b);
+bool types_equal(LangType a, LangType b);
 
-bool is_prim_type(RambutanType t);
+bool is_prim_type(LangType t);
 bool is_prim_type(std::string t);
 
-bool is_prim_type_int(RambutanType t);
+bool is_prim_type_int(LangType t);
 bool is_prim_type_int(std::string t);
 
-bool is_pointer(RambutanType t);
+bool is_pointer(LangType t);
 bool is_pointer(std::string t);

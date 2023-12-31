@@ -2,12 +2,12 @@ COMPILE: 1
 STDOUT:
 
 STDERR:
-┌[test/different_int_types_error.rmbt:6:16]
+┌[test/different_int_types_error.orc:6:16]
 │ 	"Hello World!" print
 └ 	               ^^^^^ invalid types for function 'print' (i64, ^i8)
-┌[test/different_int_types_error.rmbt:6:1]
+┌[test/different_int_types_error.orc:6:1]
 │ 	"Hello World!" print
 └ 	^^^^^^^^^^^^^^ NOTE: argument pushed here (i64)
-┌[test/different_int_types_error.rmbt:6:1]
+┌[test/different_int_types_error.orc:6:1]
 │ 	"Hello World!" print
 └ 	^^^^^^^^^^^^^^ NOTE: argument pushed here (^i8)

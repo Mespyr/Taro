@@ -1,12 +1,12 @@
-# rambutan
+# Orc 
 
-Originally started as a remake of the [Lipsem programming language](https://github.com/Mespyr/lipsem), Rambutan has diverged a lot into a compiled, stack-based programming language.
-Source files for Rambutan end in the `.rmbt` file extension.
+Originally started as a remake of the [Lipsem programming language](https://github.com/Mespyr/lipsem), Orc has diverged a lot into a compiled, stack-based programming language.
+Source files for Orc end in the `.orc` file extension.
 
-### Improvements and Changes
+### TODO??
 
-- [x] Rambutan will compile programs down to assembly and use the `fasm` assembler to make an executable. This will make the programs many times faster than the interpreter.
-- [x] Rambutan will have actual string pointers
+- [x] Orc will compile programs down to assembly and use the `fasm` assembler to make an executable. This will make the programs many times faster than the interpreter.
+- [x] Orc will have actual string pointers
 - [x] labels will be allowed to jump to from anywhere within a function, making control flow easier
 - [x] syscalls will be implemented, making the language be able to interact with the operating system
 - [x] Basic stack manipulation
@@ -36,6 +36,7 @@ Source files for Rambutan end in the `.rmbt` file extension.
 - [x] Constants (const keyword)
 - [x] Importing files
 - [ ] write code to generate a [prime spiral](https://mathimages.swarthmore.edu/index.php/Prime_spiral_(Ulam_spiral)) also known as a Ulam spiral.
+- [ ] remove labels for more conventional control flow
 - [ ] SEXP (switch expressions)
 
 
@@ -65,4 +66,9 @@ fun fib(i64) [i64]
       swp 2 - fib +,
   end
 end
+```
+
+### Best Code I've Ever Written
+```python3
+[os.system(f"mv test/{f} test/{f.removesuffix('.rmbt')}.orc") for f in os.listdir("test") if f.endswith(".rmbt")]
 ```

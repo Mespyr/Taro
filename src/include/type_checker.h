@@ -20,5 +20,5 @@ public:
 	void verify();
 	void perform_checks();
 private:
-	bool compare_type_stacks(std::vector<RambutanType> type_stack_1, std::vector<RambutanType> type_stack_2);
+	bool compare_type_stacks(std::vector<LangType> type_stack_1, std::vector<LangType> type_stack_2);
 };

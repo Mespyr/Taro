@@ -7,15 +7,15 @@ void TypeChecker::perform_checks() {
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++) {
 		Function function = fn_key->second;
 		std::string func_name = fn_key->first;
-		std::map<std::string, RambutanType> variables;
-		std::map<std::string, std::vector<RambutanType>> label_stack_states;
-		std::vector<std::pair<Op, std::vector<RambutanType>>> jump_op_stack_states;
+		std::map<std::string, LangType> variables;
+		std::map<std::string, std::vector<LangType>> label_stack_states;
+		std::vector<std::pair<Op, std::vector<LangType>>> jump_op_stack_states;
 
 		// first round of type-checking
 		// get all type_stack snapshots of all label sections
-		std::vector<RambutanType> type_stack;
+		std::vector<LangType> type_stack;
 		
-		for (RambutanType t : function.signature.argument_stack)
+		for (LangType t : function.signature.argument_stack)
 			type_stack.push_back(t);
 
 		// type check all ops
@@ -37,14 +37,14 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
 
 				// additions goes in following combinations [b, a] -> [b + a]
 
 				// int + int -> int
 				if (is_prim_type_int(a) && is_prim_type_int(b))
-					type_stack.push_back(RambutanType(
+					type_stack.push_back(LangType(
 						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else {
@@ -60,14 +60,14 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
 
 				// subtraction goes in following combinations [b, a] -> [b - a]
 
 				// int - int -> int
 				if (is_prim_type_int(a) && is_prim_type_int(b))
-					type_stack.push_back(RambutanType(
+					type_stack.push_back(LangType(
 						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else {
@@ -83,14 +83,14 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
 
 				// multiplication goes in following combinations
 
 				// int * int -> int
 				if (is_prim_type_int(a) && is_prim_type_int(b))
-					type_stack.push_back(RambutanType(
+					type_stack.push_back(LangType(
 						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else {
@@ -106,15 +106,15 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
 
 				// division goes in following combinations
 
 				// int / int -> int, int
 				if (is_prim_type_int(a) && is_prim_type_int(b)) {
-					type_stack.push_back(RambutanType(op.loc, prim_type_name(TYPE_I64), 0));
-					type_stack.push_back(RambutanType(op.loc, prim_type_name(TYPE_I64), 0));
+					type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
+					type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
 				}
 				else {
 					print_invalid_combination_of_types_error(op.loc, {b, a}, "/", "division");
@@ -131,11 +131,11 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 				
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
 
 				if (types_equal(a, b))
-					type_stack.push_back(RambutanType(
+					type_stack.push_back(LangType(
 						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else {
@@ -151,11 +151,11 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 				
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
 
 				if (types_equal(a, b))
-					type_stack.push_back(RambutanType(
+					type_stack.push_back(LangType(
 						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else {
@@ -171,11 +171,11 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 				
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
 
 				if (types_equal(a, b))
-					type_stack.push_back(RambutanType(
+					type_stack.push_back(LangType(
 						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else {
@@ -191,11 +191,11 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 				
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
 
 				if (types_equal(a, b))
-					type_stack.push_back(RambutanType(
+					type_stack.push_back(LangType(
 						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else {
@@ -211,11 +211,11 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 				
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
 
 				if (types_equal(a, b))
-					type_stack.push_back(RambutanType(
+					type_stack.push_back(LangType(
 						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else {
@@ -231,11 +231,11 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 				
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
 
 				if (types_equal(a, b))
-					type_stack.push_back(RambutanType(
+					type_stack.push_back(LangType(
 						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else {
@@ -251,10 +251,10 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 				
-				RambutanType a = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
 
 				if (is_prim_type_int(a))
-					type_stack.push_back(RambutanType(
+					type_stack.push_back(LangType(
 						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else {
@@ -269,11 +269,11 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 				
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
 
 				if (types_equal(a, b))
-					type_stack.push_back(RambutanType(
+					type_stack.push_back(LangType(
 						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else {
@@ -289,11 +289,11 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 				
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
 
 				if (types_equal(a, b))
-					type_stack.push_back(RambutanType(
+					type_stack.push_back(LangType(
 						op.loc, prim_type_name(TYPE_I64), 0
 					));
 				else {
@@ -317,7 +317,7 @@ void TypeChecker::perform_checks() {
 					print_not_enough_arguments_error(op.loc, 1, 0, "dup");
 					exit(1);
 				}
-				RambutanType a = type_stack.back();
+				LangType a = type_stack.back();
 				a.loc = op.loc;
 				type_stack.push_back(a);
 			}
@@ -327,8 +327,8 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
 				type_stack.push_back(a);
 				type_stack.push_back(b);
 			}
@@ -339,9 +339,9 @@ void TypeChecker::perform_checks() {
 				}
 
 				// [c, b, a] -> [b, a, c]
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
-				RambutanType c = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
+				LangType c = type_stack.back(); type_stack.pop_back();
 				type_stack.push_back(b);
 				type_stack.push_back(a);
 				type_stack.push_back(c);
@@ -353,8 +353,8 @@ void TypeChecker::perform_checks() {
 				}
 				
 				// [b, a] -> [b, a, b]
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType b = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType b = type_stack.back(); type_stack.pop_back();
 				type_stack.push_back(b);
 				type_stack.push_back(a);
 				b.loc = op.loc;
@@ -368,8 +368,8 @@ void TypeChecker::perform_checks() {
 					print_not_enough_arguments_error(op.loc, 1, 0, "&", "set variable");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType expected_type = function.var_offsets.at(op.str_operand).first;
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType expected_type = function.var_offsets.at(op.str_operand).first;
 
 				if (op.is_prim_type_mode()) {
 					if (!types_equal(a, expected_type)) {
@@ -399,8 +399,8 @@ void TypeChecker::perform_checks() {
 					print_not_enough_arguments_error(op.loc, 1, 0, "@", "set struct member");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				std::pair<RambutanType, int> member_type_offset = variable_member_offset(op, function.var_offsets, program.structs);
+				LangType a = type_stack.back(); type_stack.pop_back();
+				std::pair<LangType, int> member_type_offset = variable_member_offset(op, function.var_offsets, program.structs);
 				// the type needs to be a pointer to a struct
 				// op-type OP_SET_MEMBER_STRUCT assumes the value was a struct (no pointers)
 				if (op.mode == MODE_STRUCT)
@@ -413,7 +413,7 @@ void TypeChecker::perform_checks() {
 			else if (op.type == OP_READ_VAR) {
 				// if it is a primitive type sizes as only primitive types can be read directly
 				if (op.is_prim_type_mode()) {
-					RambutanType t = function.var_offsets.at(op.str_operand).first;
+					LangType t = function.var_offsets.at(op.str_operand).first;
 					t.loc = op.loc;
 					type_stack.push_back(t);
 				}
@@ -424,14 +424,14 @@ void TypeChecker::perform_checks() {
 			}
 			else if (op.type == OP_READ_VAR_STRUCT_MEMBER) {
 				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
-				std::pair<RambutanType, int> member_type_offset = variable_member_offset(op, function.var_offsets, program.structs);
+				std::pair<LangType, int> member_type_offset = variable_member_offset(op, function.var_offsets, program.structs);
 				member_type_offset.first.loc = op.loc;
 				if (op.mode == MODE_STRUCT)
 					member_type_offset.first.ptr_to_trace++;
 				type_stack.push_back(member_type_offset.first);
 			}
 			else if (op.type == OP_PUSH_VAR) {
-				type_stack.push_back(RambutanType(
+				type_stack.push_back(LangType(
 					op.loc,
 					function.var_offsets.at(op.str_operand).first.base_type,
 					function.var_offsets.at(op.str_operand).first.ptr_to_trace + 1
@@ -444,9 +444,9 @@ void TypeChecker::perform_checks() {
 					print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "@", "set pointer");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back(); // ptr
-				RambutanType b = type_stack.back(); type_stack.pop_back(); // value
-				RambutanType expected_type(op.loc, op.str_operand);
+				LangType a = type_stack.back(); type_stack.pop_back(); // ptr
+				LangType b = type_stack.back(); type_stack.pop_back(); // value
+				LangType expected_type(op.loc, op.str_operand);
 
 				expected_type.ptr_to_trace++;
 				if (!types_equal(expected_type, a)) {
@@ -483,9 +483,9 @@ void TypeChecker::perform_checks() {
 					print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "@", "set pointer member");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back(); // ptr
-				RambutanType b = type_stack.back(); type_stack.pop_back(); // value
-				RambutanType expected_type(op.loc, split_by_dot(op.str_operand).front());
+				LangType a = type_stack.back(); type_stack.pop_back(); // ptr
+				LangType b = type_stack.back(); type_stack.pop_back(); // value
+				LangType expected_type(op.loc, split_by_dot(op.str_operand).front());
 				
 				expected_type.ptr_to_trace++;
 				if (!types_equal(expected_type, a)) {
@@ -494,7 +494,7 @@ void TypeChecker::perform_checks() {
 				}
 				expected_type.ptr_to_trace--;
 
-				std::pair<RambutanType, int> member_type_offset = struct_member_offset(op, program.structs);
+				std::pair<LangType, int> member_type_offset = struct_member_offset(op, program.structs);
 				if (op.mode == MODE_STRUCT)
 					member_type_offset.first.ptr_to_trace++;
 				if (!types_equal(b, member_type_offset.first)) {
@@ -508,8 +508,8 @@ void TypeChecker::perform_checks() {
 					print_not_enough_arguments_error(op.loc, 1, 0, "&", "read pointer");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType expected_type(op.loc, op.str_operand);
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType expected_type(op.loc, op.str_operand);
 
 				expected_type.ptr_to_trace++;
 				if (!types_equal(expected_type, a)) {
@@ -525,8 +525,8 @@ void TypeChecker::perform_checks() {
 					print_not_enough_arguments_error(op.loc, 1, 0, "&", "read pointer member");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
-				RambutanType expected_type(op.loc, split_by_dot(op.str_operand).front()); // get type of struct we are getting the member from
+				LangType a = type_stack.back(); type_stack.pop_back();
+				LangType expected_type(op.loc, split_by_dot(op.str_operand).front()); // get type of struct we are getting the member from
 
 				expected_type.ptr_to_trace++;
 				if (!types_equal(expected_type, a)) {
@@ -535,7 +535,7 @@ void TypeChecker::perform_checks() {
 				}
 				expected_type.ptr_to_trace--;
 
-				std::pair<RambutanType, int> member_type_offset = struct_member_offset(op, program.structs);
+				std::pair<LangType, int> member_type_offset = struct_member_offset(op, program.structs);
 				member_type_offset.first.loc = op.loc;
 				if (op.mode == MODE_STRUCT)
 					member_type_offset.first.ptr_to_trace++;
@@ -548,21 +548,21 @@ void TypeChecker::perform_checks() {
 					print_not_enough_arguments_error(op.loc, 1, 0, "syscall0");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
 
 				if (!is_prim_type_int(a)) {
 					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall0");
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(RambutanType(op.loc, prim_type_name(TYPE_I64), 0));
+				type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL1) {
 				if (type_stack.size() < 2) {
 					print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "syscall1");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
 				type_stack.pop_back();
 
 				if (!is_prim_type_int(a)) {
@@ -570,14 +570,14 @@ void TypeChecker::perform_checks() {
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(RambutanType(op.loc, prim_type_name(TYPE_I64), 0));
+				type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL2) {
 				if (type_stack.size() < 3) {
 					print_not_enough_arguments_error(op.loc, 3, type_stack.size(), "syscall2");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 
@@ -586,14 +586,14 @@ void TypeChecker::perform_checks() {
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(RambutanType(op.loc, prim_type_name(TYPE_I64), 0));
+				type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL3) {
 				if (type_stack.size() < 4) {
 					print_not_enough_arguments_error(op.loc, 4, type_stack.size(), "syscall3");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
@@ -603,14 +603,14 @@ void TypeChecker::perform_checks() {
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(RambutanType(op.loc, prim_type_name(TYPE_I64), 0));
+				type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL4) {
 				if (type_stack.size() < 5) {
 					print_not_enough_arguments_error(op.loc, 5, type_stack.size(), "syscall4");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
@@ -621,14 +621,14 @@ void TypeChecker::perform_checks() {
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(RambutanType(op.loc, prim_type_name(TYPE_I64), 0));
+				type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL5) {
 				if (type_stack.size() < 6) {
 					print_not_enough_arguments_error(op.loc, 6, type_stack.size(), "syscall5");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
@@ -640,14 +640,14 @@ void TypeChecker::perform_checks() {
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(RambutanType(op.loc, prim_type_name(TYPE_I64), 0));
+				type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_SYSCALL6) {
 				if (type_stack.size() < 7) {
 					print_not_enough_arguments_error(op.loc, 7, type_stack.size(), "syscall6");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
 				type_stack.pop_back();
@@ -660,7 +660,7 @@ void TypeChecker::perform_checks() {
 					print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 					exit(1);
 				}
-				type_stack.push_back(RambutanType(op.loc, prim_type_name(TYPE_I64), 0));
+				type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 
 			// labels
@@ -687,7 +687,7 @@ void TypeChecker::perform_checks() {
 					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpt", "conditional jump if true");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
 
 				if (!is_prim_type_int(a)) {
 					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "cjmpt", "conditional jump if true");
@@ -702,7 +702,7 @@ void TypeChecker::perform_checks() {
 					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpf", "conditional jump if false");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
 
 				if (!is_prim_type_int(a)) {
 					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "cjmpf", "conditional jump if false");
@@ -717,7 +717,7 @@ void TypeChecker::perform_checks() {
 					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpet", "conditional jump to end if true");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
 
 				if (!is_prim_type_int(a)) {
 					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "cjmpet", "conditional jump to end if true");
@@ -732,7 +732,7 @@ void TypeChecker::perform_checks() {
 					print_not_enough_arguments_error(op.loc, 1, 0, "cjmpef", "conditional jump to end if false");
 					exit(1);
 				}
-				RambutanType a = type_stack.back(); type_stack.pop_back();
+				LangType a = type_stack.back(); type_stack.pop_back();
 
 				if (!is_prim_type_int(a)) {
 					print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "cjmpet", "conditional jump to end if false");
@@ -745,14 +745,14 @@ void TypeChecker::perform_checks() {
 
 			// other
 			else if (op.type == OP_PUSH_INT) {
-				type_stack.push_back(RambutanType(op.loc, prim_type_name(TYPE_I64), 0));
+				type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
 			}
 			else if (op.type == OP_PUSH_STR) {
-				type_stack.push_back(RambutanType(op.loc, prim_type_name(TYPE_I64), 0));
-				type_stack.push_back(RambutanType(op.loc, prim_type_name(TYPE_I8), 1)); // pointer to array of ints (string)
+				type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
+				type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I8), 1)); // pointer to array of ints (string)
 			}
 			else if (op.type == OP_PUSH_TYPE_INSTANCE) {
-				RambutanType t(op.loc, op.str_operand);
+				LangType t(op.loc, op.str_operand);
 				t.ptr_to_trace++;
 				type_stack.push_back(t);
 			}
@@ -761,7 +761,7 @@ void TypeChecker::perform_checks() {
 					print_not_enough_arguments_error(op.loc, 1, 0, "delete", "delete pointer");
 					exit(1);
 				}
-				RambutanType t = type_stack.back(); type_stack.pop_back();
+				LangType t = type_stack.back(); type_stack.pop_back();
 				if (t.ptr_to_trace == 0) {
 					print_error_at_loc(op.loc, "Can't delete a non-pointer");
 					exit(1);
@@ -779,7 +779,7 @@ void TypeChecker::perform_checks() {
 					exit(1);
 				}
 
-				std::vector<RambutanType> args;
+				std::vector<LangType> args;
 				for (unsigned long int i = call_func.signature.argument_stack.size(); i > 0; i--) {
 					args.push_back(type_stack.back());
 					type_stack.pop_back();
@@ -792,13 +792,13 @@ void TypeChecker::perform_checks() {
 						print_invalid_type_error(op.loc, human_readable_type(call_func.signature.argument_stack.at(0)), human_readable_type(args.at(0)), op.str_operand, "", true);
 					else {
 						print_invalid_combination_of_types_error(op.loc, args, op.str_operand, "", true);
-						for (RambutanType t : args)
+						for (LangType t : args)
 							print_note_at_loc(t.loc, "argument pushed here (" + human_readable_type(t) + ")");
 					}
 					exit(1);
 				}
 
-				for (RambutanType t : call_func.signature.return_stack)
+				for (LangType t : call_func.signature.return_stack)
 					type_stack.push_back(t);
 			}
 
@@ -815,14 +815,14 @@ void TypeChecker::perform_checks() {
 			if (function.signature.return_stack.size() < type_stack.size()) {
 				print_error_at_loc(function.loc, "unhandled data on the stack (expected " + std::to_string(function.signature.return_stack.size()) + " items, got " + std::to_string(type_stack.size()) + ")");
 
-				std::vector<RambutanType> excess_stack;
+				std::vector<LangType> excess_stack;
 				for (unsigned long int i = type_stack.size() - function.signature.return_stack.size(); i > 0; i--) {
 					excess_stack.push_back(type_stack.back());
 					type_stack.pop_back();
 				}
 				std::reverse(excess_stack.begin(), excess_stack.end());
 
-				for (RambutanType t : excess_stack)
+				for (LangType t : excess_stack)
 					print_note_at_loc(t.loc, "excess data pushed here (" + human_readable_type(t) + ")");
 			}
 
@@ -831,7 +831,7 @@ void TypeChecker::perform_checks() {
 
 			else if (type_stack.size() > 1) {
 				print_invalid_combination_of_types_error(function.loc, type_stack, func_name, "", true);
-				for (RambutanType t : type_stack)
+				for (LangType t : type_stack)
 					print_note_at_loc(t.loc, "argument pushed here (" + human_readable_type(t) + ")");
 			}
 
@@ -845,9 +845,9 @@ void TypeChecker::perform_checks() {
 
 		// second round of type-checking
 		// go through code again and check jmp labels to see if the stack values are the same as the label they are jumping to
-		for (std::pair<Op, std::vector<RambutanType>> op_stack_pair : jump_op_stack_states) {
+		for (std::pair<Op, std::vector<LangType>> op_stack_pair : jump_op_stack_states) {
 			Op op = op_stack_pair.first;
-			std::vector<RambutanType> op_stack_state = op_stack_pair.second;
+			std::vector<LangType> op_stack_state = op_stack_pair.second;
 
 			if (!label_stack_states.count(op.str_operand)) {
 				print_error_at_loc(op.loc, "error found in parser or type-checker. Label '" + op.str_operand + " either doesn't exist or hasn't been found by the parser.");

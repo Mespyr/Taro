@@ -64,7 +64,7 @@ void Parser::parse() {
 				exit(1);
 			}
 
-			std::map<std::string, std::pair<RambutanType, int>> members;
+			std::map<std::string, std::pair<LangType, int>> members;
 			int offset = 0;
 			while (tokens.at(i).value != "end") {
 				// get type of next member
@@ -96,7 +96,7 @@ void Parser::parse() {
 
 				// set variable type and relative offset
 				members.insert({member_name_tok.value, {
-					RambutanType(member_name_tok.loc, type_tok.value), offset
+					LangType(member_name_tok.loc, type_tok.value), offset
 				}});
 
 				// increase offset by size of type

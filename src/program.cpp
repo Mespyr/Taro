@@ -1,6 +1,6 @@
 #include "include/program.h"
 
-RambutanType::RambutanType(Location loc, std::string type_str) : loc(loc) {
+LangType::LangType(Location loc, std::string type_str) : loc(loc) {
 	std::pair<std::string, int> pair = parse_type_str(type_str);
 	ptr_to_trace = pair.second;
 	base_type = pair.first;
@@ -30,7 +30,7 @@ std::pair<std::string, int> parse_type_str(std::string str) {
 	return {str, i};
 }
 
-std::string human_readable_type(RambutanType t) {
+std::string human_readable_type(LangType t) {
 	std::string str;
 	for (int i = 0; i < t.ptr_to_trace; i++)
 		str.push_back('^');
@@ -38,24 +38,24 @@ std::string human_readable_type(RambutanType t) {
 	return str + t.base_type;
 }
 
-std::pair<RambutanType, int> struct_member_offset(Op op, std::map<std::string, Struct> structs) {
+std::pair<LangType, int> struct_member_offset(Op op, std::map<std::string, Struct> structs) {
 	static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in get_struct_member()");
 
 	std::vector<std::string> split_member_path = split_by_dot(op.str_operand);
 	std::string type_name = split_member_path.front();
 	
 	if (structs.count(type_name)) {
-		std::map<std::string, std::pair<RambutanType, int>> struct_members = structs.at(type_name).members;
+		std::map<std::string, std::pair<LangType, int>> struct_members = structs.at(type_name).members;
 		int offset = 0; // set offset to start of variable
 		unsigned long int current_member_idx = 1;
-		RambutanType member_type(op.loc);
+		LangType member_type(op.loc);
 
 		while (current_member_idx < split_member_path.size()) {
 			if (!struct_members.count(split_member_path.at(current_member_idx))) {
 				print_error_at_loc(op.loc, "struct '" + type_name + "' doesn't have the member '" + split_member_path.at(1) + "' defined");	
 				exit(1);
 			}
-			std::pair<RambutanType, int> member_type_offset_pair = struct_members.at(split_member_path.at(current_member_idx));
+			std::pair<LangType, int> member_type_offset_pair = struct_members.at(split_member_path.at(current_member_idx));
 			// increment offset by the relative offset of the member
 			offset += member_type_offset_pair.second;
 			// if the member is a struct and isn't the last member of the member path
@@ -75,7 +75,7 @@ std::pair<RambutanType, int> struct_member_offset(Op op, std::map<std::string, S
 	exit(1);
 }
 
-std::pair<RambutanType, int> variable_member_offset(Op op, std::map<std::string, std::pair<RambutanType, int>> var_offsets, std::map<std::string, Struct> structs) {
+std::pair<LangType, int> variable_member_offset(Op op, std::map<std::string, std::pair<LangType, int>> var_offsets, std::map<std::string, Struct> structs) {
 	static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in get_struct_member()");
 
 	std::vector<std::string> split_member_path = split_by_dot(op.str_operand);
@@ -89,17 +89,17 @@ std::pair<RambutanType, int> variable_member_offset(Op op, std::map<std::string,
 			print_error_at_loc(op.loc, "cannot access struct members from a variable saved as a pointer to the struct");
 			exit(1);
 		}
-		std::map<std::string, std::pair<RambutanType, int>> struct_members = structs.at(var_offsets.at(var_name).first.base_type).members;
+		std::map<std::string, std::pair<LangType, int>> struct_members = structs.at(var_offsets.at(var_name).first.base_type).members;
 		int offset = var_offsets.at(var_name).second; // set offset to start of variable
 		unsigned long int current_member_idx = 1;
-		RambutanType member_type(op.loc);
+		LangType member_type(op.loc);
 
 		while (current_member_idx < split_member_path.size()) {
 			if (!struct_members.count(split_member_path.at(current_member_idx))) {
 				print_error_at_loc(op.loc, "struct '" + var_offsets.at(var_name).first.base_type + "' doesn't have the member '" + split_member_path.at(1) + "' defined");	
 				exit(1);
 			}
-			std::pair<RambutanType, int> member_type_offset_pair = struct_members.at(split_member_path.at(current_member_idx));
+			std::pair<LangType, int> member_type_offset_pair = struct_members.at(split_member_path.at(current_member_idx));
 			// increment offset by the relative offset of the member
 			offset += member_type_offset_pair.second;
 			// if the member is a struct and isn't the last member of the member path
@@ -119,7 +119,7 @@ std::pair<RambutanType, int> variable_member_offset(Op op, std::map<std::string,
 	exit(1);
 }
 
-std::string prim_type_name(RambutanPrimType type) {
+std::string prim_type_name(LangPrimType type) {
 	switch(type) {
 		case TYPE_I64:
 			return "i64";
@@ -134,7 +134,7 @@ std::string prim_type_name(RambutanPrimType type) {
 	exit(1);
 }
 
-int sizeof_type(RambutanType type, std::map<std::string, Struct> structs) {
+int sizeof_type(LangType type, std::map<std::string, Struct> structs) {
 	if (is_pointer(type)) return 8;
 	if (is_prim_type(type)) {
 		static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in is_prim_type(LCPType)");
@@ -158,11 +158,11 @@ int sizeof_type(std::string type, std::map<std::string, Struct> structs) {
 	return structs.at(t.first).size;
 }
 
-bool types_equal(RambutanType a, RambutanType b) {
+bool types_equal(LangType a, LangType b) {
 	return (a.ptr_to_trace == b.ptr_to_trace && a.base_type == b.base_type);
 }
 
-bool is_prim_type(RambutanType t) {
+bool is_prim_type(LangType t) {
 	static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in is_prim_type(LCPType)");
 
 	if (t.base_type == prim_type_name(TYPE_I64) ||
@@ -182,7 +182,7 @@ bool is_prim_type(std::string t) {
 	return false;
 }
 
-bool is_prim_type_int(RambutanType t) {
+bool is_prim_type_int(LangType t) {
 	return (t.ptr_to_trace == 0 && (t.base_type == prim_type_name(TYPE_I64) || t.base_type == prim_type_name(TYPE_I8)));
 }
 
@@ -190,7 +190,7 @@ bool is_prim_type_int(std::string t) {
 	return (t == prim_type_name(TYPE_I64) || t == prim_type_name(TYPE_I8));
 }
 
-bool is_pointer(RambutanType t) {
+bool is_pointer(LangType t) {
 	return (t.ptr_to_trace > 0);
 }
 

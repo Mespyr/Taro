@@ -3,12 +3,12 @@ struct String
   ^i8 data
 end
 
-fun String |> init(i64 ^i8)
+fun init |> String(i64 ^i8)
   @self.data
   @self.size
 end
 
-fun String |> print()
+fun print |> String()
   &self.size &self.data
   1 1 call3 pop
 end

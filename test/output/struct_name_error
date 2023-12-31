@@ -2,6 +2,6 @@ COMPILE: 1
 STDOUT:
 
 STDERR:
-┌[test/struct_name_error.rmbt:3:7]
+┌[test/struct_name_error.orc:3:7]
 │ struct Epic.Cap
 └        ^^^^^^^^ illegal name for struct

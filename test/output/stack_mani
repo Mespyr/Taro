@@ -2,12 +2,12 @@ COMPILE: 1
 STDOUT:
 
 STDERR:
-┌[test/stack_mani.rmbt:1:4]
+┌[test/stack_mani.orc:1:4]
 │ fun main()
 └     ^^^^ unhandled data on the stack (expected 0 items, got 2)
-┌[test/stack_mani.rmbt:10:1]
+┌[test/stack_mani.orc:10:1]
 │ 	12 13 over dump
 └ 	^^ NOTE: excess data pushed here (i64)
-┌[test/stack_mani.rmbt:10:4]
+┌[test/stack_mani.orc:10:4]
 │ 	12 13 over dump
 └ 	   ^^ NOTE: excess data pushed here (i64)

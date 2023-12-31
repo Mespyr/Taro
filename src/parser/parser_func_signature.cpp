@@ -18,7 +18,7 @@ FunctionSignature Parser::parse_func_signature() {
 			print_error_at_loc(tok.loc, "unknown argument type '" + tok.value + "'");
 			exit(1);
 		}
-		signature.argument_stack.push_back(RambutanType(tok.loc, tok.value));
+		signature.argument_stack.push_back(LangType(tok.loc, tok.value));
 
 		i++;
 		if (i > tokens.size() - 1) {
@@ -45,7 +45,7 @@ FunctionSignature Parser::parse_func_signature() {
 				print_error_at_loc(tok.loc, "unknown return type '" + tok.value + "'");
 				exit(1);
 			}
-			signature.return_stack.push_back(RambutanType(tok.loc, tok.value));
+			signature.return_stack.push_back(LangType(tok.loc, tok.value));
 
 			i++;
 			if (i > tokens.size() - 1) {

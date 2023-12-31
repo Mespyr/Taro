@@ -1,7 +1,5 @@
 COMPILE: 0
 STDOUT:
-[note] compiling to assembly
-[cmd] fasm out.asm
 flat assembler  version 1.73.32  (16384 kilobytes memory, x64)
 3 passes, 515 bytes.
 

@@ -22,7 +22,7 @@ def main():
 	_test_files = os.listdir("test")
 	test_files = []
 	for i in _test_files:
-		if i.endswith(".rmbt"):
+		if i.endswith(".orc"):
 			test_files.append(i)
 
 	expected_output_files = os.listdir("test/output")
@@ -35,8 +35,8 @@ def main():
 	for test in test_files:
 		# generate output based off of test code
 		genfile = ""
-		test_base_name = test.removesuffix(".rmbt")
-		comp_proc = sp.run(["./rambutan", "test/" + test], text = True, stdout = sp.PIPE, stderr = sp.PIPE)
+		test_base_name = test.removesuffix(".orc")
+		comp_proc = sp.run(["./orcc", "test/" + test], text = True, stdout = sp.PIPE, stderr = sp.PIPE)
 		# run compiled test code
 		if comp_proc.returncode == 0:
 			run_proc = sp.run("./a.out", text = True, stdout = sp.PIPE, stderr = sp.PIPE)

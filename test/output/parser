@@ -2,6 +2,6 @@ COMPILE: 1
 STDOUT:
 
 STDERR:
-┌[test/parser.rmbt:9:1]
+┌[test/parser.orc:9:1]
 │ 	qwekdjqwklejqklwe
 └ 	^^^^^^^^^^^^^^^^^ unknown word 'qwekdjqwklejqklwe'

@@ -4,7 +4,8 @@ struct String
 end
 
 fun print |> String() [i64]
-  &self.size &self.data 1 1 call3
+  # &this.size &this.data 1 1 call3
+  1
 end
 
 def main()

@@ -10,7 +10,6 @@ enum OpCodeMode {
 	MODE_8BIT,
 	MODE_64BIT,
 	MODE_STRUCT,
-
 	MODE_COUNT
 };
 

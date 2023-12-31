@@ -21,7 +21,7 @@ PARSER_OBJ_FILES=$(patsubst $(PARSER_SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(PARSER_SR
 TYPE_CHECKER_OBJ_FILES=$(patsubst $(TYPE_CHECKER_SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(TYPE_CHECKER_SRC_FILES))
 
 HDR_FILES=$(wildcard $(INCLUDE_DIR)/*.h)
-BIN=rambutan
+BIN=orcc
 
 all: $(BIN)
 
