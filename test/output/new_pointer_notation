@@ -1,7 +1,5 @@
 COMPILE: 0
 STDOUT:
-flat assembler  version 1.73.32  (16384 kilobytes memory, x64)
-3 passes, 514 bytes.
 
 STDERR:
 
