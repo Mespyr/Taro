@@ -7,7 +7,6 @@ bool Op::is_prim_type_mode() {
 	return false;
 }
 
-
 bool is_builtin_word(std::string word) {
 	static_assert(OP_COUNT == 58, "unhandled op types in type_check_program()");
 	std::vector<std::string> builtin_words = {

@@ -3,7 +3,7 @@ struct String
   ^i8 data
 end
 
-fun print |> String() [i64]
+fun String |> print() [i64]
   # &this.size &this.data 1 1 call3
   1
 end
