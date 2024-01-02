@@ -90,7 +90,7 @@ enum OpType {
 
 class Op {
 public:
-	Op( Location loc, OpType type) :
+	Op(Location loc, OpType type) :
 		loc(loc),
 		type(type)
 	{}

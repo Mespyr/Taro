@@ -3,237 +3,40 @@
 void TypeChecker::check_op() {
 	Op op = function->ops.at(idx);
 
-	if (op.type == OP_DUMP) {
+	switch (op.type) {
+
+	case OP_DUMP: {
 		if (type_stack.size() < 1) {
 			print_not_enough_arguments_error(op.loc, 1, 0, "dump");
 			exit(1);
 		}
 		type_stack.pop_back();
-	}
+	} break;
 
-	// arithmetics
-	else if (op.type == OP_PLUS) {
-		if (type_stack.size() < 2) {
-			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "+", "addition");
-			exit(1);
-		}
+	case OP_PLUS:
+	case OP_MINUS:
+	case OP_MUL:
+	case OP_DIV:
+		handle_arithmetic_op(op);
+		break;
 
-		LangType a = type_stack.back(); type_stack.pop_back();
-		LangType b = type_stack.back(); type_stack.pop_back();
+	case OP_EQUAL:
+	case OP_GREATER:
+	case OP_LESS:
+	case OP_GREATER_EQ:
+	case OP_LESS_EQ:
+	case OP_NOT_EQ:
+	case OP_AND:
+	case OP_OR:
+		handle_comparison_op(op);
+		break;
 
-		// additions goes in following combinations [b, a] -> [b + a]
-
-		// int + int -> int
-		if (is_prim_type_int(a) && is_prim_type_int(b))
-			type_stack.push_back(LangType(
-				op.loc, prim_type_name(TYPE_I64), 0
-			));
-		else {
-			print_invalid_combination_of_types_error(op.loc, {b, a}, "+", "addition");
-			print_note_at_loc(b.loc, "first value pushed here (" + human_readable_type(b) + ")");
-			print_note_at_loc(a.loc, "second value pushed here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-	}
-	else if (op.type == OP_MINUS) {
-		if (type_stack.size() < 2) {
-			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "-", "subtraction");
-			exit(1);
-		}
-
-		LangType a = type_stack.back(); type_stack.pop_back();
-		LangType b = type_stack.back(); type_stack.pop_back();
-
-		// subtraction goes in following combinations [b, a] -> [b - a]
-
-		// int - int -> int
-		if (is_prim_type_int(a) && is_prim_type_int(b))
-			type_stack.push_back(LangType(
-				op.loc, prim_type_name(TYPE_I64), 0
-			));
-		else {
-			print_invalid_combination_of_types_error(op.loc, {b, a}, "-", "subtraction");
-			print_note_at_loc(b.loc, "first value pushed here (" + human_readable_type(b) + ")");
-			print_note_at_loc(a.loc, "second value pushed here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-	}
-	else if (op.type == OP_MUL) {
-		if (type_stack.size() < 2) {
-			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "*", "multiplication");
-			exit(1);
-		}
-
-		LangType a = type_stack.back(); type_stack.pop_back();
-		LangType b = type_stack.back(); type_stack.pop_back();
-
-		// multiplication goes in following combinations
-
-		// int * int -> int
-		if (is_prim_type_int(a) && is_prim_type_int(b))
-			type_stack.push_back(LangType(
-				op.loc, prim_type_name(TYPE_I64), 0
-			));
-		else {
-			print_invalid_combination_of_types_error(op.loc, {b, a}, "*", "multiplication");
-			print_note_at_loc(b.loc, "first value pushed here (" + human_readable_type(b) + ")");
-			print_note_at_loc(a.loc, "second value pushed here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-	}
-	else if (op.type == OP_DIV) {
-		if (type_stack.size() < 2) {
-			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "/", "division");
-			exit(1);
-		}
-
-		LangType a = type_stack.back(); type_stack.pop_back();
-		LangType b = type_stack.back(); type_stack.pop_back();
-
-		// division goes in following combinations
-
-		// int / int -> int, int
-		if (is_prim_type_int(a) && is_prim_type_int(b)) {
-			type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
-			type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
-		}
-		else {
-			print_invalid_combination_of_types_error(op.loc, {b, a}, "/", "division");
-			print_note_at_loc(b.loc, "first value pushed here (" + human_readable_type(b) + ")");
-			print_note_at_loc(a.loc, "second value pushed here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-	}
-
-	// comparisons
-	else if (op.type == OP_EQUAL) {
-		if (type_stack.size() < 2) {
-			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "=", "equal to");
-			exit(1);
-		}
-		
-		LangType a = type_stack.back(); type_stack.pop_back();
-		LangType b = type_stack.back(); type_stack.pop_back();
-
-		if (types_equal(a, b))
-			type_stack.push_back(LangType(
-				op.loc, prim_type_name(TYPE_I64), 0
-			));
-		else {
-			print_invalid_combination_of_types_error(op.loc, {b, a}, "=", "equal to");
-			print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
-			print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-	}
-	else if (op.type == OP_GREATER) {
-		if (type_stack.size() < 2) {
-			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), ">", "greater than");
-			exit(1);
-		}
-		
-		LangType a = type_stack.back(); type_stack.pop_back();
-		LangType b = type_stack.back(); type_stack.pop_back();
-
-		if (types_equal(a, b))
-			type_stack.push_back(LangType(
-				op.loc, prim_type_name(TYPE_I64), 0
-			));
-		else {
-			print_invalid_combination_of_types_error(op.loc, {b, a}, ">", "greater than");
-			print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
-			print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-	}
-	else if (op.type == OP_LESS) {
-		if (type_stack.size() < 2) {
-			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "<", "less than");
-			exit(1);
-		}
-		
-		LangType a = type_stack.back(); type_stack.pop_back();
-		LangType b = type_stack.back(); type_stack.pop_back();
-
-		if (types_equal(a, b))
-			type_stack.push_back(LangType(
-				op.loc, prim_type_name(TYPE_I64), 0
-			));
-		else {
-			print_invalid_combination_of_types_error(op.loc, {b, a}, "<", "less than");
-			print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
-			print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-	}
-	else if (op.type == OP_GREATER_EQ) {
-		if (type_stack.size() < 2) {
-			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), ">=", "greater than or equal to");
-			exit(1);
-		}
-		
-		LangType a = type_stack.back(); type_stack.pop_back();
-		LangType b = type_stack.back(); type_stack.pop_back();
-
-		if (types_equal(a, b))
-			type_stack.push_back(LangType(
-				op.loc, prim_type_name(TYPE_I64), 0
-			));
-		else {
-			print_invalid_combination_of_types_error(op.loc, {b, a}, ">=", "greater than or equal to");
-			print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
-			print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-	}
-	else if (op.type == OP_LESS_EQ) {
-		if (type_stack.size() < 2) {
-			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "<=", "less than or equal to");
-			exit(1);
-		}
-		
-		LangType a = type_stack.back(); type_stack.pop_back();
-		LangType b = type_stack.back(); type_stack.pop_back();
-
-		if (types_equal(a, b))
-			type_stack.push_back(LangType(
-				op.loc, prim_type_name(TYPE_I64), 0
-			));
-		else {
-			print_invalid_combination_of_types_error(op.loc, {b, a}, ">=", "less than or equal to");
-			print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
-			print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-	}
-	else if (op.type == OP_NOT_EQ) {
-		if (type_stack.size() < 2) {
-			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "!=", "not equal to");
-			exit(1);
-		}
-		
-		LangType a = type_stack.back(); type_stack.pop_back();
-		LangType b = type_stack.back(); type_stack.pop_back();
-
-		if (types_equal(a, b))
-			type_stack.push_back(LangType(
-				op.loc, prim_type_name(TYPE_I64), 0
-			));
-		else {
-			print_invalid_combination_of_types_error(op.loc, {b, a}, "!=", "not equal to");
-			print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
-			print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-	}
-	else if (op.type == OP_NOT) {
+	case OP_NOT: {
 		if (type_stack.size() < 1) {
 			print_not_enough_arguments_error(op.loc, 1, 0, "not");
 			exit(1);
 		}
-		
 		LangType a = type_stack.back(); type_stack.pop_back();
-
 		if (is_prim_type_int(a))
 			type_stack.push_back(LangType(
 				op.loc, prim_type_name(TYPE_I64), 0
@@ -243,57 +46,17 @@ void TypeChecker::check_op() {
 			print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 			exit(1);
 		}
-	}
-	else if (op.type == OP_AND) {
-		if (type_stack.size() < 2) {
-			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "and");
-			exit(1);
-		}
-		
-		LangType a = type_stack.back(); type_stack.pop_back();
-		LangType b = type_stack.back(); type_stack.pop_back();
+	} break;
 
-		if (types_equal(a, b))
-			type_stack.push_back(LangType(
-				op.loc, prim_type_name(TYPE_I64), 0
-			));
-		else {
-			print_invalid_combination_of_types_error(op.loc, {b, a}, "and");
-			print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
-			print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-	}
-	else if (op.type == OP_OR) {
-		if (type_stack.size() < 2) {
-			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "or");
-			exit(1);
-		}
-		
-		LangType a = type_stack.back(); type_stack.pop_back();
-		LangType b = type_stack.back(); type_stack.pop_back();
-
-		if (types_equal(a, b))
-			type_stack.push_back(LangType(
-				op.loc, prim_type_name(TYPE_I64), 0
-			));
-		else {
-			print_invalid_combination_of_types_error(op.loc, {b, a}, "or");
-			print_note_at_loc(b.loc, "first argument found here (" + human_readable_type(b) + ")");
-			print_note_at_loc(a.loc, "second argument found here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-	}		
-
-	// stack manipulation
-	else if (op.type == OP_POP) {
+	case OP_POP: {
 		if (type_stack.size() < 1) {
 			print_not_enough_arguments_error(op.loc, 1, 0, "pop");
 			exit(1);
 		}
 		type_stack.pop_back();
-	}
-	else if (op.type == OP_DUP) {
+	} break;
+
+	case OP_DUP: {
 		if (type_stack.size() < 1) {
 			print_not_enough_arguments_error(op.loc, 1, 0, "dup");
 			exit(1);
@@ -301,24 +64,24 @@ void TypeChecker::check_op() {
 		LangType a = type_stack.back();
 		a.loc = op.loc;
 		type_stack.push_back(a);
-	}
-	else if (op.type == OP_SWP) {
+	} break;
+
+	case OP_SWP: {
 		if (type_stack.size() < 2) {
 			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "swp");
 			exit(1);
 		}
-
 		LangType a = type_stack.back(); type_stack.pop_back();
 		LangType b = type_stack.back(); type_stack.pop_back();
 		type_stack.push_back(a);
 		type_stack.push_back(b);
-	}
-	else if (op.type == OP_ROT) {
+	} break;
+
+	case OP_ROT: {
 		if (type_stack.size() < 3) {
 			print_not_enough_arguments_error(op.loc, 3, type_stack.size(), "rot", "rotate");
 			exit(1);
 		}
-
 		// [c, b, a] -> [b, a, c]
 		LangType a = type_stack.back(); type_stack.pop_back();
 		LangType b = type_stack.back(); type_stack.pop_back();
@@ -326,13 +89,13 @@ void TypeChecker::check_op() {
 		type_stack.push_back(b);
 		type_stack.push_back(a);
 		type_stack.push_back(c);
-	}
-	else if (op.type == OP_OVER) {
+	} break;
+
+	case OP_OVER: {
 		if (type_stack.size() < 2) {
 			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "over");
 			exit(1);
 		}
-		
 		// [b, a] -> [b, a, b]
 		LangType a = type_stack.back(); type_stack.pop_back();
 		LangType b = type_stack.back(); type_stack.pop_back();
@@ -340,10 +103,9 @@ void TypeChecker::check_op() {
 		type_stack.push_back(a);
 		b.loc = op.loc;
 		type_stack.push_back(b);
-	}
+	} break;
 
-	// variables
-	else if (op.type == OP_SET_VAR) {
+	case OP_SET_VAR: {
 		static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 		if (type_stack.size() < 1) {
 			print_not_enough_arguments_error(op.loc, 1, 0, "&", "set variable");
@@ -373,8 +135,9 @@ void TypeChecker::check_op() {
 				exit(1);
 			}
 		}
-	}
-	else if (op.type == OP_SET_VAR_STRUCT_MEMBER) {
+	} break;
+
+	case OP_SET_VAR_STRUCT_MEMBER: {
 		static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 		if (type_stack.size() < 1) {
 			print_not_enough_arguments_error(op.loc, 1, 0, "@", "set struct member");
@@ -390,8 +153,9 @@ void TypeChecker::check_op() {
 			print_error_at_loc(op.loc, "Cannot set '" + op.str_operand + "' to type '" + human_readable_type(a) + "'. Expected type '" + human_readable_type(member_type_offset.first) + "'");
 			exit(1);
 		}
-	}
-	else if (op.type == OP_READ_VAR) {
+	} break;
+
+	case OP_READ_VAR: {
 		// if it is a primitive type sizes as only primitive types can be read directly
 		if (op.is_prim_type_mode()) {
 			LangType t = function->var_offsets.at(op.str_operand).first;
@@ -402,24 +166,24 @@ void TypeChecker::check_op() {
 			print_error_at_loc(op.loc, "compiler error: op OP_READ_VAR is set in a non-primitive mode, this is probably a bug in the parser");
 			exit(1);
 		}
-	}
-	else if (op.type == OP_READ_VAR_STRUCT_MEMBER) {
+	} break;
+
+	case OP_READ_VAR_STRUCT_MEMBER: {
 		static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 		std::pair<LangType, int> member_type_offset = variable_member_offset(op, function->var_offsets, program.structs);
 		member_type_offset.first.loc = op.loc;
 		if (op.mode == MODE_STRUCT)
 			member_type_offset.first.ptr_to_trace++;
 		type_stack.push_back(member_type_offset.first);
-	}
-	else if (op.type == OP_PUSH_VAR) {
-		type_stack.push_back(LangType(
-			op.loc,
+	} break;
+
+	case OP_PUSH_VAR:
+		type_stack.push_back(LangType(op.loc,
 			function->var_offsets.at(op.str_operand).first.base_type,
-			function->var_offsets.at(op.str_operand).first.ptr_to_trace + 1
-		));
-	}
-	// variable pointers
-	else if (op.type == OP_SET_PTR) {
+			function->var_offsets.at(op.str_operand).first.ptr_to_trace + 1));
+		break;
+
+	case OP_SET_PTR: {
 		static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 		if (type_stack.size() < 2) {
 			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "@", "set pointer");
@@ -457,8 +221,9 @@ void TypeChecker::check_op() {
 				exit(1);
 			}
 		}
-	}
-	else if (op.type == OP_SET_PTR_STRUCT_MEMBER) {
+	} break;
+
+	case OP_SET_PTR_STRUCT_MEMBER: {
 		static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 		if (type_stack.size() < 2) {
 			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "@", "set pointer member");
@@ -482,8 +247,9 @@ void TypeChecker::check_op() {
 			print_error_at_loc(op.loc, "cannot set pointer of type '" + op.str_operand + "' to type '" + human_readable_type(b) + "'. Expected type '" + human_readable_type(member_type_offset.first) + "'");
 			exit(1);
 		}
-	}
-	else if (op.type == OP_READ_PTR) {
+	} break;
+
+	case OP_READ_PTR: {
 		static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 		if (type_stack.size() < 1) {
 			print_not_enough_arguments_error(op.loc, 1, 0, "&", "read pointer");
@@ -499,8 +265,9 @@ void TypeChecker::check_op() {
 		}
 		expected_type.ptr_to_trace--;
 		type_stack.push_back(expected_type);
-	}
-	else if (op.type == OP_READ_PTR_STRUCT_MEMBER) {
+	} break;
+
+	case OP_READ_PTR_STRUCT_MEMBER: {
 		static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 		if (type_stack.size() < 1) {
 			print_not_enough_arguments_error(op.loc, 1, 0, "&", "read pointer member");
@@ -521,223 +288,54 @@ void TypeChecker::check_op() {
 		if (op.mode == MODE_STRUCT)
 			member_type_offset.first.ptr_to_trace++;
 		type_stack.push_back(member_type_offset.first);
-	}
+	} break;
 
-	// syscalls
-	else if (op.type == OP_SYSCALL0) {
-		if (type_stack.size() < 1) {
-			print_not_enough_arguments_error(op.loc, 1, 0, "syscall0");
-			exit(1);
-		}
-		LangType a = type_stack.back(); type_stack.pop_back();
+	case OP_SYSCALL0:
+	case OP_SYSCALL1:
+	case OP_SYSCALL2:
+	case OP_SYSCALL3:
+	case OP_SYSCALL4:
+	case OP_SYSCALL5:
+	case OP_SYSCALL6:
+		handle_syscall_op(op);
+		break;
 
-		if (!is_prim_type_int(a)) {
-			print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall0");
-			print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
-	}
-	else if (op.type == OP_SYSCALL1) {
-		if (type_stack.size() < 2) {
-			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "syscall1");
-			exit(1);
-		}
-		LangType a = type_stack.back(); type_stack.pop_back();
-		type_stack.pop_back();
-
-		if (!is_prim_type_int(a)) {
-			print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall1");
-			print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
-	}
-	else if (op.type == OP_SYSCALL2) {
-		if (type_stack.size() < 3) {
-			print_not_enough_arguments_error(op.loc, 3, type_stack.size(), "syscall2");
-			exit(1);
-		}
-		LangType a = type_stack.back(); type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-
-		if (!is_prim_type_int(a)) {
-			print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall2");
-			print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
-	}
-	else if (op.type == OP_SYSCALL3) {
-		if (type_stack.size() < 4) {
-			print_not_enough_arguments_error(op.loc, 4, type_stack.size(), "syscall3");
-			exit(1);
-		}
-		LangType a = type_stack.back(); type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-
-		if (!is_prim_type_int(a)) {
-			print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall3");
-			print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
-	}
-	else if (op.type == OP_SYSCALL4) {
-		if (type_stack.size() < 5) {
-			print_not_enough_arguments_error(op.loc, 5, type_stack.size(), "syscall4");
-			exit(1);
-		}
-		LangType a = type_stack.back(); type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-
-		if (!is_prim_type_int(a)) {
-			print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall4");
-			print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
-	}
-	else if (op.type == OP_SYSCALL5) {
-		if (type_stack.size() < 6) {
-			print_not_enough_arguments_error(op.loc, 6, type_stack.size(), "syscall5");
-			exit(1);
-		}
-		LangType a = type_stack.back(); type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-
-		if (!is_prim_type_int(a)) {
-			print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall5");
-			print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
-	}
-	else if (op.type == OP_SYSCALL6) {
-		if (type_stack.size() < 7) {
-			print_not_enough_arguments_error(op.loc, 7, type_stack.size(), "syscall6");
-			exit(1);
-		}
-		LangType a = type_stack.back(); type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-		type_stack.pop_back();
-
-		if (!is_prim_type_int(a)) {
-			print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "syscall6");
-			print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
-	}
-
-	// labels
-	// we do not check OP_JMP and OP_JMPE as they don't consume any data from the stack
-	// and we will compare the type stack to the labels in the second loop
-	else if (op.type == OP_LABEL) {
-		// save current stack state
+	case OP_LABEL:
 		label_stack_states.insert({op.str_operand, type_stack});
-	}
-	else if (op.type == OP_LABEL_END) {
+		break;
+
+	case OP_LABEL_END: 
 		if (!compare_type_stacks(type_stack, label_stack_states.at(op.str_operand))) {
 			print_error_at_loc(op.loc, "different types on stack before and after label definition. types of items on stack must be the same.");
 			exit(1);
 		}
-	}
-	else if (op.type == OP_JMP) {
-		jump_op_stack_states.push_back({op, type_stack});
-	}
-	else if (op.type == OP_JMPE) {
-		jump_op_stack_states.push_back({op, type_stack});
-	}
-	else if (op.type == OP_CJMPT) {
-		if (type_stack.size() < 1) {
-			print_not_enough_arguments_error(op.loc, 1, 0, "cjmpt", "conditional jump if true");
-			exit(1);
-		}
-		LangType a = type_stack.back(); type_stack.pop_back();
+		break;
 
-		if (!is_prim_type_int(a)) {
-			print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "cjmpt", "conditional jump if true");
-			print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
+	case OP_JMP:
+	case OP_JMPE:
+	case OP_CJMPT:
+	case OP_CJMPF:
+	case OP_CJMPET:
+	case OP_CJMPEF:
+		handle_jump_op(op);
+		break;
 
-		jump_op_stack_states.push_back({op, type_stack});
-	}
-	else if (op.type == OP_CJMPF) {
-		if (type_stack.size() < 1) {
-			print_not_enough_arguments_error(op.loc, 1, 0, "cjmpf", "conditional jump if false");
-			exit(1);
-		}
-		LangType a = type_stack.back(); type_stack.pop_back();
-
-		if (!is_prim_type_int(a)) {
-			print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "cjmpf", "conditional jump if false");
-			print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-
-		jump_op_stack_states.push_back({op, type_stack});
-	}
-	else if (op.type == OP_CJMPET) {
-		if (type_stack.size() < 1) {
-			print_not_enough_arguments_error(op.loc, 1, 0, "cjmpet", "conditional jump to end if true");
-			exit(1);
-		}
-		LangType a = type_stack.back(); type_stack.pop_back();
-
-		if (!is_prim_type_int(a)) {
-			print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "cjmpet", "conditional jump to end if true");
-			print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-
-		jump_op_stack_states.push_back({op, type_stack});
-	}
-	else if (op.type == OP_CJMPEF) {
-		if (type_stack.size() < 1) {
-			print_not_enough_arguments_error(op.loc, 1, 0, "cjmpef", "conditional jump to end if false");
-			exit(1);
-		}
-		LangType a = type_stack.back(); type_stack.pop_back();
-
-		if (!is_prim_type_int(a)) {
-			print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "cjmpet", "conditional jump to end if false");
-			print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-
-		jump_op_stack_states.push_back({op, type_stack});
-	}
-
-	// other
-	else if (op.type == OP_PUSH_INT) {
+	case OP_PUSH_INT:
 		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
-	}
-	else if (op.type == OP_PUSH_STR) {
+		break;
+
+	case OP_PUSH_STR:
 		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
 		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I8), 1)); // pointer to array of ints (string)
-	}
-	else if (op.type == OP_PUSH_TYPE_INSTANCE) {
+		break;
+
+	case OP_PUSH_TYPE_INSTANCE: {
 		LangType t(op.loc, op.str_operand);
 		t.ptr_to_trace++;
 		type_stack.push_back(t);
-	}
-	else if (op.type == OP_DELETE_PTR) {
+	} break;
+
+	case OP_DELETE_PTR: {
 		if (type_stack.size() < 1) {
 			print_not_enough_arguments_error(op.loc, 1, 0, "delete", "delete pointer");
 			exit(1);
@@ -749,8 +347,9 @@ void TypeChecker::check_op() {
 		}
 		op.int_operand = sizeof_type(t, program.structs);
 		program.functions.at(func_name).ops.at(idx) = op;
-	}
-	else if (op.type == OP_FUNCTION_CALL) {
+	} break;
+
+	case OP_FUNCTION_CALL: {
 		assert(program.functions.count(op.str_operand));
 
 		Function call_func = program.functions.at(op.str_operand);
@@ -781,11 +380,26 @@ void TypeChecker::check_op() {
 
 		for (LangType t : call_func.signature.return_stack)
 			type_stack.push_back(t);
-	}
+	} break;
 
-	// unreachable
-	else if (op.type == OP_FUN || op.type == OP_END || op.type == OP_COUNT || op.type == OP_STRUCT || op.type == OP_DEFINE_VAR || op.type == OP_CONST || op.type == OP_IMPORT) {
+	case OP_FUN:
+	case OP_END:
+	case OP_STRUCT:
+	case OP_DEFINE_VAR:
+	case OP_CONST:
+	case OP_IMPORT:
+	case OP_SET:
+	case OP_READ:
+	case OP_COUNT:
 		print_error_at_loc(op.loc, "unreachable: op should be handled in the parsing step. This is probably a bug.");
 		exit(1);
+		break;
+
+	case OP_SET_PTR_FROM_OTHER_PTR:
+	case OP_SET_VAR_FROM_OTHER_PTR:
+		print_error_at_loc(op.loc, "unreachable: op is created in type-checking step and shouldn't be passed in to be type-checked. This is probably a bug.");
+		exit(1);
+		break;
+	
 	}
 }

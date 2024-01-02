@@ -36,7 +36,7 @@ Source files for Orc end in the `.orc` file extension.
 - [x] Constants (const keyword)
 - [x] Importing files
 - [ ] write code to generate a [prime spiral](https://mathimages.swarthmore.edu/index.php/Prime_spiral_(Ulam_spiral)) also known as a Ulam spiral.
-- [ ] remove labels for more conventional control flow
+- [ ] remove labels for more conventional control flow (while loops and SEXP)
 - [ ] SEXP (switch expressions)
 
 

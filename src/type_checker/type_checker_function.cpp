@@ -11,9 +11,6 @@ void TypeChecker::check_function() {
 	jump_op_stack_states.clear();
 	idx = 0;
 
-	// first round of type-checking
-	// get all type_stack snapshots of all label sections
-	
 	for (LangType t : function->signature.argument_stack)
 		type_stack.push_back(t);
 
@@ -56,7 +53,6 @@ void TypeChecker::check_function() {
 		exit(1);
 	}
 
-	// second round of type-checking
 	// go through code again and check jmp labels to see if the stack values are the same as the label they are jumping to
 	for (std::pair<Op, std::vector<LangType>> op_stack_pair : jump_op_stack_states) {
 		Op op = op_stack_pair.first;
