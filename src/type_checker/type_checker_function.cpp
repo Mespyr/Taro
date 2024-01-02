@@ -1,7 +1,6 @@
 #include "../include/type_checker.h"
 
 void TypeChecker::check_function() {
-	static_assert(OP_COUNT == 58, "unhandled op types in type_check_program()");
 	static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 
 	// reset everything

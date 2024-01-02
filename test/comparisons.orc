@@ -19,9 +19,6 @@ fun main()
 	1 0 != dump
 	1 1 != dump
 
-	0 not dump
-	1 not dump
-
 	1 1 and dump
 	1 0 and dump
 	0 0 and dump

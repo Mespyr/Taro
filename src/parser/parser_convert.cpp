@@ -1,7 +1,7 @@
 #include "../include/parser.h"
 
 Op Parser::convert_token_to_op(Token tok, std::map<std::string, std::pair<LangType, int>> var_offsets) {
-	static_assert(OP_COUNT == 58, "unhandled op types in convert_token_to_op()");
+	static_assert(OP_COUNT == 57, "unhandled op types in Parser::convert_token_to_op()");
 
 	if (tok.type == TOKEN_WORD)
 	{
@@ -29,8 +29,6 @@ Op Parser::convert_token_to_op(Token tok, std::map<std::string, std::pair<LangTy
 			return Op(tok.loc, OP_LESS_EQ);
 		else if (tok.value == "!=")
 			return Op(tok.loc, OP_NOT_EQ);
-		else if (tok.value == "not")
-			return Op(tok.loc, OP_NOT);
 		else if (tok.value == "and")
 			return Op(tok.loc, OP_AND);
 		else if (tok.value == "or")

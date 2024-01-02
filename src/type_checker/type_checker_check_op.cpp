@@ -31,23 +31,6 @@ void TypeChecker::check_op() {
 		handle_comparison_op(op);
 		break;
 
-	case OP_NOT: {
-		if (type_stack.size() < 1) {
-			print_not_enough_arguments_error(op.loc, 1, 0, "not");
-			exit(1);
-		}
-		LangType a = type_stack.back(); type_stack.pop_back();
-		if (is_prim_type_int(a))
-			type_stack.push_back(LangType(
-				op.loc, prim_type_name(TYPE_I64), 0
-			));
-		else {
-			print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), "not");
-			print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
-			exit(1);
-		}
-	} break;
-
 	case OP_POP: {
 		if (type_stack.size() < 1) {
 			print_not_enough_arguments_error(op.loc, 1, 0, "pop");

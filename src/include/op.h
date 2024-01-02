@@ -28,7 +28,6 @@ enum OpType {
 	OP_GREATER_EQ,
 	OP_LESS_EQ,
 	OP_NOT_EQ,
-	OP_NOT,
 	OP_AND,
 	OP_OR,
 	// stack manipulation

@@ -1,7 +1,7 @@
 #include "include/compiler.h"
 
 void compile_to_asm(Program program, std::string output_filename) {
-	static_assert(OP_COUNT == 58, "unhandled op types in compile_to_asm()");
+	static_assert(OP_COUNT == 57, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
 
@@ -157,12 +157,6 @@ void compile_to_asm(Program program, std::string output_filename) {
 				outfile.writeln("\tcmp rax, rbx");
 				outfile.writeln("\tcmovne rcx, rdx");
 				outfile.writeln("\tpush rcx");
-			}
-			else if (op.type == OP_NOT) {
-				outfile.writeln("\t; OP_NOT");
-				outfile.writeln("\tpop rax");
-				outfile.writeln("\tnot rax");
-				outfile.writeln("\tpush rax");
 			}
 			else if (op.type == OP_AND) {
 				outfile.writeln("\t; OP_AND");
