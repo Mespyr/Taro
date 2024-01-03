@@ -33,6 +33,10 @@ void Parser::parse_function(Op current_op) {
 	}
 
 	FunctionSignature signature = parse_func_signature();
-	program.functions.insert({function_name, parse_func_body(name_token.loc, signature)});
+
+	Function func = Function(name_token.loc, function_addr, signature);
+	program.functions.insert({function_name, func});
+	parse_func_body(&func);
+	program.functions.at(function_name) = func;
 	function_addr++;
 }

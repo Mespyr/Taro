@@ -1,15 +1,13 @@
 #include "../include/parser.h"
 
-Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
-	Function func(loc, function_addr, signature);
-
+void Parser::parse_func_body(Function* func) {
 	std::map<std::string, std::pair<int, int>> labels;
 	bool found_function_end = false;
 	int recursion_level = 0;
 	std::vector<std::string> recursion_stack;
 
 	while (i < tokens.size()) {
-		Op f_op = convert_token_to_op(tokens.at(i), func.var_offsets);
+		Op f_op = convert_token_to_op(tokens.at(i), func->var_offsets);
 		
 		if (f_op.type == OP_FUN) {
 			print_error_at_loc(f_op.loc, "unexpected 'fun' keyword found inside function definition");
@@ -22,7 +20,7 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 		else if (f_op.type == OP_END) {
 			if (recursion_level == 0) {
 				found_function_end = true;
-				func.ops = link_ops(func.ops, labels);
+				func->ops = link_ops(func->ops, labels);
 				break;
 			}
 			else {
@@ -38,7 +36,7 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 				f_op.type = OP_LABEL_END;
 				f_op.int_operand = label_pair.second;
 				f_op.str_operand = ended_label;
-				func.ops.push_back(f_op);
+				func->ops.push_back(f_op);
 			}
 		}
 		else if (f_op.type == OP_LABEL) {
@@ -56,7 +54,7 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 			recursion_stack.push_back(f_op.str_operand);
 
 			f_op.int_operand = i;
-			func.ops.push_back(f_op);
+			func->ops.push_back(f_op);
 		}
 		else if (f_op.type == OP_DEFINE_VAR) {
 			i++;
@@ -74,22 +72,22 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 				print_error_at_loc(var_name_tok.loc, "name '" + var_name_tok.value + "' already exists as a struct");
 				exit(1);
 			}
-			else if (func.var_offsets.count(var_name_tok.value)) {
+			else if (func->var_offsets.count(var_name_tok.value)) {
 				print_error_at_loc(var_name_tok.loc, "variable '" + var_name_tok.value + "' already exists");
 				exit(1);
 			}
 
-			func.var_offsets.insert({var_name_tok.value,
-				{LangType(var_name_tok.loc, f_op.str_operand), func.memory_capacity}
+			func->var_offsets.insert({var_name_tok.value,
+				{LangType(var_name_tok.loc, f_op.str_operand), func->memory_capacity}
 			});
 
-			func.memory_capacity += sizeof_type(f_op.str_operand, program.structs);
+			func->memory_capacity += sizeof_type(f_op.str_operand, program.structs);
 		}
 		else if (f_op.type == OP_SET) {
 			// if setting a variable
-			if (func.var_offsets.count(f_op.str_operand)) {
+			if (func->var_offsets.count(f_op.str_operand)) {
 				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in parse_tokens()");
-				LangType type = func.var_offsets.at(f_op.str_operand).first;
+				LangType type = func->var_offsets.at(f_op.str_operand).first;
 				if (is_prim_type(type.base_type) || is_pointer(type)) {
 					// 8bit values
 					if (sizeof_type(type) == 1)
@@ -100,9 +98,9 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 				}
 				else f_op.mode = MODE_STRUCT;
 				f_op.type = OP_SET_VAR;
-				f_op.int_operand = func.var_offsets.at(f_op.str_operand).second; // offset to location of variable
+				f_op.int_operand = func->var_offsets.at(f_op.str_operand).second; // offset to location of variable
 				f_op.int_operand_2 = sizeof_type(type, program.structs); // size of type (amount of data needed to move it around)
-				func.ops.push_back(f_op);
+				func->ops.push_back(f_op);
 			}
 			else if (program.structs.count(f_op.str_operand) || is_prim_type(f_op.str_operand) || is_pointer(f_op.str_operand)) {
 				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in parse_tokens()");
@@ -129,7 +127,7 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 				f_op.type = OP_SET_PTR;
 				// since setting variable relatively via pointers, there is no global offset to provide.
 				f_op.int_operand = sizeof_type(f_op.str_operand, program.structs); // size of type (amount of data needed to move around)
-				func.ops.push_back(f_op);
+				func->ops.push_back(f_op);
 			}
 			// if setting value of struct member
 			else {
@@ -160,12 +158,12 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 
 					f_op.int_operand = member_type_offset.second; // relative offset of member in pointer
 					f_op.int_operand_2 = sizeof_type(member_type_offset.first, program.structs); // size of member
-					func.ops.push_back(f_op);
+					func->ops.push_back(f_op);
 				}
 				// if setting variable member
 				else
 				{
-					std::pair<LangType, int> member_type_offset = variable_member_offset(f_op, func.var_offsets, program.structs);
+					std::pair<LangType, int> member_type_offset = variable_member_offset(f_op, func->var_offsets, program.structs);
 					if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
 						f_op.mode = MODE_64BIT;
 					else if (program.structs.count(member_type_offset.first.base_type))
@@ -179,14 +177,14 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 					f_op.type = OP_SET_VAR_STRUCT_MEMBER;
 					f_op.int_operand = member_type_offset.second; // offset to where member is located
 					f_op.int_operand_2 = sizeof_type(member_type_offset.first, program.structs); // size of member
-					func.ops.push_back(f_op);
+					func->ops.push_back(f_op);
 				}
 			}
 		}
 		else if (f_op.type == OP_READ) {
 			// if reading a variable
-			if (func.var_offsets.count(f_op.str_operand)) {
-				LangType type = func.var_offsets.at(f_op.str_operand).first;
+			if (func->var_offsets.count(f_op.str_operand)) {
+				LangType type = func->var_offsets.at(f_op.str_operand).first;
 				if (!is_prim_type(type) && !is_pointer(type)) {
 					print_error_at_loc(f_op.loc, "Can't read whole variable for a non-primitive type (type " + human_readable_type(type) + ")");
 					exit(1);
@@ -201,8 +199,8 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 					f_op.mode = MODE_64BIT;
 
 				f_op.type = OP_READ_VAR;
-				f_op.int_operand = func.var_offsets.at(f_op.str_operand).second;
-				func.ops.push_back(f_op);
+				f_op.int_operand = func->var_offsets.at(f_op.str_operand).second;
+				func->ops.push_back(f_op);
 			}
 			// if reading value of pointer
 			else if (program.structs.count(f_op.str_operand) || is_prim_type(f_op.str_operand)) {
@@ -221,7 +219,7 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 
 				f_op.type = OP_READ_PTR;
 				f_op.int_operand = sizeof_type(f_op.str_operand, program.structs);
-				func.ops.push_back(f_op);
+				func->ops.push_back(f_op);
 			}
 			// if reading value of struct member
 			else {
@@ -246,11 +244,11 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 
 					f_op.int_operand = member_type_offset.second; // relative offset of member in pointer
 					f_op.int_operand_2 = sizeof_type(member_type_offset.first, program.structs);
-					func.ops.push_back(f_op);
+					func->ops.push_back(f_op);
 				}
 				// if reading variable member
 				else {
-					std::pair<LangType, int> member_type_offset = variable_member_offset(f_op, func.var_offsets, program.structs);
+					std::pair<LangType, int> member_type_offset = variable_member_offset(f_op, func->var_offsets, program.structs);
 					if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
 						f_op.mode = MODE_64BIT;
 					else if (program.structs.count(member_type_offset.first.base_type))
@@ -265,7 +263,7 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 					f_op.type = OP_READ_VAR_STRUCT_MEMBER;
 					f_op.int_operand = member_type_offset.second; // offset to where member is located
 					f_op.int_operand_2 = sizeof_type(member_type_offset.first, program.structs);
-					func.ops.push_back(f_op);
+					func->ops.push_back(f_op);
 				}
 			}
 		}
@@ -274,23 +272,21 @@ Function Parser::parse_func_body(Location loc, FunctionSignature signature) {
 			if (i >= tokens.size()) break;
 			Token label_jumpto_tok = tokens.at(i);
 			f_op.str_operand = label_jumpto_tok.value;
-			func.ops.push_back(f_op);
+			func->ops.push_back(f_op);
 		}
 		else if (f_op.type == OP_PUSH_VAR) {
-			f_op.int_operand = func.var_offsets.at(f_op.str_operand).second;
-			func.ops.push_back(f_op);
+			f_op.int_operand = func->var_offsets.at(f_op.str_operand).second;
+			func->ops.push_back(f_op);
 		}
 		else if (f_op.type == OP_PUSH_TYPE_INSTANCE) {
 			f_op.int_operand = sizeof_type(f_op.str_operand, program.structs);
-			func.ops.push_back(f_op);
+			func->ops.push_back(f_op);
 		}
-		else func.ops.push_back(f_op);
+		else func->ops.push_back(f_op);
 		i++;
 	}
 	if (!found_function_end) {
 		print_error_at_loc(tokens.back().loc, "Unexpected EOF while parsing function body");
 		exit(1);
 	}
-
-	return func;
 };
