@@ -33,7 +33,9 @@ int main(int argc, const char* argv[]) {
 	type_checker.verify();
 	type_checker.perform_checks();
 
-	compile_to_asm(type_checker.program, "/tmp/out.asm");
+	Compiler compiler(type_checker.program);
+	compiler.generate_asm("/tmp/out.asm");
+	
 	exec("fasm /tmp/out.asm ./a.out");
 	
 	return 0;

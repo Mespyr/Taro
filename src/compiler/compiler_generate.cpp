@@ -1,6 +1,6 @@
-#include "include/compiler.h"
+#include "../include/compiler.h"
 
-void compile_to_asm(Program program, std::string output_filename) {
+void Compiler::generate_asm(std::string output_filename) {
 	static_assert(OP_COUNT == 57, "unhandled op types in compile_to_asm()");
 
 	File outfile(output_filename, FILE_WRITE);
@@ -84,7 +84,7 @@ void compile_to_asm(Program program, std::string output_filename) {
 				outfile.writeln("\t; OP_MUL");
 				outfile.writeln("\tpop rax");
 				outfile.writeln("\tpop rbx");
-				outfile.writeln("\tmul rbx");
+				outfile.writeln("\timul rax, rbx");
 				outfile.writeln("\tpush rax");
 			}
 			else if (op.type == OP_DIV) {
@@ -213,28 +213,19 @@ void compile_to_asm(Program program, std::string output_filename) {
 			else if (op.type == OP_SET_VAR) {
 				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in compile_to_asm()");
 				outfile.writeln("\t; OP_SET_VAR " + op.str_operand + " offset:" + std::to_string(op.int_operand) + " size:" + std::to_string(op.int_operand_2));
-				if (op.is_prim_type_mode()) {
-					outfile.writeln("\tpop rbx");
-					outfile.writeln("\tmov rax, [ret_stack_rsp]");
-					outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
-
-					if (op.mode == MODE_8BIT)
-						outfile.writeln("\tmov [rax], bl");
-					else if (op.mode == MODE_64BIT)
-						outfile.writeln("\tmov [rax], rbx");
-				}
+				outfile.writeln("\tpop rbx");
+				outfile.writeln("\tmov rax, [ret_stack_rsp]");
+				outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
+				if (op.mode == MODE_8BIT)
+					outfile.writeln("\tmov [rax], bl");
+				else if (op.mode == MODE_64BIT)
+					outfile.writeln("\tmov [rax], rbx");
 				else if (op.mode == MODE_STRUCT) {
-					outfile.writeln("\tpop rbx");
-					// get pointer to struct
-					outfile.writeln("\tmov rax, [ret_stack_rsp]");
-					outfile.writeln("\tadd rax, " + std::to_string(op.int_operand));
 					outfile.writeln("\tmov rcx, [rbx]");
 					outfile.writeln("\tmov [rax], rcx");
 					for (int i = 8; i < op.int_operand_2; i+=8) {
-						outfile.writeln("\tadd rax, 8");
-						outfile.writeln("\tadd rbx, 8");
-						outfile.writeln("\tmov rcx, [rbx]");
-						outfile.writeln("\tmov [rax], rcx");
+						outfile.writeln("\tmov rcx, [rbx + " + std::to_string(i) + "]");
+						outfile.writeln("\tmov [rax + " + std::to_string(i) + "], rcx");
 					}
 				}
 			}
@@ -269,10 +260,8 @@ void compile_to_asm(Program program, std::string output_filename) {
 					outfile.writeln("\tmov rcx, [rbx]");
 					outfile.writeln("\tmov [rax], rcx");
 					for (int i = 8; i < op.int_operand_2; i+=8) {
-						outfile.writeln("\tadd rax, 8");
-						outfile.writeln("\tadd rbx, 8");
-						outfile.writeln("\tmov rcx, [rbx]");
-						outfile.writeln("\tmov [rax], rcx");
+						outfile.writeln("\tmov rcx, [rbx + " + std::to_string(i) + "]");
+						outfile.writeln("\tmov [rax + " + std::to_string(i) + "], rcx");
 					}
 				}
 			}
@@ -316,21 +305,17 @@ void compile_to_asm(Program program, std::string output_filename) {
 				outfile.writeln("\t; OP_SET_PTR " + op.str_operand + " size:" + std::to_string(op.int_operand));
 				outfile.writeln("\tpop rax");
 				outfile.writeln("\tpop rbx");
-				if (op.is_prim_type_mode()) {
-					if (op.mode == MODE_8BIT)
-						outfile.writeln("\tmov [rax], bl");
-					else if (op.mode == MODE_64BIT)
-						outfile.writeln("\tmov [rax], rbx");
-				}
+				if (op.mode == MODE_8BIT)
+					outfile.writeln("\tmov [rax], bl");
+				else if (op.mode == MODE_64BIT)
+					outfile.writeln("\tmov [rax], rbx");
 				else if (op.mode == MODE_STRUCT) {
 					// get pointer to struct
 					outfile.writeln("\tmov rcx, [rbx]");
 					outfile.writeln("\tmov [rax], rcx");
 					for (int i = 8; i < op.int_operand; i+=8) {
-						outfile.writeln("\tadd rax, 8");
-						outfile.writeln("\tadd rbx, 8");
-						outfile.writeln("\tmov rcx, [rbx]");
-						outfile.writeln("\tmov [rax], rcx");
+						outfile.writeln("\tmov rcx, [rbx + " + std::to_string(i) + "]");
+						outfile.writeln("\tmov [rax + " + std::to_string(i) + "], rcx");
 					}
 				}
 			}
@@ -364,10 +349,8 @@ void compile_to_asm(Program program, std::string output_filename) {
 					outfile.writeln("\tmov rcx, [rbx]");
 					outfile.writeln("\tmov [rax], rcx");
 					for (int i = 8; i < op.int_operand_2; i+=8) {
-						outfile.writeln("\tadd rax, 8");
-						outfile.writeln("\tadd rbx, 8");
-						outfile.writeln("\tmov rcx, [rbx]");
-						outfile.writeln("\tmov [rax], rcx");
+						outfile.writeln("\tmov rcx, [rbx + " + std::to_string(i) + "]");
+						outfile.writeln("\tmov [rax + " + std::to_string(i) + "], rcx");
 					}
 				}
 			}

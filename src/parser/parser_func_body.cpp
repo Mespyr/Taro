@@ -161,8 +161,7 @@ void Parser::parse_func_body(Function* func) {
 					func->ops.push_back(f_op);
 				}
 				// if setting variable member
-				else
-				{
+				else {
 					std::pair<LangType, int> member_type_offset = variable_member_offset(f_op, func->var_offsets, program.structs);
 					if (member_type_offset.first.ptr_to_trace > 0) // if it is a pointer, whether to a primitive or a struct
 						f_op.mode = MODE_64BIT;
