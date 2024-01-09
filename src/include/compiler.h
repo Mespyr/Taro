@@ -31,11 +31,15 @@ enum InstructionType {
 	INSTRUCTION_JNZ,
 	INSTRUCTION_JMP,
 	INSTRUCTION_TEST,
+	INSTRUCTION_XOR,
 	
 	INSTRUCTION_CALL,
 	INSTRUCTION_SYSCALL,
 
 	INSTRUCTION_COUNT,
+};
+
+class Argument {
 };
 
 class Instruction {
@@ -51,5 +55,4 @@ public:
 	void generate_asm(std::string output_filename);
 private:
 	Program program;
-	std::vector<Instruction> assembly_code;
 };

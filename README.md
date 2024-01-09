@@ -67,8 +67,3 @@ fun fib(i64) [i64]
   end
 end
 ```
-
-### Best Code I've Ever Written
-```python3
-[os.system(f"mv test/{f} test/{f.removesuffix('.rmbt')}.orc") for f in os.listdir("test") if f.endswith(".rmbt")]
-```
