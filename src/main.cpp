@@ -4,6 +4,7 @@
 #include "include/parser.h"
 #include "include/type_checker.h"
 #include "include/compiler.h"
+#include "include/assembly.h"
 
 void exec(const char* cmd) {
     char buffer[128];
@@ -37,6 +38,12 @@ int main(int argc, const char* argv[]) {
 	compiler.generate_asm("/tmp/out.asm");
 	
 	exec("fasm /tmp/out.asm ./a.out");
+
+	// TEST
+	Instruction i(INSTRUCTION_ADD);
+	i.arguments.push_back(Argument(REGISTER_RAX));
+	i.arguments.push_back(Argument("ret_stack_rsp", true, INFER_QWORD, 12));
+	std::cout << i.to_string() << std::endl;
 	
 	return 0;
 }

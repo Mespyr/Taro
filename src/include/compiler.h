@@ -3,48 +3,11 @@
 #include <string>
 #include <assert.h>
 #include <sstream>
+#include <vector>
 #include "program.h"
 #include "op.h"
 #include "file.h"
-
-enum InstructionType {
-	INSTRUCTION_PUSH,
-	INSTRUCTION_POP,
-	INSTRUCTION_MOV,
-
-	INSTRUCTION_ADD,
-	INSTRUCTION_SUB,
-	INSTRUCTION_IMUL,
-	INSTRUCTION_DIV,
-
-	INSTRUCTION_CMP,
-	INSTRUCTION_CMOVE,
-	INSTRUCTION_CMOVG,
-	INSTRUCTION_CMOVL,
-	INSTRUCTION_CMOVGE,
-	INSTRUCTION_CMOVLE,
-	INSTRUCTION_CMOVNE,
-	INSTRUCTION_AND,
-	INSTRUCTION_OR,
-
-	INSTRUCTION_JZ,
-	INSTRUCTION_JNZ,
-	INSTRUCTION_JMP,
-	INSTRUCTION_TEST,
-	INSTRUCTION_XOR,
-	
-	INSTRUCTION_CALL,
-	INSTRUCTION_SYSCALL,
-
-	INSTRUCTION_COUNT,
-};
-
-class Argument {
-};
-
-class Instruction {
-	InstructionType type;
-};
+#include "assembly.h"
 
 class Compiler {
 public:
@@ -53,6 +16,8 @@ public:
 	{}
 
 	void generate_asm(std::string output_filename);
+	void write_asm_to_file(std::string output_filename); // TODO: impl
 private:
 	Program program;
+	AssemblyProgram asm_program;
 };
