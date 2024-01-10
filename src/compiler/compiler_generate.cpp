@@ -503,8 +503,8 @@ void Compiler::generate_asm(std::string output_filename) {
 		if (str.size() == 0)
 			ss << "0x0";
 		else {
-			for (long unsigned int a = 0; a < str.size(); a++)
-				ss << (int) str.at(a) << ",";
+			for (char a : str)
+				ss << (int) a << ",";
 			ss << 0;
 		}
 		outfile.writeln("str_" + std::to_string(i) + ": db " + ss.str());

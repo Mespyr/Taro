@@ -2,8 +2,10 @@
 
 #include <cstdlib>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <map>
+#include "file.h"
 
 enum InstructionType {
 	INSTRUCTION_PUSH,
@@ -24,12 +26,13 @@ enum InstructionType {
 	INSTRUCTION_CMOVNE,
 	INSTRUCTION_AND,
 	INSTRUCTION_OR,
+	INSTRUCTION_TEST,
+	INSTRUCTION_XOR,
 
+	INSTRUCTION_LABEL, // not an instruction, but an indicator to place a label
 	INSTRUCTION_JZ,
 	INSTRUCTION_JNZ,
 	INSTRUCTION_JMP,
-	INSTRUCTION_TEST,
-	INSTRUCTION_XOR,
 	
 	INSTRUCTION_CALL,
 	INSTRUCTION_SYSCALL,
@@ -41,17 +44,12 @@ enum AsmRegister {
 	REGISTER_RBX,
 	REGISTER_RCX,
 	REGISTER_RSP,
-	REGISTER_RBP,
 	REGISTER_RDI,
 	REGISTER_RSI,
 	REGISTER_RDX,
-
-	REGISTER_EAX,
-	REGISTER_EBX,
-	REGISTER_ECX,
-	REGISTER_EDI,
-	REGISTER_ESI,
-	REGISTER_EDX,
+	REGISTER_R10,
+	REGISTER_R8,
+	REGISTER_R9,
 
 	REGISTER_AL,
 	REGISTER_BL,
@@ -105,13 +103,56 @@ public:
 		type(t)
 	{}
 
+	Instruction(InstructionType t, std::string arg_name) :
+		type(t), arg_name(arg_name)
+	{}
+
 	InstructionType type;
 	std::vector<Argument> arguments;
-
+	std::string arg_name; // used by LABEL, JZ, JNZ, JMP, CALL
+	
 	std::string to_string();
 };
 
 class AssemblyProgram { // TODO: impl
 public:
 	std::map<std::string, std::vector<Instruction>> code;
+	std::vector<std::string> string_data;
+
+	void write_to_file(std::string filename);
+	
+	Instruction inst_push(Argument arg);
+	Instruction inst_pop(Argument arg);
+	Instruction inst_mov(Argument arg1, Argument arg2);
+
+	Instruction inst_add(Argument arg1, Argument arg2);
+	Instruction inst_sub(Argument arg1, Argument arg2);
+	Instruction inst_imul(Argument arg1, Argument arg2);
+	Instruction inst_div(Argument arg);
+
+	Instruction inst_cmp(Argument arg1, Argument arg2);
+	Instruction inst_cmove(Argument arg1, Argument arg2);
+	Instruction inst_cmovg(Argument arg1, Argument arg2);
+	Instruction inst_cmovl(Argument arg1, Argument arg2);
+	Instruction inst_cmovge(Argument arg1, Argument arg2);
+	Instruction inst_cmovle(Argument arg1, Argument arg2);
+	Instruction inst_cmovne(Argument arg1, Argument arg2);
+	Instruction inst_and(Argument arg1, Argument arg2);
+	Instruction inst_or(Argument arg1, Argument arg2);
+	Instruction inst_xor(Argument arg1, Argument arg2);
+	Instruction inst_test(Argument arg1, Argument arg2);
+
+	Instruction inst_label(std::string label_name);
+	Instruction inst_jz(std::string label_name);
+	Instruction inst_jnz(std::string label_name);
+	Instruction inst_jmp(std::string label_name);
+
+	Instruction inst_call(std::string func_name);
+	Instruction inst_syscall();
+private:
+	void write_beginning_boilerplate(File* outfile);
+
+	Instruction inst_1_arity_backend(InstructionType type, Argument arg);
+	Instruction inst_2_arity_backend(InstructionType type, Argument arg1, Argument arg2);
+	Instruction inst_name_arg_backend(InstructionType type, std::string name);
 };

@@ -39,11 +39,20 @@ int main(int argc, const char* argv[]) {
 	
 	exec("fasm /tmp/out.asm ./a.out");
 
-	// TEST
-	Instruction i(INSTRUCTION_ADD);
-	i.arguments.push_back(Argument(REGISTER_RAX));
-	i.arguments.push_back(Argument("ret_stack_rsp", true, INFER_QWORD, 12));
-	std::cout << i.to_string() << std::endl;
 	
+	// TEST
+	AssemblyProgram asm_pg;
+	std::vector<Instruction> insts;
+	
+	insts.push_back(asm_pg.inst_mov(Argument(REGISTER_RDI), Argument(12)));
+	insts.push_back(asm_pg.inst_call("dump"));
+	insts.push_back(asm_pg.inst_mov(Argument(REGISTER_RAX), Argument(60)));
+	insts.push_back(asm_pg.inst_mov(Argument(REGISTER_RDI), Argument(0)));
+	insts.push_back(asm_pg.inst_syscall());
+
+	asm_pg.code.insert({"start", insts});
+	asm_pg.string_data.push_back("Hello World\n");
+	asm_pg.write_to_file("./TEST.asm");
+
 	return 0;
 }

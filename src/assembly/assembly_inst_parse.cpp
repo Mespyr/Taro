@@ -90,14 +90,17 @@ std::string Instruction::to_string() {
 	case INSTRUCTION_OR:
 		output.append("or");
 		break;
+	case INSTRUCTION_LABEL:
+		return arg_name + ":";
+		break;
 	case INSTRUCTION_JZ:
-		output.append("jz");
+		return "jz " + arg_name;
 		break;
 	case INSTRUCTION_JNZ:
-		output.append("jnz");
+		return "jnz " + arg_name;
 		break;
 	case INSTRUCTION_JMP:
-		output.append("jmp");
+		return "jmp " + arg_name;
 		break;
 	case INSTRUCTION_TEST:
 		output.append("test");
@@ -106,7 +109,7 @@ std::string Instruction::to_string() {
 		output.append("xor");
 		break;
 	case INSTRUCTION_CALL:
-		output.append("call");
+		return "call " + arg_name;
 		break;
 	case INSTRUCTION_SYSCALL:
 		output.append("syscall");

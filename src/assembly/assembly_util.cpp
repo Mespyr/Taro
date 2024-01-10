@@ -12,27 +12,18 @@ std::string register_to_string(AsmRegister reg) {
 		return "rcx";
 	case REGISTER_RSP:
 		return "rsp";
-	case REGISTER_RBP:
-		return "rbp";
 	case REGISTER_RDI:
 		return "rdi";
 	case REGISTER_RSI:
 		return "rsi";
 	case REGISTER_RDX:
 		return "rdx";
-
-	case REGISTER_EAX:
-		return "eax";
-	case REGISTER_EBX:
-		return "ebx";
-	case REGISTER_ECX:
-		return "ecx";
-	case REGISTER_EDI:
-		return "edi";
-	case REGISTER_ESI:
-		return "esi";
-	case REGISTER_EDX:
-		return "edx";
+	case REGISTER_R10:
+		return "r10";
+	case REGISTER_R8:
+		return "r8";
+	case REGISTER_R9:
+		return "r9";
 
 	case REGISTER_AL:	
 		return "al";
