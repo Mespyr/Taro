@@ -1,4 +1,4 @@
-#include "../include/type_checker.h"
+#include "type_checker.h"
 
 void TypeChecker::verify() {
 	if (!program.functions.count("main")) {

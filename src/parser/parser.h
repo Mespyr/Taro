@@ -5,12 +5,12 @@
 #include <assert.h>
 #include <map>
 #include <algorithm>
-#include "token.h"
-#include "op.h"
-#include "program.h"
-#include "error.h"
-#include "file.h"
-#include "lexer.h"
+#include "../include/token.h"
+#include "../include/op.h"
+#include "../include/program.h"
+#include "../include/error.h"
+#include "../include/file.h"
+#include "../lexer/lexer.h"
 
 class Parser {
 public:

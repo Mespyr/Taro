@@ -1,4 +1,4 @@
-#include "../include/lexer.h"
+#include "lexer.h"
 
 void Lexer::set_file(std::string filename) {
 	this->filename = filename;

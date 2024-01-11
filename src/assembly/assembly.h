@@ -5,7 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <map>
-#include "file.h"
+#include "../include/file.h"
 
 enum InstructionType {
 	INSTRUCTION_PUSH,

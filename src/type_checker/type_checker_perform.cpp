@@ -1,4 +1,4 @@
-#include "../include/type_checker.h"
+#include "type_checker.h"
 
 void TypeChecker::perform_checks() {
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++) {

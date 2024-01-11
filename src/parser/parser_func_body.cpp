@@ -1,4 +1,4 @@
-#include "../include/parser.h"
+#include "parser.h"
 
 void Parser::parse_func_body(Function* func) {
 	std::map<std::string, std::pair<int, int>> labels;

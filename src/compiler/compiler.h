@@ -4,10 +4,10 @@
 #include <assert.h>
 #include <sstream>
 #include <vector>
-#include "program.h"
-#include "op.h"
-#include "file.h"
-#include "assembly.h"
+#include "../include/program.h"
+#include "../include/op.h"
+#include "../include/file.h"
+#include "../assembly/assembly.h"
 
 class Compiler {
 public:

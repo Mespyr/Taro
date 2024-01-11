@@ -1,4 +1,4 @@
-#include "../include/type_checker.h"
+#include "type_checker.h"
 
 void TypeChecker::check_op() {
 	Op op = function->ops.at(idx);

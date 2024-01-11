@@ -1,4 +1,4 @@
-#include "../include/parser.h"
+#include "parser.h"
 
 void Parser::parse_function(Op current_op) {
 	i++;

@@ -1,4 +1,4 @@
-#include "../include/parser.h"
+#include "parser.h"
 
 bool Parser::is_legal_name(Token token_name) {
 	// if token is an integer or string

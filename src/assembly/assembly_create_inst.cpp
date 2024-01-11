@@ -1,4 +1,4 @@
-#include "../include/assembly.h"
+#include "assembly.h"
 
 // backend
 Instruction AssemblyProgram::inst_1_arity_backend(InstructionType type, Argument arg) {

@@ -1,4 +1,4 @@
-#include "../include/type_checker.h"
+#include "type_checker.h"
 
 void TypeChecker::check_function() {
 	static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");

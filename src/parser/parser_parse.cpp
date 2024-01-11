@@ -1,4 +1,4 @@
-#include "../include/parser.h"
+#include "parser.h"
 
 std::vector<Op> Parser::link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels) {
 	static_assert(OP_COUNT == 57, "unhandled op types in Parser::link_ops()");

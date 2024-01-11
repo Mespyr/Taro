@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include "include/error.h"
-#include "include/lexer.h"
-#include "include/parser.h"
-#include "include/type_checker.h"
-#include "include/compiler.h"
-#include "include/assembly.h"
+#include "lexer/lexer.h"
+#include "parser/parser.h"
+#include "type_checker/type_checker.h"
+#include "compiler/compiler.h"
+#include "assembly/assembly.h"
 
 void exec(const char* cmd) {
     char buffer[128];
@@ -39,7 +39,6 @@ int main(int argc, const char* argv[]) {
 	
 	exec("fasm /tmp/out.asm ./a.out");
 
-	
 	// TEST
 	AssemblyProgram asm_pg;
 	std::vector<Instruction> insts;

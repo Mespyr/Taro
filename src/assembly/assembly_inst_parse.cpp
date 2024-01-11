@@ -1,4 +1,4 @@
-#include "../include/assembly.h"
+#include "assembly.h"
 
 std::string Argument::to_string() {
 	std::string output;

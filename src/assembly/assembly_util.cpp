@@ -1,4 +1,4 @@
-#include "../include/assembly.h"
+#include "assembly.h"
 
 std::string register_to_string(AsmRegister reg) {
 	std::string output;

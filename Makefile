@@ -25,8 +25,6 @@ PARSER_OBJ_FILES=$(patsubst $(PARSER_SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(PARSER_SR
 TYPE_CHECKER_OBJ_FILES=$(patsubst $(TYPE_CHECKER_SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(TYPE_CHECKER_SRC_FILES))
 COMPILER_OBJ_FILES=$(patsubst $(COMPILER_SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(COMPILER_SRC_FILES))
 ASSEMBLY_OBJ_FILES=$(patsubst $(ASSEMBLY_SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(ASSEMBLY_SRC_FILES))
-
-HDR_FILES=$(wildcard $(INCLUDE_DIR)/*.h)
 BIN=orcc
 
 all: $(BIN)

@@ -1,4 +1,4 @@
-#include "../include/type_checker.h"
+#include "type_checker.h"
 
 void TypeChecker::handle_arithmetic_op(Op op) {
 	std::string fullname, name;

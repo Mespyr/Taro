@@ -1,4 +1,4 @@
-#include "../include/parser.h"
+#include "parser.h"
 
 Op Parser::convert_token_to_op(Token tok, std::map<std::string, std::pair<LangType, int>> var_offsets) {
 	static_assert(OP_COUNT == 57, "unhandled op types in Parser::convert_token_to_op()");

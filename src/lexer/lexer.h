@@ -5,9 +5,9 @@
 #include <string>
 #include <cstring>
 #include <assert.h>
-#include "token.h"
-#include "error.h"
-#include "file.h"
+#include "../include/token.h"
+#include "../include/error.h"
+#include "../include/file.h"
 
 class Lexer {
 public:

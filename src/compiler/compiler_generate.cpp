@@ -1,4 +1,4 @@
-#include "../include/compiler.h"
+#include "compiler.h"
 
 void Compiler::generate_asm(std::string output_filename) {
 	static_assert(OP_COUNT == 57, "unhandled op types in compile_to_asm()");

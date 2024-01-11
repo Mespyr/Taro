@@ -1,4 +1,4 @@
-#include "../include/lexer.h"
+#include "lexer.h"
 
 long unsigned int Lexer::find_next_token_start_col(long unsigned int column_number) {
 	while (column_number < line.length() && std::isspace(line.at(column_number)) && line.at(column_number) != '#')

@@ -1,9 +1,8 @@
 #pragma once
 
-#include "error.h"
-#include "op.h"
-#include "program.h"
-#include "error.h"
+#include "../include/op.h"
+#include "../include/program.h"
+#include "../include/error.h"
 #include <map>
 #include <string>
 #include <vector>

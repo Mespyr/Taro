@@ -1,4 +1,4 @@
-#include "../include/lexer.h"
+#include "lexer.h"
 
 void Lexer::tokenize_line() {
 	static_assert(TOKEN_TYPE_COUNT == 3, "unhandled token types in tokenize_line()");

@@ -1,4 +1,4 @@
-#include "../include/parser.h"
+#include "parser.h"
 
 FunctionSignature Parser::parse_func_signature() {
 	if (tokens.at(i).value != "(") {

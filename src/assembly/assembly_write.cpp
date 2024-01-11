@@ -1,4 +1,4 @@
-#include "../include/assembly.h"
+#include "assembly.h"
 
 void AssemblyProgram::write_beginning_boilerplate(File* outfile) {
 	outfile->writeln("format ELF64 executable 3");
