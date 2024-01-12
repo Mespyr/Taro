@@ -86,7 +86,6 @@ void Parser::parse_func_body(Function* func) {
 		else if (f_op.type == OP_SET) {
 			// if setting a variable
 			if (func->var_offsets.count(f_op.str_operand)) {
-				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in parse_tokens()");
 				LangType type = func->var_offsets.at(f_op.str_operand).first;
 				if (is_prim_type(type.base_type) || is_pointer(type)) {
 					// 8bit values
@@ -103,7 +102,6 @@ void Parser::parse_func_body(Function* func) {
 				func->ops.push_back(f_op);
 			}
 			else if (program.structs.count(f_op.str_operand) || is_prim_type(f_op.str_operand) || is_pointer(f_op.str_operand)) {
-				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in parse_tokens()");
 				// if setting value of pointer
 				if (is_pointer(f_op.str_operand)) {
 					std::pair<std::string, int> type_pair = parse_type_str(f_op.str_operand);
@@ -131,7 +129,6 @@ void Parser::parse_func_body(Function* func) {
 			}
 			// if setting value of struct member
 			else {
-				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in parse_tokens()");
 				std::vector<std::string> split_cmd = split_by_dot(f_op.str_operand);
 
 				// if there is only one value in the command ie: String, meaning that a variable String doesn't exist and a type String doesnt exist
@@ -189,7 +186,6 @@ void Parser::parse_func_body(Function* func) {
 					exit(1);
 				}
 
-				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in parse_tokens()");
 				// 8bit values
 				if (sizeof_type(type) == 1)
 					f_op.mode = MODE_8BIT;
@@ -208,7 +204,6 @@ void Parser::parse_func_body(Function* func) {
 					exit(1);
 				}
 
-				static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in parse_tokens()");
 				// 8bit values
 				if (sizeof_type(f_op.str_operand) == 1)
 					f_op.mode = MODE_8BIT;

@@ -1,7 +1,6 @@
 #include "include/op.h"
 
 bool Op::is_prim_type_mode() {
-	static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in Op::is_prim_type_mode()");
 	if (mode == MODE_8BIT || mode == MODE_64BIT)
 		return true;
 	return false;

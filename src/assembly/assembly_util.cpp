@@ -35,3 +35,12 @@ std::string register_to_string(AsmRegister reg) {
 		return "dl";
 	}
 }
+
+void AssemblyProgram::start_new_function(std::string func_name) {
+	code.insert({func_name, {}});
+	current_func_name = func_name;
+}
+
+void AssemblyProgram::new_inst(Instruction inst) {
+	code.at(current_func_name).push_back(inst);
+}

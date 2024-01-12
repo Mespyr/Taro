@@ -112,7 +112,10 @@ std::string Instruction::to_string() {
 		return "call " + arg_name;
 		break;
 	case INSTRUCTION_SYSCALL:
-		output.append("syscall");
+		return "syscall";
+		break;
+	case INSTRUCTION_RET:
+		return "ret";
 		break;
 	}
 

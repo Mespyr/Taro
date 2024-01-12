@@ -35,23 +35,10 @@ int main(int argc, const char* argv[]) {
 	type_checker.perform_checks();
 
 	Compiler compiler(type_checker.program);
-	compiler.generate_asm("/tmp/out.asm");
+	compiler.generate_asm();
+	compiler.write_asm_to_file("/tmp/out.asm");
 	
 	exec("fasm /tmp/out.asm ./a.out");
-
-	// TEST
-	AssemblyProgram asm_pg;
-	std::vector<Instruction> insts;
-	
-	insts.push_back(asm_pg.inst_mov(Argument(REGISTER_RDI), Argument(12)));
-	insts.push_back(asm_pg.inst_call("dump"));
-	insts.push_back(asm_pg.inst_mov(Argument(REGISTER_RAX), Argument(60)));
-	insts.push_back(asm_pg.inst_mov(Argument(REGISTER_RDI), Argument(0)));
-	insts.push_back(asm_pg.inst_syscall());
-
-	asm_pg.code.insert({"start", insts});
-	asm_pg.string_data.push_back("Hello World\n");
-	asm_pg.write_to_file("./TEST.asm");
 
 	return 0;
 }

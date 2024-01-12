@@ -36,6 +36,7 @@ enum InstructionType {
 	
 	INSTRUCTION_CALL,
 	INSTRUCTION_SYSCALL,
+	INSTRUCTION_RET
 };
 
 // all used registers (as far as I know)
@@ -119,6 +120,9 @@ public:
 	std::map<std::string, std::vector<Instruction>> code;
 	std::vector<std::string> string_data;
 
+	void start_new_function(std::string func_name);
+	void new_inst(Instruction inst);
+
 	void write_to_file(std::string filename);
 	
 	Instruction inst_push(Argument arg);
@@ -149,7 +153,9 @@ public:
 
 	Instruction inst_call(std::string func_name);
 	Instruction inst_syscall();
+	Instruction inst_ret();
 private:
+	std::string current_func_name;
 	void write_beginning_boilerplate(File* outfile);
 
 	Instruction inst_1_arity_backend(InstructionType type, Argument arg);

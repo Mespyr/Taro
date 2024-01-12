@@ -15,9 +15,15 @@ public:
 		program(program)
 	{}
 
-	void generate_asm(std::string output_filename);
+	void generate_asm();
 	void write_asm_to_file(std::string output_filename); // TODO: impl
 private:
+	void gen_op_asm(Op op, int func_addr);
+
+	void handle_write_data_to_ptr(Op op);
+	void handle_copy_ptr_to_ptr(Op op);
+	void handle_read_data_from_ptr(Op op);
+
 	Program program;
-	AssemblyProgram asm_program;
+	AssemblyProgram asmp;
 };

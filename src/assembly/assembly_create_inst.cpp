@@ -114,3 +114,8 @@ Instruction AssemblyProgram::inst_call(std::string func_name) {
 Instruction AssemblyProgram::inst_syscall() {
 	return Instruction(INSTRUCTION_SYSCALL);
 }
+
+Instruction AssemblyProgram::inst_ret() {
+	return Instruction(INSTRUCTION_RET);
+}
+

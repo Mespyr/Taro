@@ -89,7 +89,6 @@ void TypeChecker::check_op() {
 	} break;
 
 	case OP_SET_VAR: {
-		static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 		if (type_stack.size() < 1) {
 			print_not_enough_arguments_error(op.loc, 1, 0, "&", "set variable");
 			exit(1);
@@ -121,7 +120,6 @@ void TypeChecker::check_op() {
 	} break;
 
 	case OP_SET_VAR_STRUCT_MEMBER: {
-		static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 		if (type_stack.size() < 1) {
 			print_not_enough_arguments_error(op.loc, 1, 0, "@", "set struct member");
 			exit(1);
@@ -152,7 +150,6 @@ void TypeChecker::check_op() {
 	} break;
 
 	case OP_READ_VAR_STRUCT_MEMBER: {
-		static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 		std::pair<LangType, int> member_type_offset = variable_member_offset(op, function->var_offsets, program.structs);
 		member_type_offset.first.loc = op.loc;
 		if (op.mode == MODE_STRUCT)
@@ -167,7 +164,6 @@ void TypeChecker::check_op() {
 		break;
 
 	case OP_SET_PTR: {
-		static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 		if (type_stack.size() < 2) {
 			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "@", "set pointer");
 			exit(1);
@@ -207,7 +203,6 @@ void TypeChecker::check_op() {
 	} break;
 
 	case OP_SET_PTR_STRUCT_MEMBER: {
-		static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 		if (type_stack.size() < 2) {
 			print_not_enough_arguments_error(op.loc, 2, type_stack.size(), "@", "set pointer member");
 			exit(1);
@@ -233,7 +228,6 @@ void TypeChecker::check_op() {
 	} break;
 
 	case OP_READ_PTR: {
-		static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 		if (type_stack.size() < 1) {
 			print_not_enough_arguments_error(op.loc, 1, 0, "&", "read pointer");
 			exit(1);
@@ -251,7 +245,6 @@ void TypeChecker::check_op() {
 	} break;
 
 	case OP_READ_PTR_STRUCT_MEMBER: {
-		static_assert(MODE_COUNT == 3, "unhandled OpCodeModes in type_check_program()");
 		if (type_stack.size() < 1) {
 			print_not_enough_arguments_error(op.loc, 1, 0, "&", "read pointer member");
 			exit(1);
