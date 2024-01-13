@@ -1,8 +1,6 @@
 #include "compiler.h"
 
 void Compiler::generate_asm() {
-	static_assert(OP_COUNT == 57, "unhandled op types in compile_to_asm()");
-
 	for (auto fn_key = program.functions.begin(); fn_key != program.functions.end(); fn_key++) {
 		Function function = fn_key->second;
 		asmp.start_new_function("func_addr_" + std::to_string(function.addr));

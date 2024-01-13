@@ -16,6 +16,7 @@ public:
 	{}
 
 	void generate_asm();
+	void perform_optimizations();
 	void write_asm_to_file(std::string output_filename); // TODO: impl
 private:
 	void gen_op_asm(Op op, int func_addr);

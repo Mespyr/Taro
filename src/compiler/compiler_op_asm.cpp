@@ -6,6 +6,7 @@ void Compiler::gen_op_asm(Op op, int func_addr) {
 	switch (op.type) {
 
 	case OP_DUMP: {
+		asmp.compile_dump = true;
 		asmp.new_inst(asmp.inst_pop(Argument(REGISTER_RDI)));
 		asmp.new_inst(asmp.inst_call("dump"));
 	} break;

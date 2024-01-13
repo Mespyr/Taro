@@ -117,6 +117,7 @@ public:
 
 class AssemblyProgram { // TODO: impl
 public:
+	bool compile_dump = false;
 	std::map<std::string, std::vector<Instruction>> code;
 	std::vector<std::string> string_data;
 
