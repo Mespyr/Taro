@@ -20,7 +20,7 @@ fun recursive_fib(i64) [i64]
 
   recursion:
     1 - recursive_fib
-	&n 2 - recursive_fib +
+    &n 2 - recursive_fib +
   end
 end
 
