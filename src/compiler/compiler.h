@@ -25,6 +25,8 @@ private:
 	void handle_copy_ptr_to_ptr(Op op);
 	void handle_read_data_from_ptr(Op op);
 
+	void simple_optimize();
+	
 	Program program;
 	AssemblyProgram asmp;
 };
