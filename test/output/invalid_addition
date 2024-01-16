@@ -2,12 +2,12 @@ COMPILE: 1
 STDOUT:
 
 STDERR:
-┌[test/invalid_addition.orc:8:5]
+┌[test/invalid_addition.orc:5:5]
 │ 	s 8 +
 └ 	    ^ invalid types for operation '+' (addition) (^Str, i64)
-┌[test/invalid_addition.orc:8:1]
+┌[test/invalid_addition.orc:5:1]
 │ 	s 8 +
 └ 	^ NOTE: first value pushed here (^Str)
-┌[test/invalid_addition.orc:8:3]
+┌[test/invalid_addition.orc:5:3]
 │ 	s 8 +
 └ 	  ^ NOTE: second value pushed here (i64)

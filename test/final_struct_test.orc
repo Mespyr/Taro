@@ -2,22 +2,20 @@ fun print_raw(i64 ^i8)
 	1 1 call3 pop
 end
 
-struct String
-	i64 size
-	^i8 data
-end
+struct String(i64 size ^i8 data)
+
 fun print(^String)
 	String s @s
 	&s.size &s.data print_raw 
 	"\n" print_raw
 end
 
-struct Student
-	String name
-	String school
-	i64 grade
-	i64 age
-end
+struct Student (
+  String name
+  String school
+  i64 grade
+  i64 age
+)
 
 fun print_student_info(^Student)
 	Student s @s

@@ -1,7 +1,4 @@
-struct String
-	i64 size
-	^i8 data
-end
+struct String(i64 size ^i8 data)
 
 fun print(^String)
 	String s @s # copy string on stack to s

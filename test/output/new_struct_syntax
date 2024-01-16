@@ -5,9 +5,6 @@ STDERR:
 
 RUN: 0
 STDOUT:
-4198794
-12
-4198807
-23
+Hello World!
 
 STDERR:

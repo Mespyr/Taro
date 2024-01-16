@@ -1,12 +1,5 @@
-struct String
-	i64 size
-	^i8 data
-end
-
-struct Person
-	String name
-	i64 age
-end
+struct String(i64 size ^i8 data)
+struct Person(String name i64 age)
 
 fun main()
 	Person finn

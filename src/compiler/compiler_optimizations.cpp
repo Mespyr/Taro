@@ -1,5 +1,4 @@
 #include "compiler.h"
-#include <iostream>
 
 // zero-related optimizations
 void Compiler::simple_optimize() {

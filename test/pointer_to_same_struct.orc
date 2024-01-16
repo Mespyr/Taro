@@ -1,7 +1,4 @@
-struct Node
-	i64 value
-	^Node next
-end
+struct Node(i64 value ^Node next)
 
 fun print_list_elems(^Node i64)
 	i64 num_elements @num_elements

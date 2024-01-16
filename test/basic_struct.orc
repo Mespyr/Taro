@@ -1,18 +1,7 @@
 # experiment with diffeent structs
-struct String
-	i64 size
-	^i8 data
-end
-
-struct TwoCount
-	i64 c1
-	i64 c2
-end
-
-struct TwoChars
-	i8 c1
-	i8 c2
-end
+struct String(i64 size ^i8 data)
+struct TwoCount(i64 c1 i64 c2)
+struct TwoChars(i8 c1 i8 c2)
 
 fun main()
 	String name

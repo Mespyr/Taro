@@ -1,7 +1,4 @@
-struct Str
-	i64 size
-	^i8 data
-end
+struct Str(i64 size ^i8 data)
 
 fun main()
 	Str s

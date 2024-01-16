@@ -3,5 +3,5 @@ STDOUT:
 
 STDERR:
 ┌[test/struct_name_error.orc:3:7]
-│ struct Epic.Cap
+│ struct Epic.Cap(i64 h)
 └        ^^^^^^^^ illegal name for struct

@@ -1,7 +1,4 @@
-struct Rectangle
-	i64 width
-	i64 height
-end
+struct Rectangle(i64 width i64 height)
 
 fun print(i64 ^i8)
 	1 1 call3 pop

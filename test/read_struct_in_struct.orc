@@ -1,12 +1,5 @@
-struct String
-	i64 size
-	^i8 data
-end
-
-struct Row
-	String row
-	i64 repeat
-end
+struct String(i64 size ^i8 data)
+struct Row(String row i64 repeat)
 
 fun main()
 	Row row1

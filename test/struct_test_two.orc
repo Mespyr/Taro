@@ -1,7 +1,5 @@
-struct Rectangle
-	i64 width 
-	i64 height
-end
+struct Rectangle(i64 width i64 height)
+
 fun area(^Rectangle) [i64]
 	Rectangle r @r
 	&r.width &r.height *

@@ -8,10 +8,7 @@
 # 5. read the variable (pushes a ^String)
 # 6. save that value to a var of type String and print it
 
-struct String
-	i64 size
-	^i8 data
-end
+struct String(i64 size ^i8 data)
 
 fun get_string_in_ptr_ptr(^^String) [^String]
 	# save the string to s (^^String is pointer to ^String which is type of var s)

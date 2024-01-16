@@ -1,7 +1,4 @@
-struct String
-	i64 size
-	^i8 data
-end
+struct String(i64 size ^i8 data)
 
 fun extract_char(^String) [i8]
 	String s @s           # set string to var on stack to access members

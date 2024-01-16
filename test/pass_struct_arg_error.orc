@@ -1,7 +1,4 @@
-struct String
-	i64 size
-	^i8 count
-end
+struct String(i64 size ^i8 count)
 
 fun print(^String)
 end

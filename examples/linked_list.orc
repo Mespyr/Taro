@@ -1,12 +1,5 @@
-struct Node
-  i64 data
-  ^Node next
-end
-
-struct LinkedList
-  Node head
-  i64 size
-end
+struct Node(i64 data ^Node next)
+struct LinkedList(Node head i64 size)
 
 fun LinkedList::init(^LinkedList)
   0 swp @LinkedList.size
