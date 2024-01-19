@@ -31,6 +31,7 @@ private:
 	void optimize_current_func();
 	void remove_stored_register(AsmRegister reg);
 	void handle_mov_reg_optim();
+	void compare_stored_values_mov(Instruction i, AsmRegister write_reg, int64_t save_value);
 
 	Program program;
 	AssemblyProgram asmp;
