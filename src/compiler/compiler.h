@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <sstream>
 #include <vector>
+#include <complex>
 #include <map>
 #include "../include/program.h"
 #include "../include/op.h"
@@ -29,13 +30,12 @@ private:
 
 	void optimize_current_func();
 	void remove_stored_register(AsmRegister reg);
-	bool arguments_equal(Argument arg1, Argument arg2);
 	void handle_mov_reg_optim();
 
 	Program program;
 	AssemblyProgram asmp;
 
-	std::map<AsmRegister, Argument> stored_registers;
+	std::map<AsmRegister, int64_t> stored_registers;
 	uint32_t idx = 0;
 	std::pair<std::string, std::vector<Instruction>> fn_key;
 };

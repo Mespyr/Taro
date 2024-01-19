@@ -17,6 +17,8 @@ enum InstructionType {
 	INSTRUCTION_SUB,
 	INSTRUCTION_IMUL,
 	INSTRUCTION_DIV,
+	INSTRUCTION_INC,
+	INSTRUCTION_DEC,
 
 	INSTRUCTION_CMP,
 	INSTRUCTION_CMOVE,
@@ -135,6 +137,8 @@ public:
 	Instruction inst_sub(Argument arg1, Argument arg2);
 	Instruction inst_imul(Argument arg1, Argument arg2);
 	Instruction inst_div(Argument arg);
+	Instruction inst_inc(Argument arg);
+	Instruction inst_dec(Argument arg);
 
 	Instruction inst_cmp(Argument arg1, Argument arg2);
 	Instruction inst_cmove(Argument arg1, Argument arg2);

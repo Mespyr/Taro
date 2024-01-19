@@ -47,6 +47,14 @@ Instruction AssemblyProgram::inst_div(Argument arg) {
 	return inst_1_arity_backend(INSTRUCTION_DIV, arg);
 }
 
+Instruction AssemblyProgram::inst_inc(Argument arg) {
+	return inst_1_arity_backend(INSTRUCTION_INC, arg);
+}
+
+Instruction AssemblyProgram::inst_dec(Argument arg) {
+	return inst_1_arity_backend(INSTRUCTION_DEC, arg);
+}
+
 Instruction AssemblyProgram::inst_cmp(Argument arg1, Argument arg2) {
 	return inst_2_arity_backend(INSTRUCTION_CMP, arg1, arg2);
 }

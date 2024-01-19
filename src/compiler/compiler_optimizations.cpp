@@ -2,26 +2,57 @@
 
 void Compiler::handle_mov_reg_optim() {
 	Instruction i = fn_key.second.at(idx);
-	std::cout << idx << " " + i.to_string() << std::endl << std::endl;
 
-	// TODO: Fix optimization
-	if (i.arguments.front().type == ARG_REGISTER && i.arguments.front().read_pointer == false) {
-		AsmRegister save_reg = i.arguments.front().reg_value;
-		Argument reg_value = i.arguments.at(1);
-		if (stored_registers.count(save_reg)) {
-			if (arguments_equal(stored_registers.at(save_reg), reg_value)) {
+	Argument write_reg = i.arguments.at(0);
+	if (write_reg.read_pointer || write_reg.type != ARG_REGISTER) return;
+	Argument save_value = i.arguments.at(1);
+
+	switch (save_value.type) {
+
+	case ARG_INTEGER: {
+		if (stored_registers.count(write_reg.reg_value)) {
+			int64_t diff = save_value.int_value - stored_registers.at(write_reg.reg_value);
+			if (diff == 0)
 				fn_key.second.erase(fn_key.second.begin() + idx);
-				return;
+			else if (diff == -1) {
+				i.arguments.pop_back();
+				i.type = INSTRUCTION_DEC;
+				fn_key.second.at(idx) = i;
 			}
+			else if (diff == 1) {
+				i.arguments.pop_back();
+				i.type = INSTRUCTION_INC;
+				fn_key.second.at(idx) = i;
+			}
+			else if (diff < 0) {
+				i.arguments.pop_back();
+				i.arguments.push_back(Argument(std::abs(diff)));
+				i.type = INSTRUCTION_SUB;
+				fn_key.second.at(idx) = i;
+			}
+			else if (diff > 0) {
+				i.arguments.pop_back();
+				i.arguments.push_back(Argument(diff));
+				i.type = INSTRUCTION_ADD;
+				fn_key.second.at(idx) = i;
+			}
+			stored_registers[write_reg.reg_value] = save_value.int_value;
+			break;
 		}
-		stored_registers.emplace(save_reg, reg_value);
-	}
+		else stored_registers.insert({write_reg.reg_value, save_value.int_value});
 
-	if (i.arguments.at(1).type == ARG_INTEGER && i.arguments.at(1).int_value == 0) {
-		i.arguments.pop_back();
-		i.arguments.push_back(i.arguments.at(0));
-		i.type = INSTRUCTION_XOR;
-		fn_key.second.at(idx) = i;
+		if (save_value.int_value == 0) {
+			i.arguments.pop_back();
+			i.arguments.push_back(i.arguments.at(0));
+			i.type = INSTRUCTION_XOR;
+			fn_key.second.at(idx) = i;
+		}
+	} break;
+
+	case ARG_REGISTER:
+	case ARG_VARIABLE:
+		remove_stored_register(write_reg.reg_value);
+		break;
 	}
 }
 
@@ -47,7 +78,8 @@ void Compiler::optimize_current_func() {
 			break;
 
 		case INSTRUCTION_CALL:
-			// cant be tracked across functions so we must clear
+		case INSTRUCTION_LABEL:
+			// cant be tracked across functions or loops
 			stored_registers.clear();
 			break;
 

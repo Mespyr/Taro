@@ -64,6 +64,12 @@ std::string Instruction::to_string() {
 	case INSTRUCTION_DIV:
 		output.append("div");
 		break;
+	case INSTRUCTION_INC:
+		output.append("inc");
+		break;
+	case INSTRUCTION_DEC:
+		output.append("dec");
+		break;
 	case INSTRUCTION_CMP:
 		output.append("cmp");
 		break;
