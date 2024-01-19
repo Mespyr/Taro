@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 void print_error(std::string message);
 void print_error_at_loc(Location loc, std::string message);

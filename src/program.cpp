@@ -9,7 +9,7 @@ LangType::LangType(Location loc, std::string type_str) : loc(loc) {
 std::vector<std::string> split_by_dot(std::string str) {
 	str += ".";
 	std::vector<std::string> split;
-	long unsigned int pos = str.find(".");
+	uint64_t pos = str.find(".");
 	while (pos != std::string::npos) {
 		split.push_back(str.substr(0, pos)); // push back everything before the period
 		str = str.substr(pos+1); // set the string to everything after the period
@@ -47,7 +47,7 @@ std::pair<LangType, int> struct_member_offset(Op op, std::map<std::string, Struc
 	if (structs.count(type_name)) {
 		std::map<std::string, std::pair<LangType, int>> struct_members = structs.at(type_name).members;
 		int offset = 0; // set offset to start of variable
-		unsigned long int current_member_idx = 1;
+		uint64_t current_member_idx = 1;
 		LangType member_type(op.loc);
 
 		while (current_member_idx < split_member_path.size()) {
@@ -91,7 +91,7 @@ std::pair<LangType, int> variable_member_offset(Op op, std::map<std::string, std
 		}
 		std::map<std::string, std::pair<LangType, int>> struct_members = structs.at(var_offsets.at(var_name).first.base_type).members;
 		int offset = var_offsets.at(var_name).second; // set offset to start of variable
-		unsigned long int current_member_idx = 1;
+		uint64_t current_member_idx = 1;
 		LangType member_type(op.loc);
 
 		while (current_member_idx < split_member_path.size()) {

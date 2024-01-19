@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 
 class Location {
@@ -12,6 +13,6 @@ public:
 		file_location(file_location)
 	{};
 
-	long unsigned int line_number, column_number_start, column_number_end;
+	uint64_t line_number, column_number_start, column_number_end;
 	std::string line, file_location;
 };

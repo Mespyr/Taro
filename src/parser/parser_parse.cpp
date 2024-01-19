@@ -3,7 +3,7 @@
 std::vector<Op> Parser::link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels) {
 	static_assert(OP_COUNT == 57, "unhandled op types in Parser::link_ops()");
 
-	for (long unsigned int i = 0; i < ops.size(); i++) {
+	for (uint64_t i = 0; i < ops.size(); i++) {
 		Op current_op = ops.at(i);
 
 		if (current_op.type == OP_JMP || current_op.type == OP_CJMPF || current_op.type == OP_CJMPT || current_op.type == OP_JMPE || current_op.type == OP_CJMPET || current_op.type == OP_CJMPEF) {
@@ -100,7 +100,7 @@ void Parser::parse() {
 				exit(1);
 			}
 
-			long long eval = eval_const_expression(name_token.loc);
+			int64_t eval = eval_const_expression(name_token.loc);
 			program.consts.insert({const_name, Const(name_token.loc, eval)});
 		} break;
 

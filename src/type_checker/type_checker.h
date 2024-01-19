@@ -3,6 +3,7 @@
 #include "../include/op.h"
 #include "../include/program.h"
 #include "../include/error.h"
+#include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
@@ -21,7 +22,7 @@ public:
 private:
 	std::string func_name;
 	Function *function;
-	unsigned long int idx;
+	uint64_t idx;
 	std::vector<LangType> type_stack;
 	std::map<std::string, LangType> variables;
 	std::map<std::string, std::vector<LangType>> label_stack_states;

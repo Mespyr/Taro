@@ -1,4 +1,5 @@
 #include "assembly.h"
+#include <cstdint>
 
 std::string Argument::to_string() {
 	std::string output;
@@ -123,7 +124,7 @@ std::string Instruction::to_string() {
 		return output;
 
 	output.append(" ");
-	for (unsigned long int i = 0; i < arguments.size() - 1; i++)
+	for (uint64_t i = 0; i < arguments.size() - 1; i++)
 		output.append(arguments.at(i).to_string() + ", ");
 	output.append(arguments.back().to_string());
 

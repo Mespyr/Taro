@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <vector> 
 #include <string>
 #include <map>
@@ -39,13 +40,13 @@ public:
 
 class Const {
 public:
-	Const(Location loc, long long value) :
+	Const(Location loc, int64_t value) :
 		loc(loc),
 		value(value)
 	{}
 
 	Location loc;
-	long long value;
+	int64_t value;
 };
 
 struct FunctionSignature {

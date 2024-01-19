@@ -336,7 +336,7 @@ void TypeChecker::check_op() {
 		}
 
 		std::vector<LangType> args;
-		for (unsigned long int i = call_func.signature.argument_stack.size(); i > 0; i--) {
+		for (uint64_t i = call_func.signature.argument_stack.size(); i > 0; i--) {
 			args.push_back(type_stack.back());
 			type_stack.pop_back();
 		}

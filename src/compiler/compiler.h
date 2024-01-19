@@ -1,9 +1,11 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <assert.h>
 #include <sstream>
 #include <vector>
+#include <map>
 #include "../include/program.h"
 #include "../include/op.h"
 #include "../include/file.h"
@@ -25,8 +27,15 @@ private:
 	void handle_copy_ptr_to_ptr(Op op);
 	void handle_read_data_from_ptr(Op op);
 
-	void simple_optimize();
-	
+	void optimize_current_func();
+	void remove_stored_register(AsmRegister reg);
+	bool arguments_equal(Argument arg1, Argument arg2);
+	void handle_mov_reg_optim();
+
 	Program program;
 	AssemblyProgram asmp;
+
+	std::map<AsmRegister, Argument> stored_registers;
+	uint32_t idx = 0;
+	std::pair<std::string, std::vector<Instruction>> fn_key;
 };

@@ -23,7 +23,7 @@ void TypeChecker::check_function() {
 			print_error_at_loc(function->loc, "unhandled data on the stack (expected " + std::to_string(function->signature.return_stack.size()) + " items, got " + std::to_string(type_stack.size()) + ")");
 
 			std::vector<LangType> excess_stack;
-			for (unsigned long int i = type_stack.size() - function->signature.return_stack.size(); i > 0; i--) {
+			for (uint64_t i = type_stack.size() - function->signature.return_stack.size(); i > 0; i--) {
 				excess_stack.push_back(type_stack.back());
 				type_stack.pop_back();
 			}

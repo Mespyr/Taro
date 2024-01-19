@@ -4,8 +4,8 @@ void Lexer::tokenize_line() {
 	static_assert(TOKEN_TYPE_COUNT == 3, "unhandled token types in tokenize_line()");
 
 	// get starting position of first token
-	long unsigned int column_number_start = find_next_token_start_col(0);
-	long unsigned int column_number_end;
+	uint64_t column_number_start = find_next_token_start_col(0);
+	uint64_t column_number_end;
 
 	while (column_number_start < line.length()) {
 		// if there is a comment, then ignore rest of line

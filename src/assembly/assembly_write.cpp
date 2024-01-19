@@ -1,4 +1,5 @@
 #include "assembly.h"
+#include <cstdint>
 
 void AssemblyProgram::write_beginning_boilerplate(File* outfile) {
 	outfile->writeln("format ELF64 executable 3");
@@ -54,7 +55,7 @@ void AssemblyProgram::write_to_file(std::string filename) {
 
 	// start data segment
 	outfile.writeln("segment readable writable");
-	for (long unsigned int i = 0; i < string_data.size(); i++) {
+	for (uint64_t i = 0; i < string_data.size(); i++) {
 		std::string str = string_data.at(i);
 		std::stringstream ss;
 		if (str.size() == 0)

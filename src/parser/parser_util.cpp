@@ -1,4 +1,5 @@
 #include "parser.h"
+#include <cstdint>
 
 bool Parser::is_legal_name(Token token_name) {
 	// if token is an integer or string
@@ -20,7 +21,7 @@ bool Parser::is_legal_name(Token token_name) {
 std::string Parser::add_escapes_to_string(std::string str) {
 	std::string buf;
 	std::string ret;
-	long unsigned int i = 0;
+	uint64_t i = 0;
 
 	// can't get 2 chars if string is 1 or 0 chars
 	if (str.length() < 2) return str;
@@ -52,8 +53,8 @@ std::string Parser::add_escapes_to_string(std::string str) {
 	return ret;
 }
 
-long long Parser::eval_const_expression(Location definition_loc) {
-	std::vector<long long> stack;
+int64_t Parser::eval_const_expression(Location definition_loc) {
+	std::vector<int64_t> stack;
 
 	while (tokens.at(i).value != "end") {
 		Op op = convert_token_to_op(tokens.at(i));
@@ -65,8 +66,8 @@ long long Parser::eval_const_expression(Location definition_loc) {
 				print_not_enough_arguments_error(op.loc, 2, stack.size(), "+", "addition");
 				exit(1);
 			}
-			long long a = stack.back(); stack.pop_back();
-			long long b = stack.back(); stack.pop_back();
+			int64_t a = stack.back(); stack.pop_back();
+			int64_t b = stack.back(); stack.pop_back();
 			stack.push_back(a + b);
 		}
 		else if (op.type == OP_MINUS) {
@@ -75,8 +76,8 @@ long long Parser::eval_const_expression(Location definition_loc) {
 				exit(1);
 			}
 			// b, a = b - a
-			long long a = stack.back(); stack.pop_back();
-			long long b = stack.back(); stack.pop_back();
+			int64_t a = stack.back(); stack.pop_back();
+			int64_t b = stack.back(); stack.pop_back();
 			stack.push_back(b - a);
 		}
 		else if (op.type == OP_MUL) {
@@ -84,8 +85,8 @@ long long Parser::eval_const_expression(Location definition_loc) {
 				print_not_enough_arguments_error(op.loc, 2, stack.size(), "*", "multiplication");
 				exit(1);
 			}
-			long long a = stack.back(); stack.pop_back();
-			long long b = stack.back(); stack.pop_back();
+			int64_t a = stack.back(); stack.pop_back();
+			int64_t b = stack.back(); stack.pop_back();
 			stack.push_back(a * b);
 		}
 		else if (op.type == OP_DIV) {
@@ -94,8 +95,8 @@ long long Parser::eval_const_expression(Location definition_loc) {
 				exit(1);
 			}
 			// b, a = b/a, b%a
-			long long a = stack.back(); stack.pop_back();
-			long long b = stack.back(); stack.pop_back();
+			int64_t a = stack.back(); stack.pop_back();
+			int64_t b = stack.back(); stack.pop_back();
 			stack.push_back(b / a);
 			stack.push_back(b % a);
 		}
@@ -112,8 +113,8 @@ long long Parser::eval_const_expression(Location definition_loc) {
 				exit(1);
 			}
 			// b, a = a, b
-			long long a = stack.back(); stack.pop_back();
-			long long b = stack.back(); stack.pop_back();
+			int64_t a = stack.back(); stack.pop_back();
+			int64_t b = stack.back(); stack.pop_back();
 			stack.push_back(a);
 			stack.push_back(b);
 		}

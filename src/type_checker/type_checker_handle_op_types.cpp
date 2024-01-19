@@ -110,7 +110,7 @@ void TypeChecker::handle_comparison_op(Op op) {
 
 void TypeChecker::handle_syscall_op(Op op) {
 	std::string name;
-	unsigned long int stack_size;
+	uint8_t stack_size;
 
 	switch (op.type) {
 	case OP_SYSCALL0:
@@ -155,7 +155,7 @@ void TypeChecker::handle_syscall_op(Op op) {
 	}
 
 	LangType a = type_stack.back(); type_stack.pop_back();
-	for (unsigned long int i = 1; i < stack_size; i++)
+	for (uint8_t i = 1; i < stack_size; i++)
 		type_stack.pop_back();
 
 	if (!is_prim_type_int(a)) {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <cstdlib>
 #include <string>
 #include <sstream>
@@ -73,15 +74,15 @@ enum ArgumentType {
 
 class Argument {
 public:
-	Argument(std::string value, bool read_pointer = false, AsmSizeInference size_inference = INFER_NONE, long long add_amount = 0) :
+	Argument(std::string value, bool read_pointer = false, AsmSizeInference size_inference = INFER_NONE, int64_t add_amount = 0) :
 		read_pointer(read_pointer), size_inference(size_inference), type(ARG_VARIABLE), var_value(value), add_amount(add_amount) 
 	{}
 
-	Argument(long long value, bool read_pointer = false, AsmSizeInference size_inference = INFER_NONE, long long add_amount = 0) :
+	Argument(int64_t value, bool read_pointer = false, AsmSizeInference size_inference = INFER_NONE, int64_t add_amount = 0) :
 		read_pointer(read_pointer), size_inference(size_inference), type(ARG_INTEGER), int_value(value), add_amount(add_amount) 
 	{}
 
-	Argument(AsmRegister value, bool read_pointer = false, AsmSizeInference size_inference = INFER_NONE, long long add_amount = 0) :
+	Argument(AsmRegister value, bool read_pointer = false, AsmSizeInference size_inference = INFER_NONE, int64_t add_amount = 0) :
 		read_pointer(read_pointer), size_inference(size_inference), type(ARG_REGISTER), reg_value(value), add_amount(add_amount) 
 	{}
 
@@ -90,10 +91,10 @@ public:
 
 	ArgumentType type;
 	std::string var_value;
-	long long int_value;
+	int64_t int_value;
 	AsmRegister reg_value;
 
-	long long add_amount;
+	int64_t add_amount;
 
 	std::string to_string();
 };

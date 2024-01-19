@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <assert.h>
@@ -93,7 +94,7 @@ public:
 		type(type)
 	{}
 
-	Op(Location loc, OpType type, long long int_operand) :
+	Op(Location loc, OpType type, int64_t int_operand) :
 		loc(loc),
 		type(type),
 		int_operand(int_operand)
@@ -110,8 +111,8 @@ public:
 	Location loc;
 	OpType type;
 
-	long long int_operand;
-	long long int_operand_2;
+	int64_t int_operand;
+	int64_t int_operand_2;
 	std::string str_operand;
 	OpCodeMode mode;
 };

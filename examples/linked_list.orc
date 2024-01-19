@@ -59,9 +59,9 @@ fun LinkedList::clear(^LinkedList)
   0 loop:
     dup &LL &LinkedList.size 1 - = cjmpet loop
     swp dup &Node.next
-	swp delete
-	swp 1 +
-	jmp loop
+    swp delete
+    swp 1 +
+    jmp loop
   end pop pop
   0 &LL @LinkedList.size
 end

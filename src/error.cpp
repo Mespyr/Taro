@@ -1,5 +1,4 @@
 #include "include/error.h"
-#include "include/program.h"
 
 void print_error(std::string message) {
 	std::cerr << "ERROR: " << message << std::endl;
@@ -9,13 +8,13 @@ void print_error_at_loc(Location loc, std::string message) {
 	std::cerr << "┌[" << loc.file_location << ":" << loc.line_number << ":" << loc.column_number_start << "]\n";
 	std::cerr << "│ " << loc.line << "\n└ ";
 
-	for (long unsigned int i = 0; i < loc.column_number_start; i++) {
+	for (uint64_t i = 0; i < loc.column_number_start; i++) {
 		if (loc.line.at(i) == '\t')
 			std::cerr << "\t";
 		else std::cerr << " ";
 	}
 
-	for (long unsigned int i = loc.column_number_start; i < loc.column_number_end; i++) {
+	for (uint64_t i = loc.column_number_start; i < loc.column_number_end; i++) {
 		if (loc.line.at(i) == '\t')
 			std::cerr << "\t";
 		else std::cerr << "^";
@@ -28,13 +27,13 @@ void print_note_at_loc(Location loc, std::string message) {
 	std::cerr << "┌[" << loc.file_location << ":" << loc.line_number << ":" << loc.column_number_start << "]\n";
 	std::cerr << "│ " << loc.line << "\n└ ";
 
-	for (long unsigned int i = 0; i < loc.column_number_start; i++) {
+	for (uint64_t i = 0; i < loc.column_number_start; i++) {
 		if (loc.line.at(i) == '\t')
 			std::cerr << "\t";
 		else std::cerr << " ";
 	}
 
-	for (long unsigned int i = loc.column_number_start; i < loc.column_number_end; i++) {
+	for (uint64_t i = loc.column_number_start; i < loc.column_number_end; i++) {
 		if (loc.line.at(i) == '\t')
 			std::cerr << "\t";
 		else std::cerr << "^";
@@ -44,21 +43,21 @@ void print_note_at_loc(Location loc, std::string message) {
 }
 
 void print_not_enough_arguments_error(Location loc, int expected, int actual, std::string name, std::string fullname, bool is_func) {
-		if (is_func) 
-			// not enough items on stack for function 'name' (expected 'expected', got 'actual')
-			print_error_at_loc(loc, "not enough items on stack for function '" + name + "' (expected " + std::to_string(expected) + ", got " + std::to_string(actual) + ")");
-		else if (fullname == "")
-			// not enough items on stack for operation 'name' (expected 'expected', got 'actual')
-			print_error_at_loc(loc, "not enough items on stack for operation '" + name + "' (expected " + std::to_string(expected) + ", got " + std::to_string(actual) + ")");
-		else
-			// not enough items on stack for operation 'name' (fullname) (expected 'expected', got 'actual')
-			print_error_at_loc(loc, "not enough items on stack for operation '" + name + "' (" + fullname + ") (expected " + std::to_string(expected) + ", got " + std::to_string(actual) + ")");
+	if (is_func) 
+		// not enough items on stack for function 'name' (expected 'expected', got 'actual')
+		print_error_at_loc(loc, "not enough items on stack for function '" + name + "' (expected " + std::to_string(expected) + ", got " + std::to_string(actual) + ")");
+	else if (fullname == "")
+		// not enough items on stack for operation 'name' (expected 'expected', got 'actual')
+		print_error_at_loc(loc, "not enough items on stack for operation '" + name + "' (expected " + std::to_string(expected) + ", got " + std::to_string(actual) + ")");
+	else
+		// not enough items on stack for operation 'name' (fullname) (expected 'expected', got 'actual')
+		print_error_at_loc(loc, "not enough items on stack for operation '" + name + "' (" + fullname + ") (expected " + std::to_string(expected) + ", got " + std::to_string(actual) + ")");
 }
 
 void print_invalid_combination_of_types_error(Location loc, std::vector<LangType> types, std::string name, std::string fullname, bool is_func) {
 	// ex: 'int, int, ptr, int'
 	std::string types_str;
-	for (unsigned long int i = 0; i < types.size() - 1; i++)
+	for (uint64_t i = 0; i < types.size() - 1; i++)
 		types_str.append(human_readable_type(types.at(i)) + ", ");
 	types_str.append(human_readable_type(types.back()));
 	
