@@ -119,9 +119,12 @@ void Compiler::gen_op_asm(Op op, int func_addr) {
 		asmp.new_inst(asmp.inst_pop(Argument(REGISTER_RAX)));
 		break;
 
-	case OP_DUP:
-		asmp.new_inst(asmp.inst_push(Argument(REGISTER_RSP, true, INFER_QWORD)));
-		break;
+	case OP_DUP: {
+		asmp.new_inst(asmp.inst_pop(Argument(REGISTER_RAX)));
+		asmp.new_inst(asmp.inst_push(Argument(REGISTER_RAX)));
+		asmp.new_inst(asmp.inst_push(Argument(REGISTER_RAX)));
+		//asmp.new_inst(asmp.inst_push(Argument(REGISTER_RSP, true, INFER_QWORD)));
+	} break;
 
 	case OP_SWP: {
 		asmp.new_inst(asmp.inst_pop(Argument(REGISTER_RAX)));

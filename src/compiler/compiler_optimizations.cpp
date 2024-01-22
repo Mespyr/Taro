@@ -2,7 +2,9 @@
 
 void Compiler::optimize_current_func() {
 	idx = 0;
-	for (Instruction i : fn_key.second) {
+	while (idx < fn_key.second.size()) {
+		Instruction i = fn_key.second.at(idx);
+
 		switch (i.type) {
 
 		case INSTRUCTION_ADD:

@@ -6,6 +6,7 @@ bool Compiler::arguments_equal(Argument a, Argument b) {
 
 void Compiler::erase_idx(uint32_t i) {
 	fn_key.second.erase(fn_key.second.begin() + i);
+	idx--;
 }
 
 void Compiler::remove_stored_register(AsmRegister reg) {
