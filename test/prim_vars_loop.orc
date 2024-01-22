@@ -12,4 +12,3 @@ fun main()
 	end
 
 	"Done!\n" 1 1 call3 pop
-end

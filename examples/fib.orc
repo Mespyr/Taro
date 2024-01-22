@@ -8,7 +8,6 @@ fun linear_fib(i64) [i64]
     &i 1 + @i
     jmp loop
   end swp pop
-end
 
 fun recursive_fib(i64) [i64]
   i64 n @n
@@ -22,9 +21,7 @@ fun recursive_fib(i64) [i64]
     1 - recursive_fib
     &n 2 - recursive_fib +
   end
-end
 
 fun main()
   1000000 linear_fib dump
   40 recursive_fib dump
-end

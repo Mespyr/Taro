@@ -6,4 +6,3 @@ fun main()
 		&x dump
 		jmp loop
 	end
-end

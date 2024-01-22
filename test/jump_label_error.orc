@@ -4,4 +4,3 @@ fun main()
 		10 10 cjmpet loop # push extra int onto stack here
 		pop
 	end pop pop
-end

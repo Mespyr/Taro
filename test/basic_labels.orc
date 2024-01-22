@@ -10,4 +10,3 @@ fun main()
 	jmp label
 
 	endlabel: end
-end

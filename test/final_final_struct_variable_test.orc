@@ -1,8 +1,9 @@
-struct Rectangle(i64 width i64 height)
+struct Rectangle
+  i64 width
+  i64 height
 
 fun print(i64 ^i8)
 	1 1 call3 pop
-end
 
 fun scale(i64 ^Rectangle)
 	^Rectangle r @r
@@ -13,7 +14,6 @@ fun scale(i64 ^Rectangle)
 
 	&r &Rectangle.height &deg *
 	&r @Rectangle.height
-end
 
 fun display(^Rectangle)
 	Rectangle r @r
@@ -30,11 +30,9 @@ fun display(^Rectangle)
 	
 		1 + jmp height_loop
 	end pop
-end
 
 fun area(^Rectangle) [i64]
 	dup &Rectangle.width swp &Rectangle.height *
-end
 
 fun main()
 	Rectangle rect
@@ -46,4 +44,3 @@ fun main()
 	2 rect scale
 	rect display
 	rect area dump
-end

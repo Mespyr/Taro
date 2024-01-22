@@ -1,4 +1,3 @@
 fun main()
 	# comments
 	12 13 + print "Helllo WOrld"
-end

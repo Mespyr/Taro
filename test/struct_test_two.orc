@@ -1,15 +1,15 @@
-struct Rectangle(i64 width i64 height)
+struct Rectangle
+  i64 width i64 height
 
 fun area(^Rectangle) [i64]
 	Rectangle r @r
 	&r.width &r.height *
-end
+
 fun perimeter(^Rectangle) [i64]
 	Rectangle r @r
 	&r.width 2 *
 	&r.height 2 *
 	+
-end
 
 fun main()
 	Rectangle r
@@ -18,4 +18,3 @@ fun main()
 	
 	r area dump
 	r perimeter dump
-end

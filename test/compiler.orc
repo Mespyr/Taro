@@ -1,6 +1,5 @@
 fun print2(i64 i64)
 	dump dump
-end
 
 
 fun main()
@@ -11,4 +10,3 @@ fun main()
 	4 2 / print2
 
 	5 2 - dump
-end

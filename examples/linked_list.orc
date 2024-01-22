@@ -1,9 +1,13 @@
-struct Node(i64 data ^Node next)
-struct LinkedList(Node head i64 size)
+struct Node
+  i64 data
+  ^Node next
+
+struct LinkedList
+  Node head
+  i64 size
 
 fun LinkedList::init(^LinkedList)
   0 swp @LinkedList.size
-end
 
 fun LinkedList::append(i64 ^LinkedList)
   ^LinkedList LL @LL
@@ -26,7 +30,6 @@ fun LinkedList::append(i64 ^LinkedList)
   end
 
   &LL &LinkedList.size 1 + &LL @LinkedList.size
-end
 
 fun LinkedList::print(^LinkedList)
   LinkedList LL @LL
@@ -37,7 +40,6 @@ fun LinkedList::print(^LinkedList)
     swp 1 +
     jmp loop
   end pop pop
-end
 
 fun LinkedList::pop(^LinkedList)
   ^LinkedList LL @LL
@@ -50,7 +52,6 @@ fun LinkedList::pop(^LinkedList)
   end pop
   delete
   &LL &LinkedList.size 1 - &LL @LinkedList.size
-end
 
 fun LinkedList::clear(^LinkedList)
   ^LinkedList LL @LL
@@ -64,11 +65,9 @@ fun LinkedList::clear(^LinkedList)
     jmp loop
   end pop pop
   0 &LL @LinkedList.size
-end
 
 fun print(i64 ^i8)
   1 1 call3 pop
-end
 
 fun main()
   LinkedList LL
@@ -93,4 +92,3 @@ fun main()
 
   "Size of Linked List After Clearing\n" print
   &LL.size dump
-end

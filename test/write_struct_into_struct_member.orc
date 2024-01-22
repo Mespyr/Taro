@@ -1,5 +1,7 @@
-struct String(i64 size ^i8 data)
-struct Person(String name i64 age)
+struct String
+  i64 size ^i8 data
+struct Person
+  String name i64 age
 
 fun main()
 	Person finn
@@ -10,4 +12,3 @@ fun main()
 
 	&finn.name.size &finn.name.data 1 1 call3 pop
 	&finn.age dump
-end

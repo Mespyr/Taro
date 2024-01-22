@@ -29,9 +29,16 @@ private:
 	void handle_read_data_from_ptr(Op op);
 
 	void optimize_current_func();
+	bool arguments_equal(Argument a, Argument b);
+	void erase_idx(uint32_t i);
 	void remove_stored_register(AsmRegister reg);
+
 	void handle_mov_reg_optim();
 	void compare_stored_values_mov(Instruction i, AsmRegister write_reg, int64_t save_value);
+
+    int64_t find_idx_for_top_push();
+	bool register_is_used(AsmRegister reg, uint32_t end_idx);
+	void handle_stack_optim();
 
 	Program program;
 	AssemblyProgram asmp;

@@ -3,7 +3,6 @@ fun crazy_copy(^i64 ^i64)
 	^i64 a @a
 	&a dup &i64 420 + swp @i64
 	&a &b @i64
-end
 
 fun main()
 	i64 a 69 @a
@@ -15,4 +14,3 @@ fun main()
 
 	"b = " 1 1 call3 pop
 	&b dump
-end

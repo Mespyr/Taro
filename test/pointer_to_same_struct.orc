@@ -1,4 +1,5 @@
-struct Node(i64 value ^Node next)
+struct Node
+  i64 value ^Node next
 
 fun print_list_elems(^Node i64)
 	i64 num_elements @num_elements
@@ -13,7 +14,6 @@ fun print_list_elems(^Node i64)
 		&idx 1 + @idx
 		jmp loop
 	end pop
-end
 
 fun main()
 	Node n1 12 @n1.value
@@ -24,4 +24,3 @@ fun main()
 	n1 @n2.next
 
 	n1 12 print_list_elems
-end

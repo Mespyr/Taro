@@ -1,45 +1,39 @@
 #include "parser.h"
+#include <cstdlib>
+#include <error.h>
 
 void Parser::parse_func_body(Function* func) {
 	std::map<std::string, std::pair<int, int>> labels;
-	bool found_function_end = false;
 	int recursion_level = 0;
 	std::vector<std::string> recursion_stack;
+	bool inside_function = true;
 
-	while (i < tokens.size()) {
+	while (inside_function) {
 		Op f_op = convert_token_to_op(tokens.at(i), func->var_offsets);
-		
-		if (f_op.type == OP_FUN) {
-			print_error_at_loc(f_op.loc, "unexpected 'fun' keyword found inside function definition");
-			exit(1);
-		}
-		else if (f_op.type == OP_STRUCT) {
-			print_error_at_loc(f_op.loc, "unexpected 'struct' keyword found inside function definition");
-			exit(1);
-		}
-		else if (f_op.type == OP_END) {
+
+		switch (f_op.type) {
+
+		case OP_END: {
 			if (recursion_level == 0) {
-				found_function_end = true;
-				func->ops = link_ops(func->ops, labels);
-				break;
+				print_error_at_loc(f_op.loc, "unexpected 'end' keyword found while parsing");
+				exit(1);
 			}
-			else {
-				recursion_level--;
-				std::string ended_label = recursion_stack.back();
-				recursion_stack.pop_back();
+			recursion_level--;
+			std::string ended_label = recursion_stack.back();
+			recursion_stack.pop_back();
 
-				// set second idx to end of label	
-				std::pair<int, int> label_pair = labels.at(ended_label);
-				label_pair.second = i;
-				labels.at(ended_label) = label_pair;
+			// set second idx to end of label	
+			std::pair<int, int> label_pair = labels.at(ended_label);
+			label_pair.second = i;
+			labels.at(ended_label) = label_pair;
 
-				f_op.type = OP_LABEL_END;
-				f_op.int_operand = label_pair.second;
-				f_op.str_operand = ended_label;
-				func->ops.push_back(f_op);
-			}
-		}
-		else if (f_op.type == OP_LABEL) {
+			f_op.type = OP_LABEL_END;
+			f_op.int_operand = label_pair.second;
+			f_op.str_operand = ended_label;
+			func->ops.push_back(f_op);
+		} break;
+
+		case OP_LABEL: {
 			if (labels.count(f_op.str_operand)) {
 				print_error_at_loc(f_op.loc, "redefinition of label '" + f_op.str_operand + "'");
 				exit(1);
@@ -55,8 +49,9 @@ void Parser::parse_func_body(Function* func) {
 
 			f_op.int_operand = i;
 			func->ops.push_back(f_op);
-		}
-		else if (f_op.type == OP_DEFINE_VAR) {
+		} break;
+
+		case OP_DEFINE_VAR: {
 			i++;
 			if (i >= tokens.size()) break;
 			Token var_name_tok = tokens.at(i);
@@ -82,8 +77,9 @@ void Parser::parse_func_body(Function* func) {
 			});
 
 			func->memory_capacity += sizeof_type(f_op.str_operand, program.structs);
-		}
-		else if (f_op.type == OP_SET) {
+		} break;
+
+		case OP_SET: {
 			// if setting a variable
 			if (func->var_offsets.count(f_op.str_operand)) {
 				LangType type = func->var_offsets.at(f_op.str_operand).first;
@@ -176,8 +172,9 @@ void Parser::parse_func_body(Function* func) {
 					func->ops.push_back(f_op);
 				}
 			}
-		}
-		else if (f_op.type == OP_READ) {
+		} break;
+
+		case OP_READ: {
 			// if reading a variable
 			if (func->var_offsets.count(f_op.str_operand)) {
 				LangType type = func->var_offsets.at(f_op.str_operand).first;
@@ -260,27 +257,53 @@ void Parser::parse_func_body(Function* func) {
 					func->ops.push_back(f_op);
 				}
 			}
-		}
-		else if (f_op.type == OP_JMP || f_op.type == OP_CJMPT || f_op.type == OP_CJMPF || f_op.type == OP_JMPE || f_op.type == OP_CJMPET || f_op.type == OP_CJMPEF) {
+		} break;
+
+		case OP_JMP:
+		case OP_JMPE:
+		case OP_CJMPT:
+		case OP_CJMPF:
+		case OP_CJMPET:
+		case OP_CJMPEF: {
 			i++;
 			if (i >= tokens.size()) break;
 			Token label_jumpto_tok = tokens.at(i);
 			f_op.str_operand = label_jumpto_tok.value;
 			func->ops.push_back(f_op);
-		}
-		else if (f_op.type == OP_PUSH_VAR) {
+		} break;
+
+		case OP_PUSH_VAR: {
 			f_op.int_operand = func->var_offsets.at(f_op.str_operand).second;
 			func->ops.push_back(f_op);
-		}
-		else if (f_op.type == OP_PUSH_TYPE_INSTANCE) {
+		} break;
+
+		case OP_PUSH_TYPE_INSTANCE: {
 			f_op.int_operand = sizeof_type(f_op.str_operand, program.structs);
 			func->ops.push_back(f_op);
+		} break;
+
+		case OP_FUN:
+		case OP_STRUCT:
+		case OP_IMPORT:
+		case OP_CONST:
+			inside_function = false;
+			break;
+
+		default:
+			func->ops.push_back(f_op);
+			break;
+		};
+
+		if (!inside_function) i--;
+		else i++;
+		
+		if (i >= tokens.size()) {
+			if (recursion_level > 0) {
+				print_error_at_loc(tokens.back().loc, "unexpected EOF while parsing");
+				exit(1);
+			}
+			inside_function = false;
 		}
-		else func->ops.push_back(f_op);
-		i++;
 	}
-	if (!found_function_end) {
-		print_error_at_loc(tokens.back().loc, "Unexpected EOF while parsing function body");
-		exit(1);
-	}
+	func->ops = link_ops(func->ops, labels);
 };

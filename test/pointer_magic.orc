@@ -8,18 +8,18 @@
 # 5. read the variable (pushes a ^String)
 # 6. save that value to a var of type String and print it
 
-struct String(i64 size ^i8 data)
+struct String
+  i64 size
+  ^i8 data
 
 fun get_string_in_ptr_ptr(^^String) [^String]
 	# save the string to s (^^String is pointer to ^String which is type of var s)
 	# and read the value (get ^String)
 	^String s @s &s
-end
 
 fun print(^String)
 	String s @s
 	&s.size &s.data 1 1 call3 pop
-end
 
 fun main()
 	String s
@@ -31,4 +31,3 @@ fun main()
 	str_ptr get_string_in_ptr_ptr @str_2
 
 	str_2 print
-end

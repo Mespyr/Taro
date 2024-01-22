@@ -14,4 +14,3 @@ fun main()
 
 		dup cjmpt loop
 	end
-end

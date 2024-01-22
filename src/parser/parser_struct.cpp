@@ -32,15 +32,9 @@ void Parser::parse_struct(Op current_op) {
 		exit(1);
 	}
 
-	if (tokens.at(i).value != "(") {
-		print_error_at_loc(tokens.at(i).loc, "unexpected token found while parsing");
-		exit(1);
-	}
-	i++;
-
 	std::map<std::string, std::pair<LangType, int>> members;
 	int offset = 0;
-	while (tokens.at(i).value != ")") {
+	while (i < tokens.size()) {
 		// get type of next member
 		Token type_tok = tokens.at(i);
 		std::pair<std::string, int> type_info = parse_type_str(type_tok.value);
@@ -59,7 +53,7 @@ void Parser::parse_struct(Op current_op) {
 		// get member name
 		i++;
 		if (i > tokens.size() - 1) {
-			print_error_at_loc(type_tok.loc, "unexpected EOF found while parsing function definition");
+			print_error_at_loc(type_tok.loc, "unexpected EOF found while parsing struct member definition");
 			exit(1);
 		}
 		Token member_name_tok = tokens.at(i);
@@ -78,9 +72,12 @@ void Parser::parse_struct(Op current_op) {
 		else offset += sizeof_type(base_type, program.structs);
 
 		i++;
-		if (i > tokens.size() - 1) {
-			print_error_at_loc(member_name_tok.loc, "unexpected EOF found while parsing function definition");
-			exit(1);
+		if (tokens.at(i).value == "fun" ||
+			tokens.at(i).value == "struct" ||
+			tokens.at(i).value == "import" ||
+			tokens.at(i).value == "const") {
+			i--;
+			break;
 		}
 	}
 	// align the offset into sections of 8

@@ -12,4 +12,3 @@ fun main()
 	MUL dump
 	DIV dump
 	MOD dump
-end

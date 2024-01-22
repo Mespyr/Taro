@@ -1,5 +1,5 @@
-fun mod(i64 i64) [i64] / swp pop end
-fun sq(i64) [i64] dup * end
+fun mod(i64 i64) [i64] / swp pop
+fun sq(i64) [i64] dup *
 
 fun ?prime(i64) [i64]
   i64 is_prime
@@ -21,7 +21,6 @@ fun ?prime(i64) [i64]
 
   pop pop
   &is_prime
-end
 
 fun main()
   1 loop:
@@ -32,4 +31,3 @@ fun main()
     end
     1 + jmp loop
   end pop
-end

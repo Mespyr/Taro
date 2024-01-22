@@ -8,4 +8,3 @@ fun main()
 	12 13 14 rot dump dump dump
 
 	12 13 over dump
-end

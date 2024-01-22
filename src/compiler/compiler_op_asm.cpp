@@ -33,7 +33,7 @@ void Compiler::gen_op_asm(Op op, int func_addr) {
 	} break;
 
 	case OP_DIV: {
-		asmp.new_inst(asmp.inst_xor(Argument(REGISTER_RDX), Argument(REGISTER_RDX)));
+		asmp.new_inst(asmp.inst_mov(Argument(REGISTER_RDX), Argument(0)));
 		asmp.new_inst(asmp.inst_pop(Argument(REGISTER_RBX)));
 		asmp.new_inst(asmp.inst_pop(Argument(REGISTER_RAX)));
 		asmp.new_inst(asmp.inst_div(Argument(REGISTER_RBX)));

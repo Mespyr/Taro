@@ -26,4 +26,3 @@ fun main()
 	1 1 or dump
 	1 0 or dump
 	0 0 or dump
-end

@@ -4,4 +4,3 @@ fun main()
 	&n 12 = dump
 
 	n 12 = dump
-end

@@ -5,4 +5,3 @@ fun main()
 	&count dump
 	&count 1 + @count
 	&count dump
-end

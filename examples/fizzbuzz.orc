@@ -1,10 +1,5 @@
-fun modulo(i64 i64) [i64]
-  / swp pop
-end
-
-fun puts(i64 ^i8)
-  1 1 call3 pop
-end
+fun modulo(i64 i64) [i64] / swp pop
+fun puts(i64 ^i8) 1 1 call3 pop
 
 fun fizzbuzz(i64)
   i64 i @i
@@ -28,7 +23,6 @@ fun fizzbuzz(i64)
   end
 
   else: &i dump end
-end
 
 fun main()
   1 loop:
@@ -36,4 +30,3 @@ fun main()
     dup fizzbuzz
     1 + jmp loop
   end pop
-end
