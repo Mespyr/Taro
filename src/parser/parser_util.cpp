@@ -55,13 +55,18 @@ std::string Parser::add_escapes_to_string(std::string str) {
 
 int64_t Parser::eval_const_expression(Location definition_loc) {
 	std::vector<int64_t> stack;
+	bool inside_const_def = true;
 
-	while (tokens.at(i).value != "end") {
+	while (inside_const_def) {
 		Op op = convert_token_to_op(tokens.at(i));
 
-		if (op.type == OP_PUSH_INT)
+		switch (op.type) {
+
+		case OP_PUSH_INT:
 			stack.push_back(op.int_operand);
-		else if (op.type == OP_PLUS) {
+			break;
+
+		case OP_PLUS: {
 			if (stack.size() < 2) {
 				print_not_enough_arguments_error(op.loc, 2, stack.size(), "+", "addition");
 				exit(1);
@@ -69,8 +74,9 @@ int64_t Parser::eval_const_expression(Location definition_loc) {
 			int64_t a = stack.back(); stack.pop_back();
 			int64_t b = stack.back(); stack.pop_back();
 			stack.push_back(a + b);
-		}
-		else if (op.type == OP_MINUS) {
+		} break;
+
+		case OP_MINUS: {
 			if (stack.size() < 2) {
 				print_not_enough_arguments_error(op.loc, 2, stack.size(), "-", "subtraction");
 				exit(1);
@@ -79,8 +85,9 @@ int64_t Parser::eval_const_expression(Location definition_loc) {
 			int64_t a = stack.back(); stack.pop_back();
 			int64_t b = stack.back(); stack.pop_back();
 			stack.push_back(b - a);
-		}
-		else if (op.type == OP_MUL) {
+		} break;
+
+		case OP_MUL: {
 			if (stack.size() < 2) {
 				print_not_enough_arguments_error(op.loc, 2, stack.size(), "*", "multiplication");
 				exit(1);
@@ -88,8 +95,9 @@ int64_t Parser::eval_const_expression(Location definition_loc) {
 			int64_t a = stack.back(); stack.pop_back();
 			int64_t b = stack.back(); stack.pop_back();
 			stack.push_back(a * b);
-		}
-		else if (op.type == OP_DIV) {
+		} break;
+
+		case OP_DIV: {
 			if (stack.size() < 2) {
 				print_not_enough_arguments_error(op.loc, 2, stack.size(), "/", "division");
 				exit(1);
@@ -99,15 +107,17 @@ int64_t Parser::eval_const_expression(Location definition_loc) {
 			int64_t b = stack.back(); stack.pop_back();
 			stack.push_back(b / a);
 			stack.push_back(b % a);
-		}
-		else if (op.type == OP_POP) {
+		} break;
+
+		case OP_POP: {
 			if (stack.size() < 1) {
 				print_not_enough_arguments_error(op.loc, 1, stack.size(), "pop");
 				exit(1);
 			}
 			stack.pop_back();
-		}
-		else if (op.type == OP_SWP) {
+		} break;
+
+		case OP_SWP: {
 			if (stack.size() < 2) {
 				print_not_enough_arguments_error(op.loc, 2, stack.size(), "swp");
 				exit(1);
@@ -117,17 +127,25 @@ int64_t Parser::eval_const_expression(Location definition_loc) {
 			int64_t b = stack.back(); stack.pop_back();
 			stack.push_back(a);
 			stack.push_back(b);
-		}
-		else {
+		} break;
+
+		case OP_FUN:
+		case OP_CONST:
+		case OP_IMPORT:
+		case OP_STRUCT:
+			i--;
+			inside_const_def = false;
+			break;
+
+		default:
 			print_error_at_loc(op.loc, "unsuppored keyword in compile-time evaluation of expression");
 			exit(1);
 		}
-
-		i++;
-		if (i > tokens.size() - 1) {
-			print_error_at_loc(tokens.at(i - 1).loc, "unexpected EOF found while parsing");
-			exit(1);
-		}
+		if (!inside_const_def)
+			break;
+		else i++;
+		if (i >= tokens.size())
+			inside_const_def = false;
 	}
 
 	if (stack.size() > 1) {

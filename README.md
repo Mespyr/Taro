@@ -47,11 +47,9 @@ fun factorial(i64) [i64]
     0 => pop 1,
 	_ => dup 1 - factorial *,
   end
-end
 
 fun main()
   12 factorial dump
-end
 ```
 SEXP works by taking the top integer on the stack, and comparing it to a bunch of different other values. If it is, then it executes that section of code up to the `,`. 
 The integer is not consumed by the operation unless removed by the expression, and all expressions must return the same types onto the stack for it to pass with the type checker.
@@ -65,5 +63,4 @@ fun fib(i64) [i64]
       dup 1 - fib
       swp 2 - fib +,
   end
-end
 ```
