@@ -1,9 +1,9 @@
-const HELLO 12 22 + end
-const WORLD HELLO 35 + end
-const MINUS WORLD HELLO - end
-const MUL HELLO WORLD * end
-const DIV WORLD HELLO / pop end
-const MOD WORLD HELLO / swp pop end
+const HELLO 12 22 +
+const WORLD HELLO 35 +
+const MINUS WORLD HELLO -
+const MUL HELLO WORLD *
+const DIV WORLD HELLO / pop
+const MOD WORLD HELLO / swp pop
 
 fun main()
 	HELLO dump
