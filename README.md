@@ -14,6 +14,7 @@ Source files for Orc end in the `.orc` file extension.
 - [x] Type Checking
 - [x] have more fancy type notation (using `^` to indicate pointers, making custom types possible)
 - [x] add two types of integer (i8, i64) instead of just default `int` keyword. good for string as string type is a `^i8`.
+  - [x] Switch this back to more generic `Int` and `Char`
 - [x] Structs
 	- [x] struct definition
 	- [x] struct definition as variable

@@ -1,5 +1,5 @@
 struct String
-  i64 size ^i8 count
+  Int size ^Char count
 
 fun print(^String)
 

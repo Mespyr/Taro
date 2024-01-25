@@ -1,7 +1,7 @@
 struct String
-  i64 size ^i8 data
+  Int size ^Char data
 struct Person
-  String name i64 age
+  String name Int age
 
 fun main()
 	Person finn

@@ -1,15 +1,15 @@
 # experiment with diffeent structs
 struct String
-  i64 size
-  ^i8 data
+  Int size
+  ^Char data
 
 struct TwoCount
-  i64 c1
-  i64 c2
+  Int c1
+  Int c2
 
 struct TwoChars
-  i8 c1
-  i8 c2
+  Char c1
+  Char c2
 
 fun main()
 	String name

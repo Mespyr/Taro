@@ -10,8 +10,8 @@
 // PROGRAM TYPES
 
 enum LangPrimType {
-	TYPE_I8,
-	TYPE_I64,
+	TYPE_CHAR,
+	TYPE_INT,
 	PRIM_TYPES_COUNT
 };
 

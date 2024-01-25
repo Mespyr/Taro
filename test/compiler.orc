@@ -1,6 +1,5 @@
-fun print2(i64 i64)
+fun print2(Int Int)
 	dump dump
-
 
 fun main()
 	12 13 + dump

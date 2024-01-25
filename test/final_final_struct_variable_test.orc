@@ -1,13 +1,13 @@
 struct Rectangle
-  i64 width
-  i64 height
+  Int width
+  Int height
 
-fun print(i64 ^i8)
+fun print(Int ^Char)
 	1 1 call3 pop
 
-fun scale(i64 ^Rectangle)
+fun scale(Int ^Rectangle)
 	^Rectangle r @r
-	i64 deg @deg
+	Int deg @deg
 
 	&r &Rectangle.width &deg *
 	&r @Rectangle.width
@@ -31,7 +31,7 @@ fun display(^Rectangle)
 		1 + jmp height_loop
 	end pop
 
-fun area(^Rectangle) [i64]
+fun area(^Rectangle) [Int]
 	dup &Rectangle.width swp &Rectangle.height *
 
 fun main()

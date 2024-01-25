@@ -297,12 +297,12 @@ void TypeChecker::check_op() {
 		break;
 
 	case OP_PUSH_INT:
-		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
+		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_INT), 0));
 		break;
 
 	case OP_PUSH_STR:
-		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
-		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I8), 1)); // pointer to array of ints (string)
+		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_INT), 0));
+		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_CHAR), 1)); // pointer to array of ints (string)
 		break;
 
 	case OP_PUSH_TYPE_INSTANCE: {

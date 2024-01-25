@@ -1,4 +1,4 @@
-fun func() [i64]
+fun func() [Int]
 	12 13 +
 
 fun main()

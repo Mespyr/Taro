@@ -1,11 +1,11 @@
-fun dplus(^i64) [^i64]
-	i64 n @n
+fun dplus(^Int) [^Int]
+	Int n @n
 	# n * 2 + n
 	&n 2 * &n + @n
 	n
 
 fun main()
-	i64 count
+	Int count
 	10 @count
 	count dplus @count
 	&count dump

@@ -1,7 +1,7 @@
-fun funny(^i64)
-	69 swp @i64
+fun funny(^Int)
+	69 swp @Int
 
 fun main()
-	i64 a
+	Int a
 	a funny
 	&a dump

@@ -1,5 +1,5 @@
 struct Str
-  i64 size ^i8 data
+  Int size ^Char data
 
 fun main()
 	Str s

@@ -1,5 +1,5 @@
 fun main()
-	i64 count  # count is a pointer to an integer
+	Int count  # count is a pointer to an integer
 	0 @count
 
 	&count dump

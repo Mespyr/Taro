@@ -1,6 +1,6 @@
-fun linear_fib(i64) [i64]
-  i64 n @n
-  i64 i 1 @i
+fun linear_fib(Int) [Int]
+  Int n @n
+  Int i 1 @i
 
   0 1 loop:
     &n &i > cjmpef loop
@@ -9,9 +9,9 @@ fun linear_fib(i64) [i64]
     jmp loop
   end swp pop
 
-fun recursive_fib(i64) [i64]
-  i64 n @n
-  i64 res
+fun recursive_fib(Int) [Int]
+  Int n @n
+  Int res
 
   &n &n 0 =
   &n 1 =

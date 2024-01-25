@@ -1,5 +1,5 @@
 fun main()
-	i64 count
+	Int count
 	10 @count # initialize
 
 	# count down

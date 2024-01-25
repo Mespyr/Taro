@@ -1,8 +1,8 @@
 struct String
-  i64 size
-  ^i8 data
+  Int size
+  ^Char data
 
-fun new_String(i64 ^i8) [^String]
+fun new_String(Int ^Char) [^String]
   <String> swp over @String.data
   swp over @String.size
 
@@ -18,13 +18,17 @@ const COMPLEX
   34 35 + 21 20 *
   9 + * 10 - 21 / +
 
-fun discover(i64) [i64]
+fun discover(Int) [Int]
   dup dup + +
 
-fun make(i64) [i64]
+fun make(Int) [Int]
   dup discover
   swp dup + / +
-  
+
+fun TEST_PRIM_VARS()
+  <Int> dup 12 swp @Int
+  &Int dump
+
 fun main()
   ^String str
   "Hello World!\n" new_String @str
@@ -34,3 +38,4 @@ fun main()
   &str print
 
   COMPLEX discover make dump
+  TEST_PRIM_VARS

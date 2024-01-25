@@ -1,7 +1,8 @@
 struct String
-  i64 size ^i8 data
+  Int size
+  ^Char data
 
-fun String::init(i64 ^i8 ^String)
+fun String::init(Int ^Char ^String)
 	# save the pointer to a variable
 	# so I dont have to juggle the pointer on the stack
 	# and to see if this could work

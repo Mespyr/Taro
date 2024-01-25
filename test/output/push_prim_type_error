@@ -4,10 +4,10 @@ STDOUT:
 STDERR:
 ┌[test/push_prim_type_error.orc:6:6]
 │ 	n 12 = dump
-└ 	     ^ invalid types for operation '=' (equal to) (^i64, i64)
+└ 	     ^ invalid types for operation '=' (equal to) (^Int, Int)
 ┌[test/push_prim_type_error.orc:6:1]
 │ 	n 12 = dump
-└ 	^ NOTE: first argument found here (^i64)
+└ 	^ NOTE: first argument found here (^Int)
 ┌[test/push_prim_type_error.orc:6:3]
 │ 	n 12 = dump
-└ 	  ^^ NOTE: second argument found here (i64)
+└ 	  ^^ NOTE: second argument found here (Int)

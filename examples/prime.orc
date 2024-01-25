@@ -1,8 +1,8 @@
-fun mod(i64 i64) [i64] / swp pop
-fun sq(i64) [i64] dup *
+fun mod(Int Int) [Int] / swp pop
+fun sq(Int) [Int] dup *
 
-fun ?prime(i64) [i64]
-  i64 is_prime
+fun ?prime(Int) [Int]
+  Int is_prime
   1 @is_prime 2
 
   over 2 < cjmpf loop

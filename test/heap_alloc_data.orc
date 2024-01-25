@@ -1,7 +1,8 @@
 struct String
-  i64 size ^i8 data
+  Int size
+  ^Char data
 
-fun new_String(i64 ^i8) [^String]
+fun new_String(Int ^Char) [^String]
 	<String>
 	swp over @String.data
 	swp over @String.size

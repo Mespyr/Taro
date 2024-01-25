@@ -1,11 +1,11 @@
 struct Rectangle
-  i64 width i64 height
+  Int width Int height
 
-fun area(^Rectangle) [i64]
+fun area(^Rectangle) [Int]
 	Rectangle r @r
 	&r.width &r.height *
 
-fun perimeter(^Rectangle) [i64]
+fun perimeter(^Rectangle) [Int]
 	Rectangle r @r
 	&r.width 2 *
 	&r.height 2 *

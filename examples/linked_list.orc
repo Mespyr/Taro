@@ -1,17 +1,17 @@
 struct Node
-  i64 data
+  Int data
   ^Node next
 
 struct LinkedList
   Node head
-  i64 size
+  Int size
 
 fun LinkedList::init(^LinkedList)
   0 swp @LinkedList.size
 
-fun LinkedList::append(i64 ^LinkedList)
+fun LinkedList::append(Int ^LinkedList)
   ^LinkedList LL @LL
-  i64 value @value
+  Int value @value
   &LL &LinkedList.size 0 = cjmpf append 
 
   &value &LL @LinkedList.head.data
@@ -66,7 +66,7 @@ fun LinkedList::clear(^LinkedList)
   end pop pop
   0 &LL @LinkedList.size
 
-fun print(i64 ^i8)
+fun print(Int ^Char)
   1 1 call3 pop
 
 fun main()

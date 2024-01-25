@@ -1,5 +1,5 @@
 fun main()
-	i64 n
+	Int n
 	
 	&n 12 = dump
 

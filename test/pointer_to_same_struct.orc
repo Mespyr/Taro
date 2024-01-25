@@ -1,9 +1,10 @@
 struct Node
-  i64 value ^Node next
+  Int value
+  ^Node next
 
-fun print_list_elems(^Node i64)
-	i64 num_elements @num_elements
-	i64 idx 0 @idx
+fun print_list_elems(^Node Int)
+	Int num_elements @num_elements
+	Int idx 0 @idx
 
 	loop:
 		&idx &num_elements = cjmpet loop

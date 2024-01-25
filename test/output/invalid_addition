@@ -4,10 +4,10 @@ STDOUT:
 STDERR:
 ┌[test/invalid_addition.orc:6:5]
 │ 	s 8 +
-└ 	    ^ invalid types for operation '+' (addition) (^Str, i64)
+└ 	    ^ invalid types for operation '+' (addition) (^Str, Int)
 ┌[test/invalid_addition.orc:6:1]
 │ 	s 8 +
 └ 	^ NOTE: first value pushed here (^Str)
 ┌[test/invalid_addition.orc:6:3]
 │ 	s 8 +
-└ 	  ^ NOTE: second value pushed here (i64)
+└ 	  ^ NOTE: second value pushed here (Int)

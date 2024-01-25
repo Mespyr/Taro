@@ -1,8 +1,8 @@
-fun modulo(i64 i64) [i64] / swp pop
-fun puts(i64 ^i8) 1 1 call3 pop
+fun modulo(Int Int) [Int] / swp pop
+fun puts(Int ^Char) 1 1 call3 pop
 
-fun fizzbuzz(i64)
-  i64 i @i
+fun fizzbuzz(Int)
+  Int i @i
 
   &i 15 modulo 0 = cjmpef divisible_15
   divisible_15:

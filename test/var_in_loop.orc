@@ -1,6 +1,6 @@
 fun main()
 	loop:
-		i64 x
+		Int x
 		&x 10 + @x
 		&x 1000 >= cjmpet loop
 		&x dump

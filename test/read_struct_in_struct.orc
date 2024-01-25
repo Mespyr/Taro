@@ -1,7 +1,7 @@
 struct String
-  i64 size ^i8 data
+  Int size ^Char data
 struct Row
-  String row i64 repeat
+  String row Int repeat
 
 fun main()
 	Row row1

@@ -1,9 +1,10 @@
 struct String
-  i64 size ^i8 data
+  Int size
+  ^Char data
 
-fun extract_char(^String) [i8]
+fun extract_char(^String) [Char]
 	String s @s           # set string to var on stack to access members
-	i8 char &s.data @char # read first char in ^i8 by abusing how @ works
+	Char char &s.data @char # read first char in ^i8 by abusing how @ works
 	&char                 # read value in char
 
 fun main()

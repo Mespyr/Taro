@@ -1,11 +1,12 @@
 struct String
-  i64 size
-  ^i8 data
+  Int size
+  ^Char data
+
 struct Object
-  i64 int_val
+  Int int_val
   String str_val
 
-fun String_init(i64 ^i8) [^String]
+fun String_init(Int ^Char) [^String]
   <String> swp over @String.data
    swp over @String.size
 

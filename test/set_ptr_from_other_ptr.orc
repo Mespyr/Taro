@@ -1,12 +1,12 @@
-fun crazy_copy(^i64 ^i64)
-	^i64 b @b
-	^i64 a @a
-	&a dup &i64 420 + swp @i64
-	&a &b @i64
+fun crazy_copy(^Int ^Int)
+	^Int b @b
+	^Int a @a
+	&a dup &Int 420 + swp @Int
+	&a &b @Int
 
 fun main()
-	i64 a 69 @a
-	i64 b
+	Int a 69 @a
+	Int b
 	a b crazy_copy
 	
 	"a = " 1 1 call3 pop

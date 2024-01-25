@@ -1,10 +1,10 @@
 # check use of ^ symbol in arg stack and ret stack
 # as well as lack of it
 
-fun get_cool_str() [i64 ^i8]
+fun get_cool_str() [Int ^Char]
 	"Hello World!\n"
 
-fun print(i64 ^i8)
+fun print(Int ^Char)
 	1 1 call3 pop
 
 fun main()

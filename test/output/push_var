@@ -4,10 +4,10 @@ STDOUT:
 STDERR:
 ┌[test/push_var.orc:6:5]
 │ 	s 1 = dump
-└ 	    ^ invalid types for operation '=' (equal to) (^String, i64)
+└ 	    ^ invalid types for operation '=' (equal to) (^String, Int)
 ┌[test/push_var.orc:6:1]
 │ 	s 1 = dump
 └ 	^ NOTE: first argument found here (^String)
 ┌[test/push_var.orc:6:3]
 │ 	s 1 = dump
-└ 	  ^ NOTE: second argument found here (i64)
+└ 	  ^ NOTE: second argument found here (Int)

@@ -35,9 +35,9 @@ void TypeChecker::handle_arithmetic_op(Op op) {
 	LangType b = type_stack.back(); type_stack.pop_back();
 
 	if (is_prim_type_int(a) && is_prim_type_int(b)) {
-		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
+		type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_INT), 0));
 		if (op.type == OP_DIV)
-			type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
+			type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_INT), 0));
 	}
 	else {
 		print_invalid_combination_of_types_error(op.loc, {b, a}, name, fullname);
@@ -98,7 +98,7 @@ void TypeChecker::handle_comparison_op(Op op) {
 
 	if (types_equal(a, b))
 		type_stack.push_back(LangType(
-			op.loc, prim_type_name(TYPE_I64), 0
+			op.loc, prim_type_name(TYPE_INT), 0
 		));
 	else {
 		print_invalid_combination_of_types_error(op.loc, {b, a}, name, fullname);
@@ -159,11 +159,11 @@ void TypeChecker::handle_syscall_op(Op op) {
 		type_stack.pop_back();
 
 	if (!is_prim_type_int(a)) {
-		print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), name);
+		print_invalid_type_error(op.loc, prim_type_name(TYPE_INT), human_readable_type(a), name);
 		print_note_at_loc(a.loc, "syscall number pushed here (" + human_readable_type(a) + ")");
 		exit(1);
 	}
-	type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_I64), 0));
+	type_stack.push_back(LangType(op.loc, prim_type_name(TYPE_INT), 0));
 }
 
 void TypeChecker::handle_jump_op(Op op) {
@@ -204,7 +204,7 @@ void TypeChecker::handle_jump_op(Op op) {
 	LangType a = type_stack.back(); type_stack.pop_back();
 
 	if (!is_prim_type_int(a)) {
-		print_invalid_type_error(op.loc, prim_type_name(TYPE_I64), human_readable_type(a), name, fullname);
+		print_invalid_type_error(op.loc, prim_type_name(TYPE_INT), human_readable_type(a), name, fullname);
 		print_note_at_loc(a.loc, "first argument found here (" + human_readable_type(a) + ")");
 		exit(1);
 	}

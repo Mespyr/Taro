@@ -121,11 +121,11 @@ std::pair<LangType, int> variable_member_offset(Op op, std::map<std::string, std
 
 std::string prim_type_name(LangPrimType type) {
 	switch(type) {
-		case TYPE_I64:
-			return "i64";
+		case TYPE_INT:
+			return "Int";
 			break;
-		case TYPE_I8:
-			return "i8";
+		case TYPE_CHAR:
+			return "Char";
 			break;
 		case PRIM_TYPES_COUNT:
 			print_error("DONT PASS PRIM_TYPES_COUNT INTO prim_type_size()");
@@ -139,8 +139,8 @@ int sizeof_type(LangType type, std::map<std::string, Struct> structs) {
 	if (is_prim_type(type)) {
 		static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in is_prim_type(LCPType)");
 		
-		if (type.base_type == prim_type_name(TYPE_I8)) return 1;
-		if (type.base_type == prim_type_name(TYPE_I64)) return 8;
+		if (type.base_type == prim_type_name(TYPE_CHAR)) return 1;
+		if (type.base_type == prim_type_name(TYPE_INT)) return 8;
 	}
 	return structs.at(type.base_type).size;
 }
@@ -152,8 +152,8 @@ int sizeof_type(std::string type, std::map<std::string, Struct> structs) {
 	if (is_prim_type(t.first)) {
 		static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in is_prim_type(LCPType)");
 		
-		if (t.first == prim_type_name(TYPE_I8)) return 1;
-		if (t.first == prim_type_name(TYPE_I64)) return 8;
+		if (t.first == prim_type_name(TYPE_CHAR)) return 1;
+		if (t.first == prim_type_name(TYPE_INT)) return 8;
 	}
 	return structs.at(t.first).size;
 }
@@ -165,8 +165,8 @@ bool types_equal(LangType a, LangType b) {
 bool is_prim_type(LangType t) {
 	static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in is_prim_type(LCPType)");
 
-	if (t.base_type == prim_type_name(TYPE_I64) ||
-		t.base_type == prim_type_name(TYPE_I8))
+	if (t.base_type == prim_type_name(TYPE_INT) ||
+		t.base_type == prim_type_name(TYPE_CHAR))
 		return true;
 
 	return false;
@@ -175,19 +175,19 @@ bool is_prim_type(std::string t) {
 	static_assert(PRIM_TYPES_COUNT == 2, "unhandled prim types in is_prim_type(std::string)");
 
 	std::string base_t = parse_type_str(t).first;
-	if (base_t == prim_type_name(TYPE_I64) ||
-		base_t == prim_type_name(TYPE_I8))
+	if (base_t == prim_type_name(TYPE_INT) ||
+		base_t == prim_type_name(TYPE_CHAR))
 		return true;
 
 	return false;
 }
 
 bool is_prim_type_int(LangType t) {
-	return (t.ptr_to_trace == 0 && (t.base_type == prim_type_name(TYPE_I64) || t.base_type == prim_type_name(TYPE_I8)));
+	return (t.ptr_to_trace == 0 && (t.base_type == prim_type_name(TYPE_INT) || t.base_type == prim_type_name(TYPE_CHAR)));
 }
 
 bool is_prim_type_int(std::string t) {
-	return (t == prim_type_name(TYPE_I64) || t == prim_type_name(TYPE_I8));
+	return (t == prim_type_name(TYPE_INT) || t == prim_type_name(TYPE_CHAR));
 }
 
 bool is_pointer(LangType t) {

@@ -7,4 +7,4 @@ STDERR:
 └     ^^^^ unhandled data on the stack (expected 0 items, got 1)
 ┌[test/complex_labels.orc:6:4]
 │ 		1 -
-└ 		  ^ NOTE: excess data pushed here (i64)
+└ 		  ^ NOTE: excess data pushed here (Int)
