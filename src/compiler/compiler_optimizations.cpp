@@ -18,9 +18,11 @@ void Compiler::optimize_current_func() {
 		case INSTRUCTION_MOV:
 			handle_mov_reg_optim();
 			break;
-
 		case INSTRUCTION_POP:
-			handle_stack_optim();
+			handle_stack_pop_optim();
+			break;
+		case INSTRUCTION_PUSH:
+			handle_stack_push_optim();
 			break;
 
 		case INSTRUCTION_CALL:

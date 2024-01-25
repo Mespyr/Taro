@@ -1,6 +1,3 @@
-const SYS_write 1
-const STDOUT 1
-
 struct String
   i64 size
   ^i8 data
@@ -8,6 +5,9 @@ struct String
 fun new_String(i64 ^i8) [^String]
   <String> swp over @String.data
   swp over @String.size
+
+const SYS_write 1
+const STDOUT 1
 
 fun print(^String)
   dup &String.size
@@ -18,6 +18,13 @@ const COMPLEX
   34 35 + 21 20 *
   9 + * 10 - 21 / +
 
+fun discover(i64) [i64]
+  dup dup + +
+
+fun make(i64) [i64]
+  dup discover
+  swp dup + / +
+  
 fun main()
   ^String str
   "Hello World!\n" new_String @str
@@ -26,4 +33,4 @@ fun main()
   &str print
   &str print
 
-  COMPLEX dump
+  COMPLEX discover make dump

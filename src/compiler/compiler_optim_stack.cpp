@@ -1,91 +1,6 @@
 #include "compiler.h"
 
-int64_t Compiler::find_idx_for_top_push() {
-	int32_t indent = 0;
-	for (uint32_t i = idx-1; i > 0; i--) {
-		Instruction inst = fn_key.second.at(i);
-		switch (inst.type) {
-
-		case INSTRUCTION_POP:
-			indent++;
-			break;
-			
-		case INSTRUCTION_PUSH: {
-			if (indent > 0) indent--;
-			else return i;
-		} break;
-
-		case INSTRUCTION_CALL:
-		case INSTRUCTION_LABEL:
-		case INSTRUCTION_JMP:
-		case INSTRUCTION_JZ:
-		case INSTRUCTION_JNZ:
-		case INSTRUCTION_SYSCALL:
-		case INSTRUCTION_RET: // JUST TO MAKE SURE IDK
-			return -1;
-
-		default:
-			break;
-		}
-	}
-
-	return -1;
-}
-
-bool Compiler::register_is_used(AsmRegister reg, uint32_t end_idx) {
-	for (uint32_t i = idx-1; i > end_idx; i--) {
-		Instruction inst = fn_key.second.at(i);
-		switch (inst.type) {
-
-		// 2 arity
-		case INSTRUCTION_ADD:
-		case INSTRUCTION_SUB:
-		case INSTRUCTION_IMUL:
-		case INSTRUCTION_MOV:
-		case INSTRUCTION_CMP:
-		case INSTRUCTION_CMOVE:
-		case INSTRUCTION_CMOVG:
-		case INSTRUCTION_CMOVL:
-		case INSTRUCTION_CMOVGE:
-		case INSTRUCTION_CMOVLE:
-		case INSTRUCTION_CMOVNE:
-		case INSTRUCTION_AND:
-		case INSTRUCTION_OR: {
-			Argument a = inst.arguments.front();
-			Argument b = inst.arguments.back();
-			if ((a.type == ARG_REGISTER && a.reg_value == reg) ||
-				(b.type == ARG_REGISTER && b.reg_value == reg))
-				return true;
-		} break;
-
-		// 1 arity
-		case INSTRUCTION_INC:
-		case INSTRUCTION_DEC:
-		case INSTRUCTION_PUSH:
-		case INSTRUCTION_POP: {
-			Argument a = inst.arguments.front();
-			if (a.type == ARG_REGISTER && a.reg_value == reg)
-				return true;
-		} break;
-
-		/* only one that really modifies more than js the register specified
-		   without using another op before or after it
-		 */
-		case INSTRUCTION_DIV: {
-			Argument a = inst.arguments.front();
-			if ((a.type == ARG_REGISTER && a.reg_value == reg) ||
-				(reg == REGISTER_RAX) || (reg == REGISTER_RDX))
-				return true;
-		} break;
-
-		default:
-			break;
-		}
-	}
-	return false;
-}
-
-void Compiler::handle_stack_optim() {
+void Compiler::handle_stack_pop_optim() {
 	Instruction i = fn_key.second.at(idx);
 	remove_stored_register(i.arguments.front().reg_value);
 
@@ -93,15 +8,10 @@ void Compiler::handle_stack_optim() {
 	if (push_idx == -1)
 		return;
 
-	/*
-	  This is assuming that
-	  1. the instruction is pop (which it has to be)
-	  2. we are popping to a register (which is the only time we use pop)
-	 */
+	// assumes that we are popping to a register (we only pop to registers)
 	Argument set_arg = i.arguments.front();
 	if (register_is_used(set_arg.reg_value, push_idx))
 		return;
-
 
 	// This is assuming that the pushed argument is static (ie: string pointer, register, integer)
 	Argument pushed_arg = fn_key.second.at(push_idx).arguments.front();
@@ -117,5 +27,47 @@ void Compiler::handle_stack_optim() {
 	push_inst.arguments.push_back(set_arg);
 	push_inst.arguments.push_back(pushed_arg);
     fn_key.second.at(push_idx) = push_inst;
+	erase_idx(idx);
+}
+
+void Compiler::handle_stack_push_optim() {
+	Instruction i = fn_key.second.at(idx);
+	
+	// check if pushing a register on the stack
+	Argument arg = i.arguments.front();
+	if (arg.type != ARG_REGISTER ||
+		arg.read_pointer || arg.add_amount != 0)
+		return;
+
+	AsmRegister push_reg = arg.reg_value;
+
+	// if there is no instructions before this one, return
+	if (idx == 0)
+		return;
+
+	// assumes that we are popping to a register (we only pop to registers)
+	Instruction prev_inst = fn_key.second.at(idx - 1);
+	if (prev_inst.type != INSTRUCTION_POP)
+		return;
+	AsmRegister pop_reg = prev_inst.arguments.front().reg_value;
+
+	if (push_reg != pop_reg)
+		return;
+
+	/*
+	  erase pop and push if register value isn't ever used
+	  - no point in reading the top value from the stack if we never use it
+	  - not have had it happen in any of my tests so idk if it even works
+	  - or if it even occurs in the generated code
+	 */
+	if (!register_is_used_before_being_set(push_reg)) {
+		erase_idx(idx);
+		erase_idx(idx);
+		return;
+	}
+	
+	prev_inst.type = INSTRUCTION_MOV;
+	prev_inst.arguments.push_back(Argument(REGISTER_RSP, true));
+	fn_key.second.at(idx - 1) = prev_inst;
 	erase_idx(idx);
 }

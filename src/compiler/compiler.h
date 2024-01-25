@@ -36,9 +36,11 @@ private:
 	void handle_mov_reg_optim();
 	void compare_stored_values_mov(Instruction i, AsmRegister write_reg, int64_t save_value);
 
-    int64_t find_idx_for_top_push();
 	bool register_is_used(AsmRegister reg, uint32_t end_idx);
-	void handle_stack_optim();
+    bool register_is_used_before_being_set(AsmRegister reg);
+    int64_t find_idx_for_top_push();
+	void handle_stack_pop_optim();
+	void handle_stack_push_optim();
 
 	Program program;
 	AssemblyProgram asmp;

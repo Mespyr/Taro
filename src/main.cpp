@@ -38,7 +38,6 @@ int main(int argc, const char* argv[]) {
 	compiler.generate_asm();
 	compiler.perform_optimizations();
 	compiler.write_asm_to_file("/tmp/out.asm");
-	
 	exec("fasm /tmp/out.asm ./a.out");
 
 	return 0;
