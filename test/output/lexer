@@ -2,6 +2,6 @@ COMPILE: 1
 STDOUT:
 
 STDERR:
-┌[test/lexer.orc:3:9]
+┌[test/lexer.och:3:9]
 │ 	12 13 + print "Helllo WOrld"
 └ 	        ^^^^^ unknown word 'print'

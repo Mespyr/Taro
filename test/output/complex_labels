@@ -2,9 +2,9 @@ COMPILE: 1
 STDOUT:
 
 STDERR:
-┌[test/complex_labels.orc:4:4]
+┌[test/complex_labels.och:4:4]
 │ fun main()
 └     ^^^^ unhandled data on the stack (expected 0 items, got 1)
-┌[test/complex_labels.orc:6:4]
+┌[test/complex_labels.och:6:4]
 │ 		1 -
 └ 		  ^ NOTE: excess data pushed here (Int)

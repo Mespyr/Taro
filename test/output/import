@@ -1,10 +1,7 @@
-COMPILE: 0
+COMPILE: 1
 STDOUT:
 
 STDERR:
-
-RUN: 0
-STDOUT:
-Hello World!
-
-STDERR:
+┌[test/import.och:1:7]
+│ import "test/test_lib/print.orc"
+└        ^^^^^^^^^^^^^^^^^^^^^^^^^ No such file or directory, 'test/test_lib/print.orc'

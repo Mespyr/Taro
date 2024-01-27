@@ -1,12 +1,12 @@
-# Orc 
+# Ochre 
 
-Originally started as a remake of the [Lipsem programming language](https://github.com/Mespyr/lipsem), Orc has diverged a lot into a compiled, stack-based programming language.
-Source files for Orc end in the `.orc` file extension.
+Originally started as a remake of the [Lipsem programming language](https://github.com/Mespyr/lipsem), Ochre has diverged a lot into a compiled, stack-based programming language.
+Source files for Ochre end in the `.och` file extension.
 
 ### TODO??
 
-- [x] Orc will compile programs down to assembly and use the `fasm` assembler to make an executable. This will make the programs many times faster than the interpreter.
-- [x] Orc will have actual string pointers
+- [x] Ochre will compile programs down to assembly and use the `fasm` assembler to make an executable. This will make the programs many times faster than the interpreter.
+- [x] Ochre will have actual string pointers
 - [x] labels will be allowed to jump to from anywhere within a function, making control flow easier
 - [x] syscalls will be implemented, making the language be able to interact with the operating system
 - [x] Basic stack manipulation
@@ -43,10 +43,10 @@ Source files for Orc end in the `.orc` file extension.
 
 ### SEXP Ideal Design
 ```
-fun factorial(i64) [i64]
+fun factorial(Int) [Int]
   sexp
     0 => pop 1,
-	_ => dup 1 - factorial *,
+    _ => dup 1 - factorial *,
   end
 
 fun main()
@@ -56,7 +56,7 @@ SEXP works by taking the top integer on the stack, and comparing it to a bunch o
 The integer is not consumed by the operation unless removed by the expression, and all expressions must return the same types onto the stack for it to pass with the type checker.
 Here's another example
 ``` 
-fun fib(i64) [i64]
+fun fib(Int) [Int]
   sexp
     0 => pop 1,
     1 => pop 1,
