@@ -31,7 +31,6 @@
 *.out
 *.app
 
-orcc
-*.asm
+.ochre
 obj/
 a.out
