@@ -21,6 +21,22 @@ void Compiler::handle_stack_pop_optim() {
 		return;
 	}
 
+	/*
+	  TODO:
+	  check in stored registers to see if pushed reg has a value and use that as arg
+	  using the reg might makes stuff weird with parralel execution and force the program to wait
+	  for the prev inst to execute before moving when both could be executed at the same time
+
+	  ex: (What we're currently generating)
+	      mov rax, 1
+	      mov rdi, rax
+	  vs: (What could be done)
+	      mov rax, 1
+		  mov rdi, 1
+
+	  the latter is able to execute in parallel (much faster)
+	*/
+	
 	Instruction push_inst = fn_key.second.at(push_idx);
 	push_inst.type = INSTRUCTION_MOV;
 	push_inst.arguments.clear();
@@ -61,6 +77,7 @@ void Compiler::handle_stack_push_optim() {
 	  - or if it even occurs in the generated code
 	 */
 	if (!register_is_used_before_being_set(push_reg)) {
+		std::cout << "Holy Shit it happened" << std::endl;
 		erase_idx(idx);
 		erase_idx(idx);
 		return;
