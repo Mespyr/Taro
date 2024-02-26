@@ -1,8 +1,6 @@
 #include "parser.h"
 
 std::vector<Op> Parser::link_ops(std::vector<Op> ops, std::map<std::string, std::pair<int, int>> labels) {
-	static_assert(OP_COUNT == 57, "unhandled op types in Parser::link_ops()");
-
 	for (uint64_t i = 0; i < ops.size(); i++) {
 		Op current_op = ops.at(i);
 
@@ -25,8 +23,6 @@ std::vector<Op> Parser::link_ops(std::vector<Op> ops, std::map<std::string, std:
 }
 
 void Parser::parse() {
-	static_assert(OP_COUNT == 57, "unhandled op types in Parser::parse()");
-
 	while (i < tokens.size()) {
 		Op current_op = convert_token_to_op(tokens.at(i));
 

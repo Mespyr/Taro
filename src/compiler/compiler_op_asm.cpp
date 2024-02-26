@@ -199,7 +199,7 @@ void Compiler::gen_op_asm(Op op, int func_addr) {
 
 	case OP_READ_PTR: {
 		asmp.new_inst(asmp.inst_pop(Argument(REGISTER_RAX)));
-		asmp.new_inst(asmp.inst_xor(Argument(REGISTER_RBX), Argument(REGISTER_RBX)));
+		asmp.new_inst(asmp.inst_mov(Argument(REGISTER_RBX), Argument(0)));
 		handle_read_data_from_ptr(op);
 	} break;
 

@@ -1,7 +1,8 @@
 #include "compiler.h"
 
-void Compiler::optimize_current_func() {
+void Compiler::optimize_func() {
 	idx = 0;
+	stored_registers.clear();
 	while (idx < fn_key.second.size()) {
 		Instruction i = fn_key.second.at(idx);
 
@@ -26,6 +27,7 @@ void Compiler::optimize_current_func() {
 			break;
 
 		case INSTRUCTION_CALL:
+		case INSTRUCTION_SYSCALL:
 		case INSTRUCTION_LABEL:
 		case INSTRUCTION_JMP:
 		case INSTRUCTION_JZ:
@@ -39,13 +41,12 @@ void Compiler::optimize_current_func() {
 		}
 		idx++;
 	}
-	asmp.code.at(fn_key.first) = fn_key.second;
 }
 
 void Compiler::perform_optimizations() {
 	for (auto key : asmp.code) {
 		fn_key = key;
-		stored_registers.clear();
-		optimize_current_func();
+		optimize_func();
+		asmp.code.at(fn_key.first) = fn_key.second;
 	}
 }

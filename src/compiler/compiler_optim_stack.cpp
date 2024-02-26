@@ -10,16 +10,19 @@ void Compiler::handle_stack_pop_optim() {
 
 	// assumes that we are popping to a register (we only pop to registers)
 	Argument set_arg = i.arguments.front();
-	if (register_is_used(set_arg.reg_value, push_idx))
+	if (register_is_used_before(set_arg.reg_value, push_idx))
 		return;
 
 	// This is assuming that the pushed argument is static (ie: string pointer, register, integer)
-	Argument pushed_arg = fn_key.second.at(push_idx).arguments.front();
+	Instruction push_inst = fn_key.second.at(push_idx);
+	Argument pushed_arg = push_inst.arguments.front();
 	if (arguments_equal(set_arg, pushed_arg)) {
 		erase_idx(idx);
 		erase_idx(push_idx);
 		return;
 	}
+    fn_key.second.at(push_idx) = asmp.inst_mov(set_arg, pushed_arg);
+	erase_idx(idx);
 
 	/*
 	  TODO:
@@ -27,23 +30,39 @@ void Compiler::handle_stack_pop_optim() {
 	  using the reg might makes stuff weird with parralel execution and force the program to wait
 	  for the prev inst to execute before moving when both could be executed at the same time
 
-	  ex: (What we're currently generating)
-	      mov rax, 1
-	      mov rdi, rax
-	  vs: (What could be done)
-	      mov rax, 1
-		  mov rdi, 1
+	  Steps:
+	  1. check if instruction before push_idx is setting the pushed_arg (assumed register)
+	  2. if it is, check after push_idx to see if register value is used at all before being set again
+	  3. if the register is set before being used, remove push_idx-1 and set the 2nd arg of push_idx to the 2nd arg of push_idx-1
 
-	  the latter is able to execute in parallel (much faster)
+	  ex:
+	    mov rax, 10
+		mov rdx, rax
+	  converts to:
+	    mov rdx, 10
 	*/
-	
-	Instruction push_inst = fn_key.second.at(push_idx);
-	push_inst.type = INSTRUCTION_MOV;
-	push_inst.arguments.clear();
-	push_inst.arguments.push_back(set_arg);
-	push_inst.arguments.push_back(pushed_arg);
-    fn_key.second.at(push_idx) = push_inst;
-	erase_idx(idx);
+	//std::cout << "wow" << std::endl;
+	//std::cout << fn_key.second.at(push_idx).to_string() << std::endl;
+
+	// first, check if the argument written to the register IS ALSO a register
+	if (pushed_arg.type != ARG_REGISTER || pushed_arg.read_pointer)
+		return;
+	// make sure previous instruction to just-created mov IS ALSO a mov
+	Instruction prev_inst = fn_key.second.at(push_idx-1);
+	if (prev_inst.type != INSTRUCTION_MOV)
+		return;
+	// check if it is setting a register and if they are the same
+	Argument set_reg = prev_inst.arguments.front();
+	if (set_reg.type != ARG_REGISTER || set_reg.read_pointer)
+		return;
+	if (set_reg.reg_value != pushed_arg.reg_value)
+		return;
+
+	// check if register is used after being set
+	if (register_is_used_before_being_set_again(set_arg.reg_value, push_idx))
+		return;
+
+
 }
 
 void Compiler::handle_stack_push_optim() {
@@ -76,15 +95,13 @@ void Compiler::handle_stack_push_optim() {
 	  - not have had it happen in any of my tests so idk if it even works
 	  - or if it even occurs in the generated code
 	 */
-	if (!register_is_used_before_being_set(push_reg)) {
+	if (!register_is_used_before_being_set_again(push_reg, idx)) {
 		std::cout << "Holy Shit it happened" << std::endl;
 		erase_idx(idx);
 		erase_idx(idx);
 		return;
 	}
 	
-	prev_inst.type = INSTRUCTION_MOV;
-	prev_inst.arguments.push_back(Argument(REGISTER_RSP, true));
-	fn_key.second.at(idx - 1) = prev_inst;
+	fn_key.second.at(idx - 1) = asmp.inst_mov(prev_inst.arguments.front(), Argument(REGISTER_RSP, true));
 	erase_idx(idx);
 }

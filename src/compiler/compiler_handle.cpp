@@ -45,12 +45,12 @@ void Compiler::handle_read_data_from_ptr(Op op) {
 	// unless pushing struct; we then push rax onto stack
 	switch (op.mode) {
 	case MODE_8BIT:
-		asmp.new_inst(asmp.inst_xor(Argument(REGISTER_RBX), Argument(REGISTER_RBX)));
+		asmp.new_inst(asmp.inst_mov(Argument(REGISTER_RBX), Argument(0)));
 		asmp.new_inst(asmp.inst_mov(Argument(REGISTER_BL), Argument(REGISTER_RAX, true)));
 		asmp.new_inst(asmp.inst_push(Argument(REGISTER_RBX)));
 		break;
 	case MODE_64BIT:
-		asmp.new_inst(asmp.inst_xor(Argument(REGISTER_RBX), Argument(REGISTER_RBX)));
+		asmp.new_inst(asmp.inst_mov(Argument(REGISTER_RBX), Argument(0)));
 		asmp.new_inst(asmp.inst_mov(Argument(REGISTER_RBX), Argument(REGISTER_RAX, true)));
 		asmp.new_inst(asmp.inst_push(Argument(REGISTER_RBX)));
 		break;

@@ -1,8 +1,6 @@
 #include "lexer.h"
 
 void Lexer::tokenize_line() {
-	static_assert(TOKEN_TYPE_COUNT == 3, "unhandled token types in tokenize_line()");
-
 	// get starting position of first token
 	uint64_t column_number_start = find_next_token_start_col(0);
 	uint64_t column_number_end;

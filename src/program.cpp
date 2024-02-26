@@ -60,7 +60,9 @@ std::pair<LangType, int> struct_member_offset(Op op, std::map<std::string, Struc
 			offset += member_type_offset_pair.second;
 			// if the member is a struct and isn't the last member of the member path
 			// access the members of the member's type and continue
-			if (structs.count(member_type_offset_pair.first.base_type) && member_type_offset_pair.first.ptr_to_trace == 0 && current_member_idx < split_member_path.size() - 1) {
+			if (structs.count(member_type_offset_pair.first.base_type) &&
+				member_type_offset_pair.first.ptr_to_trace == 0 &&
+				current_member_idx < split_member_path.size() - 1) {
 				struct_members = structs.at(member_type_offset_pair.first.base_type).members;
 				current_member_idx++;
 			}
@@ -104,7 +106,9 @@ std::pair<LangType, int> variable_member_offset(Op op, std::map<std::string, std
 			offset += member_type_offset_pair.second;
 			// if the member is a struct and isn't the last member of the member path
 			// access the members of the member's type and continue
-			if (structs.count(member_type_offset_pair.first.base_type) && member_type_offset_pair.first.ptr_to_trace == 0 && current_member_idx < split_member_path.size() - 1) {
+			if (structs.count(member_type_offset_pair.first.base_type) &&
+				member_type_offset_pair.first.ptr_to_trace == 0 &&
+				current_member_idx < split_member_path.size() - 1) {
 				struct_members = structs.at(member_type_offset_pair.first.base_type).members;
 				current_member_idx++;
 			}

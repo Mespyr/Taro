@@ -1,5 +1,4 @@
 #include "compiler.h"
-#include <cstdint>
 
 bool Compiler::arguments_equal(Argument a, Argument b) {
 	return a.to_string() == b.to_string();
@@ -19,7 +18,7 @@ void Compiler::remove_stored_register(AsmRegister reg) {
 			++it;
 }
 
-bool Compiler::register_is_used(AsmRegister reg, uint32_t end_idx) {
+bool Compiler::register_is_used_before(AsmRegister reg, uint32_t end_idx) {
 	for (uint32_t i = idx-1; i > end_idx; i--) {
 		Instruction inst = fn_key.second.at(i);
 		switch (inst.type) {
@@ -72,10 +71,10 @@ bool Compiler::register_is_used(AsmRegister reg, uint32_t end_idx) {
 	return false;
 }
 
-bool Compiler::register_is_used_before_being_set(AsmRegister reg) {
+bool Compiler::register_is_used_before_being_set_again(AsmRegister reg, uint32_t start_idx) {
 	// true -> register value was used
 	// false -> register was set again without being used
-	for (uint32_t i = idx+1; i < fn_key.second.size(); i++) {
+	for (uint32_t i = start_idx+1; i < fn_key.second.size(); i++) {
 		Instruction inst = fn_key.second.at(i);
 		switch (inst.type) {
 
@@ -152,9 +151,11 @@ bool Compiler::register_is_used_before_being_set(AsmRegister reg) {
 		case INSTRUCTION_JMP:
 		case INSTRUCTION_JZ:
 		case INSTRUCTION_JNZ:
-		case INSTRUCTION_SYSCALL:
 		case INSTRUCTION_RET: // JUST TO MAKE SURE IDK
 			return false;
+
+		case INSTRUCTION_SYSCALL:
+			return true;
 
 		default:
 			break;

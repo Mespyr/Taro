@@ -1,35 +1,38 @@
+# WARNING
+This is an old repo. Please go to [Ochre](https://github.com/Mespyr/Ochre) for newest rendition.
+This code is for a much different language with a lot of bad programming design choices which is why I've desided to restart.
+
 # Ochre 
 Ochre is a stack-based programming language with a combination of both high-level and low-level features. It aims to have the simplicity of a Forth-like language, while still possessing the modern features that allow an ease of development.
-[Language Specification (Very Much in Progress)](SPECS.md) 
 
 ## TODO??
 - [ ] Finish assembly optimizations
 - [ ] Cond (if/switch statement)
 ```
-fun main()
-  Int x 12 @x
+fun fizzbuzz(Int)
   cond
-  | &x 12 = : 13 @x ;
-  | &x 14 = : 12 @x ;
+  (dup 15 modulo 0 =) pop "Fizzbuzz\n" print ;
+  (dup 3 modulo 0 = ) pop "Fizz\n" print ;
+  (dup 5 modulp 0 = ) pop "Buzz\n" print ;
+  else dump ;
 
-  &x dump
+fun fib(Int) {Int}
+  cond (dup 1 >)
+    dup 1 - fib 
+    swp 2 - fib + ;
 ```
 
 - [ ] While Loops
 ```
 fun main()
-  Int idx 0 @idx
-  while &idx 10 < :
-    &idx dup dump
-    1 + @idx ;
+  0 while (dup 100 <)
+    dup fizzbuzz 1 + ;
+  pop
 ```
 
 - [ ] Type Cast
 ```
-fun neg(Int) {Int}
-  dup dup + -
-
-fun make_smth_idk(Int) {^Char}
+fun mmap_string(Int) {^Char}
   # mmap syscall
   0 swp # item on stack is size
   3 33 1 neg 0
