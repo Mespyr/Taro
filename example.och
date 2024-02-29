@@ -12,7 +12,7 @@ type Node<T> =
 type LinkedList<T> =
   size: Int
   head: Node<T>
-fn LinkedList.init = 0 self <-size # TODO: design syntax
+fn LinkedList.init = 0 self <-size
 
 # generic functions + cast
 fn NULL<T>[^T] = 0 cast(^T)
@@ -21,40 +21,34 @@ fn NULL2<T U>[^T ^U] =
   0 cast(^U)
 
 # conditions
-fn cmp(Int) =
+fn fizzbuzz(Int) =
   case
-    (dup 1 eq?) "one\n"
-    (dup 2 eq?) "two\n"
-  else "idk\n";
-  print pop
+  (dup 15 % 0 eq?) pop "FizzBuzz\n" print
+  (dup 3 % 0 eq?)  pop "Fizz\n" print
+  (dup 5 % 0 eq?)  pop "Buzz\n" print
+  else dump end
+
+fn fib(Int) [Int] =
+  case (dup 1 >)
+    dup 1 - fib
+    swp 2 - fib +
+  end
 
 # passing functions as arguments
 fn test(Int) [Int] = 12 +
 fn caller( Function(Int)[Int] ) [Int] =
-  12 swp callfn # calling functions on stack
+  12 swp callfn
 
 # const values
-const ARRAY_SIZE = 10 2 *
+const IDK = 10 2 *
 
-type AccessStruct =
-  int_v: Int
-  char_v: Char
-fn access_syntax =
-  new(AccessStruct)
-  # set char_v to A
-  dup 'A' <-char_v
-  dup 12 <-int_v
-  # push value at field
-  dup ->int_v  dump
-  dup ->char_v dump
-
+# see structs.och for a more detailed look into structs, reading pointers and members
 fn main =
-  # heap allocated structs
   new(LinkedList<Int>)
-  dup ->head->data dump
-  delete # delete heap struct
+  dup ->size dump
+  delete
 
-  pushfn(test) caller dump # pushing functions to stack
+  pushfn(test) caller dump
 
   # syntax allows for crazy shit
   # should stop at five

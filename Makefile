@@ -1,4 +1,4 @@
-CPP=clang++
+CPP=g++
 CPPFLAGS=-Wall -Wextra -pedantic
 SRC_DIRS=src
 OBJ_DIR=obj
