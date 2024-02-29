@@ -1,7 +1,0 @@
-COMPILE: 1
-STDOUT:
-
-STDERR:
-┌[test/parser.och:8:1]
-│ 	qwekdjqwklejqklwe
-└ 	^^^^^^^^^^^^^^^^^ unknown word 'qwekdjqwklejqklwe'

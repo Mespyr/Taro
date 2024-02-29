@@ -1,7 +1,0 @@
-COMPILE: 1
-STDOUT:
-
-STDERR:
-┌[test/pass_struct_arg_error.och:7:4]
-│ 	12 print
-└ 	   ^^^^^ invalid type for function 'print' (expected ^String, got Int)

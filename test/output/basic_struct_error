@@ -1,7 +1,0 @@
-COMPILE: 1
-STDOUT:
-
-STDERR:
-┌[test/basic_struct_error.och:7:8]
-│ 	"Finn" @name.size
-└ 	       ^^^^^^^^^^ Cannot set 'name.size' to type '^Char'. Expected type 'Int'

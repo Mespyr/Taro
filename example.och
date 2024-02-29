@@ -1,0 +1,63 @@
+import "std.och"
+
+# expressions defining new stack operations
+expr swpovr(a b) = b a b
+expr ovr2(a b) = a b a b
+
+# generics + types + members
+type Node<T> =
+  next: ^Node<T>
+  data: T
+
+type LinkedList<T> =
+  size: Int
+  head: Node<T>
+fn LinkedList.init = 0 self <-size # TODO: design syntax
+
+# generic functions + cast
+fn NULL<T>[^T] = 0 cast(^T)
+fn NULL2<T U>[^T ^U] =
+  0 cast(^T)
+  0 cast(^U)
+
+# conditions
+fn cmp(Int) =
+  case
+    (dup 1 eq?) "one\n"
+    (dup 2 eq?) "two\n"
+  else "idk\n";
+  print pop
+
+# passing functions as arguments
+fn test(Int) [Int] = 12 +
+fn caller( Function(Int)[Int] ) [Int] =
+  12 swp callfn # calling functions on stack
+
+# const values
+const ARRAY_SIZE = 10 2 *
+
+type AccessStruct =
+  int_v: Int
+  char_v: Char
+fn access_syntax =
+  new(AccessStruct)
+  # set char_v to A
+  dup 'A' <-char_v
+  dup 12 <-int_v
+  # push value at field
+  dup ->int_v  dump
+  dup ->char_v dump
+
+fn main =
+  # heap allocated structs
+  new(LinkedList<Int>)
+  dup ->head->data dump
+  delete # delete heap struct
+
+  pushfn(test) caller dump # pushing functions to stack
+
+  # syntax allows for crazy shit
+  # should stop at five
+  0 while (dup case (dup 2 % 0 eq?) 10 else 5; <)
+    dup dump 1 +
+  end pop

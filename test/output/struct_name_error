@@ -1,7 +1,0 @@
-COMPILE: 1
-STDOUT:
-
-STDERR:
-┌[test/struct_name_error.och:3:7]
-│ struct Epic.Cap
-└        ^^^^^^^^ illegal name for struct

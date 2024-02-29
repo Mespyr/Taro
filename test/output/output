@@ -1,8 +1,0 @@
-COMPILE: 1
-STDOUT:
-[note] tokenizing file
-[note] parsing tokens
-[note] type-checking program
-
-STDERR:
-ERROR: no entry point found in program (no 'main' function)

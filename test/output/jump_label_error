@@ -1,7 +1,0 @@
-COMPILE: 1
-STDOUT:
-
-STDERR:
-┌[test/jump_label_error.och:4:8]
-│ 		10 10 cjmpet loop # push extra int onto stack here
-└ 		      ^^^^^^ different types on stack then what was expected at the label.

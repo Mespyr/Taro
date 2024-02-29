@@ -1,7 +1,0 @@
-COMPILE: 1
-STDOUT:
-
-STDERR:
-┌[test/set_struct_from_struct_error.och:7:4]
-│ 	12 @s
-└ 	   ^^ Cannot set 's' to type 'Int'. Expected type '^String'
