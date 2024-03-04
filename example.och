@@ -1,24 +1,24 @@
 import "std.och"
 
 # expressions defining new stack operations
-expr swpovr(a b) = b a b
-expr ovr2(a b) = a b a b
+expr swp(a b) = b a
+expr dup(a) = a a
+expr pop(a) =
+expr under(a b) = b a b
 
 # generics + types + members
 type Node<T> =
   next: ^Node<T>
   data: T
 
-type LinkedList<T> =
+type List<T> =
   size: Int
   head: Node<T>
-fn LinkedList.init = 0 self <-size
+fn List.init = 0 this @:size
 
 # generic functions + cast
 fn NULL<T>[^T] = 0 cast(^T)
-fn NULL2<T U>[^T ^U] =
-  0 cast(^T)
-  0 cast(^U)
+fn NULL2<T U>[^T ^U] = NULL<T> NULL<U>
 
 # conditions
 fn fizzbuzz(Int) =
@@ -34,24 +34,42 @@ fn fib(Int) [Int] =
     swp 2 - fib +
   end
 
+type String =
+  size: Int
+  data: ^Char
+
+fn new_String(Int ^Char) [^String] =
+  new(String) under @:data
+  under @:size
+
+fn print(^String) =
+  dup :size swp :data
+  1 1 call3 pop
+
 # passing functions as arguments
 fn test(Int) [Int] = 12 +
-fn caller( Function(Int)[Int] ) [Int] =
-  12 swp callfn
+fn caller(Int Function(Int)[Int]) [Int] =
+  swp 1 + swp callfn
 
-# const values
-const IDK = 10 2 *
+# boxed types (just an impl for feature showcase)
+type Integer = v: Int
+fn Integer.unwrap[Int] = this :v
+fn Integer.add(^Integer) [^Integer] =
+  dup .unwrap swp delete
+  this .unwrap + this @:v this
 
-# see structs.och for a more detailed look into structs, reading pointers and members
-fn main =
-  new(LinkedList<Int>)
-  dup ->size dump
+fn boxInt(Int) [^Integer] =
+  new(Integer) under @:v
+
+fn get_new_num[^Integer] = 14 boxInt
+fn box_main =
+  12 boxInt 13 boxInt .add
+  get_new_num .add
+  dup .unwrap dump
   delete
 
-  pushfn(test) caller dump
-
-  # syntax allows for crazy shit
-  # should stop at five
-  0 while (dup case (dup 2 % 0 eq?) 10 else 5; <)
-    dup dump 1 +
+fn main =
+  0 while (dup case (dup 2 % 0 eq?) 10 else 5 end <)
+    dup pushfn(test) caller dump 1 +
   end pop
+  box_main
