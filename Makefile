@@ -1,6 +1,6 @@
 CPP=g++
 CPPFLAGS=-Wall -Wextra -pedantic
-SRC_DIRS=src
+SRC_DIRS=src src/scanner src/error
 OBJ_DIR=obj
 OBJ_FILES=$(foreach dir, $(SRC_DIRS), \
   $(patsubst $(dir)/%.cpp, $(OBJ_DIR)/%.o, $(wildcard $(dir)/*.cpp)))

@@ -1,4 +1,6 @@
 #include <iostream>
+#include "scanner/scanner.hpp"
+#include "token.hpp"
 
 int main(int argc, const char* argv[]) {
 	if (argc < 2) {
@@ -6,6 +8,10 @@ int main(int argc, const char* argv[]) {
 		return 1;
 	}
 
-	std::cout << argv[1] << std::endl;
+	Scanner scanner(argv[1]);
+	if (scanner.error) {
+		std::cout << scanner.error.value().to_string() << std::endl;
+		return 1;
+	}
 	return 0;
 }
