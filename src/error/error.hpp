@@ -1,23 +1,20 @@
 #pragma once
 
 #include <string>
+
 #include "../location.hpp"
 
 class Error {
-public:
-	Error(std::string message) :
-		message(message) {}
-	std::string to_string();
-private:
-	std::string message;
+  public:
+    std::string message;
+    Error(std::string message) : message(message) {}
+    virtual std::string to_string();
 };
 
-class LocatedError : Error {
-public:
-	LocatedError(Location loc, std::string message) :
-		Error(message),
-		loc(loc)
-	{}
-private:
-	Location loc;
+class LocationError : public Error {
+  public:
+    Location loc;
+    LocationError(Location loc, std::string message)
+        : Error(message), loc(loc) {}
+    std::string to_string();
 };

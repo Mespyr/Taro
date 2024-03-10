@@ -4,15 +4,15 @@
 #include <string>
 
 class Location {
-public:
-	Location(uint32_t line_number, uint32_t column_number_start, uint32_t column_number_end, std::string line, std::string file_location) :
-		line_number(line_number), 
-		column_number_start(column_number_start), 
-		column_number_end(column_number_end),
-		line(line),
-		file_location(file_location)
-	{}
+  public:
+    Location(uint32_t line_num, uint32_t start_column, uint32_t end_column,
+             std::string line, std::string file_location)
+        : line_num(line_num),
+          start_column(start_column),
+          end_column(end_column),
+          line(line),
+          file_location(file_location) {}
 
-	uint32_t line_number, column_number_start, column_number_end;
-	std::string line, file_location;
+    uint32_t    line_num, start_column, end_column;
+    std::string line, file_location;
 };
