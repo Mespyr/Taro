@@ -9,8 +9,8 @@ void Scanner::insert(const std::string& filename) {
 
     std::ifstream file(filename);
     if (!file.is_open()) {
-        error.reset(new Error("couldn't open file '" + filename +
-                              "': " + strerror(errno)));
+        error = std::make_unique<Error>("couldn't open file '" + filename +
+                                        "': " + strerror(errno));
         return;
     }
 
@@ -20,9 +20,8 @@ void Scanner::insert(const std::string& filename) {
 
     while (!file.eof()) {
         std::getline(file, buf);
-        tokenize_line(buf, line_num);
+        tokenize_line(buf, line_num++);
         if (error) return;
-        line_num++;
     }
 
     stream_index = temp;

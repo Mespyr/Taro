@@ -8,60 +8,60 @@ expr under(a b) = b a b
 
 # generics + types + members
 type Node<T> =
-  next: ^Node<T>
-  data: T
+  :next ^Node<T>
+  :data T
 
 type List<T> =
-  size: Int
-  head: Node<T>
+  :size Int
+  :head Node<T>
 fn List.init = 0 this @:size
 
 # generic functions + cast
-fn NULL<T>[^T] = 0 cast(^T)
-fn NULL2<T U>[^T ^U] = NULL<T> NULL<U>
+fn NULL<T> [^T] = 0 cast(^T)
+fn NULL2<T U> [^T ^U] = NULL<T> NULL<U>
 
 # conditions
-fn fizzbuzz(Int) =
+fn fizzbuzz (Int) =
   case
   (dup 15 % 0 eq?) pop "FizzBuzz\n" print
   (dup 3 % 0 eq?)  pop "Fizz\n" print
   (dup 5 % 0 eq?)  pop "Buzz\n" print
   else dump end
 
-fn fib(Int) [Int] =
+fn fib (Int) [Int] =
   case (dup 1 >)
     dup 1 - fib
     swp 2 - fib +
   end
 
 type String =
-  size: Int
-  data: ^Char
+  :size Int
+  :data ^Char
 
-fn new_String(Int ^Char) [^String] =
+fn new_String (Int ^Char) [^String] =
   new(String) under @:data
   under @:size
 
-fn print(^String) =
+fn print (^String) =
   dup :size swp :data
   1 1 call3 pop
 
 # passing functions as arguments
-fn test(Int) [Int] = 12 +
+fn test (Int) [Int] = 12 +
 fn caller(Int Function(Int)[Int]) [Int] =
   swp 1 + swp callfn
 
 # boxed types (just an impl for feature showcase)
-type Integer = v: Int
-fn Integer.unwrap[Int] = this :v
-fn Integer.add(^Integer) [^Integer] =
+type Integer = :v Int
+fn Integer.unwrap [Int] = this :v
+fn Integer.add (^Integer) [^Integer] =
   dup .unwrap swp delete
   this .unwrap + this @:v this
 
-fn boxInt(Int) [^Integer] =
+fn boxInt (Int) [^Integer] =
   new(Integer) under @:v
 
-fn get_new_num[^Integer] = 14 boxInt
+fn get_new_num [^Integer] = 14 boxInt
 fn box_main =
   12 boxInt 13 boxInt .add
   get_new_num .add

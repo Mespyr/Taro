@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <cstring>
 #include <memory>
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -29,9 +28,10 @@ class Scanner {
     uint32_t find_start_col(const std::string& line, uint32_t column_number);
     uint32_t find_end_col(const std::string& line, uint32_t column_number);
     uint32_t find_string_end(const std::string& line, uint32_t column_number);
+    uint32_t find_char_end(const std::string& line, uint32_t column_number);
     void     tokenize_line(const std::string& line, uint32_t line_num);
 
-    std::optional<Token::Type> single_char_token_type(char c);
-    bool                       is_single_char_token(char c);
-    Token::Type                get_token_type(const std::string& token);
+    Token::Type get_token_type(const std::string& token);
+
+    bool is_number(std::string str);
 };
