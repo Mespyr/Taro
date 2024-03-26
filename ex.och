@@ -1,75 +1,87 @@
 import "std.och"
 
-# expressions defining new stack operations
-expr swp(a b) = b a
-expr dup(a) = a a
-expr pop(a) =
-expr under(a b) = b a b
+##### STACK OPERATIONS #####
+# expr: defines new stack operations.
+expr swp   (a b) = b a
+expr dup   (a) = a a
+expr pop   (a) =
+expr under (a b) = b a b
+############################
 
-# generics + types + members
-type Node<T> =
-  :next ^Node<T>
-  :data T
-
-type List<T> =
-  :size Int
-  :head Node<T>
-fn List.init = 0 this @:size
-
-# generic functions + cast
-fn NULL<T> [^T] = 0 cast(^T)
-fn NULL2<T U> [^T ^U] = NULL<T> NULL<U>
-
-# conditions
-fn fizzbuzz (Int) =
-  case
-  (dup 15 % 0 eq?) pop "FizzBuzz\n" print
-  (dup 3 % 0 eq?)  pop "Fizz\n" print
-  (dup 5 % 0 eq?)  pop "Buzz\n" print
-  else dump end
-
-fn fib (Int) [Int] =
-  case (dup 1 >)
-    dup 1 - fib
-    swp 2 - fib +
-  end
-
+######## TYPES ########
+# type: defines a new type which
+#       has its own members.
 type String =
-  :size Int
-  :data ^Char
-
-fn new_String (Int ^Char) [^String] =
-  new(String) under @:data
-  under @:size
-
+  :size U32
+  :data ^U8
+# types: members can be read using
+#        `:` followed by the member name.
 fn print (^String) =
   dup :size swp :data
   1 1 call3 pop
+# types: members can be set with `@` followed
+#        by the member name.
+#        you can create a new instance of a type
+#        using the `new` keyword.
+fn new_String (U32 ^U8) [^String] =
+  new(String) under @data
+  under @size
+# types: methods can be made. `this` keyword
+#        pushes the instance which the method is
+#        being called from onto the stack.
+fn String.set (U32 ^U8) [^String] =
+  this under @data @size this
+#######################
 
-# passing functions as arguments
-fn test (Int) [Int] = 12 +
-fn caller(Int Function(Int)[Int]) [Int] =
+##### GENERICS & CAST #####
+# generics: similar to C++ templates
+type Node<T> =
+  :next ^Node<T>
+  :data T
+# generics: can also be used on functions.
+# cast: cast any type on the stack to another
+fn NULL<T> [^T] = 0 cast(^T)
+fn NULL2<T U> [^T ^U] = NULL<T> NULL<U>
+###########################
+
+######### CONDITIONS #########
+# case: a mix of `switch` and `if` statements
+#       from other languages.
+fn fizzbuzz (I64) =
+  case
+  (dup 15 % 0 eq) pop "FizzBuzz\n" print
+  (dup 3 % 0 eq)  pop "Fizz\n" print
+  (dup 5 % 0 eq)  pop "Buzz\n" print
+  else dump end
+# `?`: if the top value on the stack is true,
+#      it continues executing the function. if
+#      not, it returns from the function.
+fn fib (U64) [U64] = dup 1 gre?
+  dup 1 - fib
+  swp 2 - fib +
+##############################
+
+##### FUNCTIONS ON THE STACK #####
+# ???: this is our test function.
+fn test (I64) [I64] = 12 +
+# arguments: you can pass functions as
+#            arguments using `Function`
+#            and describing the signature.
+# callfn: keyword to call the function on
+#         the top of the stack.
+fn caller(I64 Function(I64)[I64]) [I64] =
   swp 1 + swp callfn
+# pushfn: pushes functions onto the stack
+fn run (I64) = pushfn(test) caller dump
+##################################
 
-# boxed types (just an impl for feature showcase)
-type Integer = :v Int
-fn Integer.unwrap [Int] = this :v
-fn Integer.add (^Integer) [^Integer] =
-  dup .unwrap swp delete
-  this .unwrap + this @:v this
-
-fn boxInt (Int) [^Integer] =
-  new(Integer) under @:v
-
-fn get_new_num [^Integer] = 14 boxInt
-fn box_main =
-  12 boxInt 13 boxInt .add
-  get_new_num .add
-  dup .unwrap dump
-  delete
-
+######## WHILE LOOPS ########
+# while: similar to other languages.
+#        condition goes inside parentheses.
+#        any valid ochre code can go inside.
 fn main =
-  0 while (dup case (dup 2 % 0 eq?) 10 else 5 end <)
-    dup pushfn(test) caller dump 1 +
-  end pop
-  box_main
+  0 while (dup 15 les)
+    dup run
+    1 +
+  end
+#############################
