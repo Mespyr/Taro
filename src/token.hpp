@@ -28,6 +28,15 @@ class Token {
         K_CALLFN,
         K_DELETE,
         K_PUSHFN,
+        K_EQ,
+        K_GRE,
+        K_LES,
+        K_GRE_EQ,
+        K_LES_EQ,
+        K_NOT_EQ,
+        K_AND,
+        K_OR,
+        K_EXTERN,
 
         //
         WORD,
@@ -46,7 +55,8 @@ class Token {
         PERIOD,
         AT_SIGN,
         POINTER,
-        EQUALS
+        EQUALS,
+        QUESTION_MARK
     };
 
     Token(std::string value, Type type, Location loc)
@@ -59,7 +69,7 @@ class Token {
     static inline const std::unordered_map<char, Type> single_chars = {
         {'(', L_PAREN}, {')', R_PAREN}, {'[', L_BRACE}, {']', R_BRACE},
         {'<', L_ANGLE}, {'>', R_ANGLE}, {':', COLON},   {'.', PERIOD},
-        {'@', AT_SIGN}, {'^', POINTER}, {'=', EQUALS}};
+        {'@', AT_SIGN}, {'^', POINTER}, {'=', EQUALS},  {'?', QUESTION_MARK}};
 
     static inline const std::unordered_map<std::string, Type> keywords = {
         {"import", K_IMPORT}, {"expr", K_EXPR},     {"type", K_TYPE},
@@ -68,5 +78,8 @@ class Token {
         {"new", K_NEW},       {"call1", K_CALL1},   {"call2", K_CALL2},
         {"call3", K_CALL3},   {"call4", K_CALL4},   {"call5", K_CALL5},
         {"call6", K_CALL6},   {"callfn", K_CALLFN}, {"delete", K_DELETE},
-        {"pushfn", K_PUSHFN}};
+        {"pushfn", K_PUSHFN}, {"eq", K_EQ},         {"gre", K_GRE},
+        {"les", K_LES},       {"gre-eq", K_GRE_EQ}, {"les-eq", K_LES_EQ},
+        {"not-eq", K_NOT_EQ}, {"and", K_AND},       {"or", K_OR},
+        {"extern", K_EXTERN}};
 };

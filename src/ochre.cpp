@@ -23,6 +23,7 @@ const std::string t_type(Token::Type t) {
     case Token::PERIOD: return "PERIOD";
     case Token::AT_SIGN: return "ATSIGN";
     case Token::POINTER: return "POINTER";
+    case Token::QUESTION_MARK: return "QUESTION MARK";
     case Token::EQUALS: return "EQUALS";
     case Token::K_IMPORT: return "K_IMPORT";
     case Token::K_EXPR: return "K_EXPR";
@@ -43,6 +44,16 @@ const std::string t_type(Token::Type t) {
     case Token::K_CALLFN: return "K_CALLFN";
     case Token::K_DELETE: return "K_DELETE";
     case Token::K_PUSHFN: return "K_PUSHFN";
+    case Token::K_EXTERN: return "K_EXTERN";
+
+    case Token::K_EQ: return "K_EQ";
+    case Token::K_GRE: return "K_GRE";
+    case Token::K_LES: return "K_LES";
+    case Token::K_GRE_EQ: return "K_GRE_EQ";
+    case Token::K_LES_EQ: return "K_LES_EQ";
+    case Token::K_NOT_EQ: return "K_NOT_EQ";
+    case Token::K_AND: return "K_AND";
+    case Token::K_OR: return "K_OR";
     }
     return "";
 }
@@ -63,9 +74,9 @@ int main(int argc, const char* argv[]) {
     while (!scanner.eof()) {
         Token t = scanner.next();
         std::cout << "(" << t.loc.line_num << ")\t" << t.value;
-        if (t.loc.end_column - t.loc.start_column >= 8) {
+        if (t.loc.end_column - t.loc.start_column >= 8)
             std::cout << "\t" << t_type(t.type) << std::endl;
-        } else
+        else
             std::cout << "\t\t" << t_type(t.type) << std::endl;
     }
 
