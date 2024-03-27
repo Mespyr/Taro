@@ -75,6 +75,18 @@ fn caller(I64 Function(I64)[I64]) [I64] =
 fn run (I64) = pushfn(test) caller dump
 ##################################
 
+#### BIND ####
+# bind: takes values off of the stack
+#       and binds them to words, which
+#       when referenced, are pushed onto
+#       the stack.
+fn bindfn (I64) =
+  bind (n)
+    n 1 + dump
+    n n + dump
+  end
+##############
+
 ######## WHILE LOOPS ########
 # while: similar to other languages.
 #        condition goes inside parentheses.
@@ -85,3 +97,7 @@ fn main =
     1 +
   end
 #############################
+
+fn gre-eq (I64 I64) [I64] =
+  bind x xs in
+  x xs gre x xs eq or

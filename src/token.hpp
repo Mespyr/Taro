@@ -37,10 +37,12 @@ class Token {
         K_AND,
         K_OR,
         K_EXTERN,
+        K_BIND,
 
         //
         WORD,
         NUMBER,
+        FLOATING_POINT,
         STRING,
         CHAR,
 
@@ -81,5 +83,5 @@ class Token {
         {"pushfn", K_PUSHFN}, {"eq", K_EQ},         {"gre", K_GRE},
         {"les", K_LES},       {"gre-eq", K_GRE_EQ}, {"les-eq", K_LES_EQ},
         {"not-eq", K_NOT_EQ}, {"and", K_AND},       {"or", K_OR},
-        {"extern", K_EXTERN}};
+        {"extern", K_EXTERN}, {"bind", K_BIND}};
 };

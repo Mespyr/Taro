@@ -1,3 +1,9 @@
+#include <algorithm>
+#include <cctype>
+#include <cstdint>
+#include <iostream>
+#include <memory>
+
 #include "scanner.hpp"
 
 void Scanner::tokenize_line(const std::string& line, uint32_t line_num) {
@@ -59,6 +65,32 @@ void Scanner::tokenize_line(const std::string& line, uint32_t line_num) {
             std::string str =
                 line.substr(start_column, end_column - start_column);
             Token::Type type = get_token_type(str);
+            // means were either dealing with a float or an error
+            if (type == Token::NUMBER && end_column < line.length() &&
+                line.at(end_column) == '.') {
+                end_column++;
+                if (end_column >= line.length() ||
+                    std::isspace(line.at(end_column))) {
+                    error = std::make_unique<LocationError>(
+                        Location(line_num, start_column, end_column, line,
+                                 current_file),
+                        "unexpected '.' found while tokenizing number");
+                    return;
+                }
+                uint32_t old_end_column = end_column;
+                end_column = find_end_col(line, end_column);
+                std::string float_decimal_section =
+                    line.substr(old_end_column, end_column - old_end_column);
+                if (get_token_type(float_decimal_section) != Token::NUMBER) {
+                    error = std::make_unique<LocationError>(
+                        Location(line_num, old_end_column - 1, end_column, line,
+                                 current_file),
+                        "unexpected '.' found while tokenizing number");
+                    return;
+                }
+                type = Token::FLOATING_POINT;
+                str = line.substr(start_column, end_column - start_column);
+            }
             token_stream.insert(
                 token_stream.begin() + stream_index,
                 Token(str, type,

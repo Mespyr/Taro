@@ -1,3 +1,6 @@
+#include <cctype>
+#include <cstdint>
+
 #include "scanner.hpp"
 
 uint32_t Scanner::find_start_col(const std::string& line,

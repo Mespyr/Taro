@@ -11,6 +11,7 @@ const std::string t_type(Token::Type t) {
     switch (t) {
     case Token::WORD: return "WORD";
     case Token::NUMBER: return "NUMBER";
+    case Token::FLOATING_POINT: return "FLOATING POINT";
     case Token::STRING: return "STRING";
     case Token::CHAR: return "CHAR";
     case Token::L_PAREN: return "L_PAREN";
@@ -45,6 +46,7 @@ const std::string t_type(Token::Type t) {
     case Token::K_DELETE: return "K_DELETE";
     case Token::K_PUSHFN: return "K_PUSHFN";
     case Token::K_EXTERN: return "K_EXTERN";
+    case Token::K_BIND: return "K_BIND";
 
     case Token::K_EQ: return "K_EQ";
     case Token::K_GRE: return "K_GRE";
