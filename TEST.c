@@ -1,45 +1,34 @@
+/* ########## boilerplate ########### */
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/syscall.h>
 #include <unistd.h>
-
 typedef char    U8;
 typedef int64_t I64;
 typedef int32_t I32;
-
+typedef double  F64;
+typedef float   F32;
 typedef union {
-    float  F32;
-    double F64;
-    I64    pass;
+    F32 _F32;
+    F64 _F64;
+    I64 pass;
 } FloatPasser;
 FloatPasser OCH_float;
+void* OCH_stack[1024];
+uint32_t OCH_top = 0;
 
-/* custom types */
+/* ###### external ################ */
+void PUTU(I64);
+void PUTD(F64);
 
+/* ########## types ############### */
 typedef struct {
     I64 size;
     U8* data;
 } String;
 
-/* stack definition */
-
-void*    OCH_stack[1024];
-uint32_t OCH_top = 0;
-
-/* external */
-
-void PUTU(int64_t n) {
-    printf("%d", n);
-    fflush(stdout);
-}
-void PUTD(double n) {
-    printf("%f", n);
-    fflush(stdout);
-}
-
-/* user defined */
-
+/* ######### functions ############ */
 void print() {  // I64 ^U8
     void *syscall_num, *arg0, *arg1, *arg2;
     OCH_stack[OCH_top++] = (void*)1;     // PUSH I64 1
@@ -68,10 +57,10 @@ int main() {
     OCH_stack[OCH_top++] = (void*)"\n";  // PUSH ^U8
     print();                             // CALL print
 
-    OCH_float.F64 = 12.3;  // PUSH F64 12.3
+    OCH_float._F64 = 12.3;  // PUSH F64 12.3
     OCH_stack[OCH_top++] = (void*)OCH_float.pass;
     OCH_float.pass = (I64)OCH_stack[--OCH_top];  // POP to global float pass
-    PUTD(OCH_float.F64); // CALL_EXTERNAL PUTD
+    PUTD(OCH_float._F64); // CALL_EXTERNAL PUTD
 
     OCH_stack[OCH_top++] = (void*)1;     // PUSH I64 1
     OCH_stack[OCH_top++] = (void*)"\n";  // PUSH ^U8
@@ -91,4 +80,14 @@ int main() {
     ((void (*)(void))(OCH_stack[--OCH_top]))(); // CALLFN
 
     return 0;
+}
+
+// idealy in a seperate file or obj file
+void PUTU(int64_t n) {
+    printf("%d", n);
+    fflush(stdout);
+}
+void PUTD(double n) {
+    printf("%f", n);
+    fflush(stdout);
 }
