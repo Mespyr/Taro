@@ -1,7 +1,3 @@
-#include <algorithm>
-#include <cctype>
-#include <cstdint>
-#include <iostream>
 #include <memory>
 
 #include "scanner.hpp"
@@ -81,7 +77,8 @@ void Scanner::tokenize_line(const std::string& line, uint32_t line_num) {
                 end_column = find_end_col(line, end_column);
                 std::string float_decimal_section =
                     line.substr(old_end_column, end_column - old_end_column);
-                if (get_token_type(float_decimal_section) != Token::NUMBER) {
+                if (get_token_type(float_decimal_section) != Token::NUMBER ||
+                    float_decimal_section.front() == '-') {
                     error = std::make_unique<LocationError>(
                         Location(line_num, old_end_column - 1, end_column, line,
                                  current_file),
