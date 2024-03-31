@@ -1,5 +1,3 @@
-#include <memory>
-
 #include "scanner.hpp"
 
 void Scanner::tokenize_line(const std::string& line, uint32_t line_num) {

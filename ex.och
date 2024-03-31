@@ -11,26 +11,25 @@ expr under (a b) = b a b
 ######## TYPES ########
 # type: defines a new type which
 #       has its own members.
-type String =
-  :size U32
-  :data ^U8
+type Vec2 =
+  :x I64
+  :y I64
 # types: members can be read using
 #        `:` followed by the member name.
-fn print (^String) =
-  dup :size swp :data
-  1 1 call3 pop
+fn combine (^Vec2) [I64] =
+  dup :x swp :y +
 # types: members can be set with `@` followed
 #        by the member name.
 #        you can create a new instance of a type
 #        using the `new` keyword.
-fn new_String (U32 ^U8) [^String] =
-  new(String) under @data
-  under @size
+fn group(I64 I64) [^Vec2] =
+  new(Vec2) under @y
+  under @x
 # types: methods can be made. `this` keyword
 #        pushes the instance which the method is
 #        being called from onto the stack.
-fn String.set (U32 ^U8) [^String] =
-  this under @data @size this
+fn Vec2.set (I64 I64) =
+  this under @y @x
 #######################
 
 ##### GENERICS & CAST #####
@@ -82,9 +81,8 @@ fn run (I64) = pushfn(test) caller dump
 #       the stack.
 fn bindfn (I64) =
   bind (n)
-    n 1 + dump
-    n n + dump
-  end
+  n 1 + dump
+  n n + dump
 ##############
 
 ######## WHILE LOOPS ########
@@ -97,7 +95,3 @@ fn main =
     1 +
   end
 #############################
-
-fn gre-eq (I64 I64) [I64] =
-  bind x xs in
-  x xs gre x xs eq or
