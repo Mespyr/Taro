@@ -36,12 +36,6 @@ const std::string t_type(Token::Type t) {
     case Token::K_ELSE: return "K_ELSE";
     case Token::K_END: return "K_END";
     case Token::K_NEW: return "K_NEW";
-    case Token::K_CALL1:
-    case Token::K_CALL2:
-    case Token::K_CALL3:
-    case Token::K_CALL4:
-    case Token::K_CALL5:
-    case Token::K_CALL6: return "syscall";
     case Token::K_CALLFN: return "K_CALLFN";
     case Token::K_DELETE: return "K_DELETE";
     case Token::K_PUSHFN: return "K_PUSHFN";
