@@ -22,7 +22,7 @@ typedef struct {
 } Vec2;
 
 /* ###### external ################ */
-extern void PUTU(I64);
+extern void PUTI(I64);
 extern void PUTD(F64);
 extern void print(String);
 extern F32 distance(Vec2*, Vec2*);
@@ -37,7 +37,7 @@ void helloworld() {
 int main() {
     OCH_stack[OCH_top++] = (void*)20;  // PUSH I64 20
     void *temp = OCH_stack[--OCH_top];       // POP to temp
-    PUTU((I64)temp);                   // CALL_EXTERNAL PUTU
+    PUTI((I64)temp);                   // CALL_EXTERNAL PUTI
 
     FloatPasser float_temp;  // PUSH F64 12.3
 	float_temp._F64 = 12.3;

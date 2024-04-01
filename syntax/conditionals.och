@@ -1,0 +1,23 @@
+import "std.och"
+
+expr swp   (a b) = b a
+expr dup   (a) = a a
+expr pop   (a) =
+expr under (a b) = b a b
+
+fn fizzbuzz (I64) =
+  case
+  (dup 15 % 0 eq) pop "FizzBuzz\n" print
+  (dup 3 % 0 eq)  pop "Fizz\n" print
+  (dup 5 % 0 eq)  pop "Buzz\n" print
+  else dump end
+
+fn fib (U64) [U64] = dup 1 gre?
+  dup 1 - fib
+  swp 2 - fib +
+
+fn main =
+  10 fib dump
+  0 while (dup 100 les)
+    dup fizzbuzz 1 +
+  end

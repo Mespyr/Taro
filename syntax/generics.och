@@ -1,14 +1,13 @@
 expr dup (a)   = a a
 expr swp (a b) = b a
 
-extern fn print (U64 ^U8)
-extern fn sqrt (F64) [F64] # link with `-lm`
+extern fn putf64 (F64)
+extern fn puti (I64)
+extern fn sqrt (F64) [F64]  # link with `-lm`
 
-# math
 fn abs<T> (T) [T] = dup 0 les? -1 *
 fn sq<T> (T) [T] = dup *
 
-# Vec2
 type Vec2<T> =
   :x T
   :y T
@@ -20,21 +19,11 @@ fn distance (Vec2<F64> Vec2<F64>) [F64] =
   P2:x P1:x - sq<F64>
   P2:y P1:y - sq<F64> + sqrt
 
-fn fib (I64) [I64] = dup 1 gre?
-  dup 1 - fib
-  swp 2 - fib +
-
 fn main =
   new(Vec2<F64> Vec2<F64>)
   bind (P1 P2)
   1.2 2.7 P1.set
   4.2 6.9 P2.set
-  
-  case (P1 P2 distance 10 gre)
-    "Points are FAR apart\n"
-  else
-    "Points are CLOSE together\n"
-  end print
 
-  -10 abs<I64> fib
-  55 eq? "fib(10) is 55!\n" print
+  P1 P2 distance putf64
+  -10 abs<I64> puti

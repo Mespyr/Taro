@@ -18,6 +18,8 @@ const std::string t_type(Token::Type t) {
     case Token::R_PAREN: return "R_PAREN";
     case Token::L_BRACE: return "L_BRACE";
     case Token::R_BRACE: return "R_BRACE";
+    case Token::L_CURLY: return "L_CURLY";
+    case Token::R_CURLY: return "R_CURLY";
     case Token::L_ANGLE: return "L_ANGLE";
     case Token::R_ANGLE: return "R_ANGLE";
     case Token::COLON: return "COLON";
@@ -36,9 +38,8 @@ const std::string t_type(Token::Type t) {
     case Token::K_ELSE: return "K_ELSE";
     case Token::K_END: return "K_END";
     case Token::K_NEW: return "K_NEW";
-    case Token::K_CALLFN: return "K_CALLFN";
-    case Token::K_DELETE: return "K_DELETE";
-    case Token::K_PUSHFN: return "K_PUSHFN";
+    case Token::K_CALL: return "K_CALL";
+    case Token::K_PUSH: return "K_PUSH";
     case Token::K_EXTERN: return "K_EXTERN";
     case Token::K_BIND: return "K_BIND";
 

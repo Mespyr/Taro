@@ -19,9 +19,8 @@ class Token {
         K_ELSE,
         K_END,
         K_NEW,
-        K_CALLFN,
-        K_DELETE,
-        K_PUSHFN,
+        K_CALL,
+        K_PUSH,
         K_EQ,
         K_GRE,
         K_LES,
@@ -33,7 +32,7 @@ class Token {
         K_EXTERN,
         K_BIND,
 
-        //
+        // literals
         WORD,
         NUMBER,
         FLOATING_POINT,
@@ -47,6 +46,8 @@ class Token {
         R_BRACE,
         L_ANGLE,
         R_ANGLE,
+        L_CURLY,
+        R_CURLY,
         COLON,
         PERIOD,
         AT_SIGN,
@@ -63,17 +64,18 @@ class Token {
     Type        type;
 
     static inline const std::unordered_map<char, Type> single_chars = {
-        {'(', L_PAREN}, {')', R_PAREN}, {'[', L_BRACE}, {']', R_BRACE},
-        {'<', L_ANGLE}, {'>', R_ANGLE}, {':', COLON},   {'.', PERIOD},
-        {'@', AT_SIGN}, {'^', POINTER}, {'=', EQUALS},  {'?', QUESTION_MARK}};
+        {'(', L_PAREN}, {')', R_PAREN},      {'[', L_BRACE}, {']', R_BRACE},
+        {'{', L_CURLY}, {'}', R_CURLY},      {'<', L_ANGLE}, {'>', R_ANGLE},
+        {':', COLON},   {'.', PERIOD},       {'@', AT_SIGN}, {'^', POINTER},
+        {'=', EQUALS},  {'?', QUESTION_MARK}};
 
     static inline const std::unordered_map<std::string, Type> keywords = {
         {"import", K_IMPORT}, {"expr", K_EXPR},     {"type", K_TYPE},
         {"fn", K_FN},         {"this", K_THIS},     {"cast", K_CAST},
         {"case", K_CASE},     {"else", K_ELSE},     {"end", K_END},
-        {"new", K_NEW},       {"callfn", K_CALLFN}, {"delete", K_DELETE},
-        {"pushfn", K_PUSHFN}, {"eq", K_EQ},         {"gre", K_GRE},
-        {"les", K_LES},       {"gre-eq", K_GRE_EQ}, {"les-eq", K_LES_EQ},
-        {"not-eq", K_NOT_EQ}, {"and", K_AND},       {"or", K_OR},
-        {"extern", K_EXTERN}, {"bind", K_BIND}};
+        {"new", K_NEW},       {"call", K_CALL},     {"push", K_PUSH},
+        {"eq", K_EQ},         {"gre", K_GRE},       {"les", K_LES},
+        {"gre-eq", K_GRE_EQ}, {"les-eq", K_LES_EQ}, {"not-eq", K_NOT_EQ},
+        {"and", K_AND},       {"or", K_OR},         {"extern", K_EXTERN},
+        {"bind", K_BIND}};
 };

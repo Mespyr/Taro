@@ -40,10 +40,4 @@ ochre input.och
 ```
 This would creates an object file `input.o` which can be linked to other object files and libraries using `gcc` or other C compilers.
 
-If the `-l` flag is used (link), the compiler will link the object file for you using `gcc` or any other C compiler. It won't produce an object file this way.
-```
-ochre input.och -l
-```
-This would produce an executable named `input`.
-
-Because of Ochre's lack of header files and its use of the `import` keyword, compiling two source files together is an unnecesary feature, since you can just import one of the files directly into your main source file.
+Because of Ochre's lack of header files and its use of the `import` keyword, compiling two source files together is an unnecesary feature, since you can just import one of the files directly into your main source file. The `extern` keyword is also meant for functions which follow the C calling convention so you can't link two Ochre object files together.

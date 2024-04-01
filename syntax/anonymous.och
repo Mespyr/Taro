@@ -1,0 +1,6 @@
+fn callon ((I64)[I64] I64) =
+  call dump
+
+fn main =
+  (I64)[I64]{dup *} bind(sq_lamb)
+  sq_lamb 12 callon
