@@ -44,10 +44,6 @@ class Token {
         R_PAREN,
         L_BRACE,
         R_BRACE,
-        L_ANGLE,
-        R_ANGLE,
-        L_CURLY,
-        R_CURLY,
         COLON,
         PERIOD,
         AT_SIGN,
@@ -64,10 +60,9 @@ class Token {
     Type        type;
 
     static inline const std::unordered_map<char, Type> single_chars = {
-        {'(', L_PAREN}, {')', R_PAREN},      {'[', L_BRACE}, {']', R_BRACE},
-        {'{', L_CURLY}, {'}', R_CURLY},      {'<', L_ANGLE}, {'>', R_ANGLE},
-        {':', COLON},   {'.', PERIOD},       {'@', AT_SIGN}, {'^', POINTER},
-        {'=', EQUALS},  {'?', QUESTION_MARK}};
+        {'(', L_PAREN}, {')', R_PAREN}, {'[', L_BRACE}, {']', R_BRACE},
+        {':', COLON},   {'.', PERIOD},
+        {'@', AT_SIGN}, {'^', POINTER}, {'=', EQUALS},  {'?', QUESTION_MARK}};
 
     static inline const std::unordered_map<std::string, Type> keywords = {
         {"import", K_IMPORT}, {"expr", K_EXPR},     {"type", K_TYPE},

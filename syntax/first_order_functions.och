@@ -1,6 +1,6 @@
-fn caller<T> (T (T)[T] ) [T] = call
+fn caller[T] (T (T -> T) -> T) = call
 
-fn sq (I64) [I64] = dup *
+fn sq (I64 -> I64) = dup *
 fn run (I64) = push(sq) caller<I64> dump
 
 fn main =

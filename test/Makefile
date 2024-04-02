@@ -1,5 +1,5 @@
 CC=gcc
-CCFLANGS=-Wall -Wextra -pedantic
+CCFLAGS=-std=c99
 LDFLAGS=-lm
 
 SRC_FILES=main.c lib.c

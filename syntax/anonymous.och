@@ -1,6 +1,11 @@
-fn callon ((I64)[I64] I64) =
-  call dump
+# PLAN: annonymous functions will has strict definitions
+# one in -> one out:
+#    function signature always takes one type in and one type out
+extern fn puti (I64)
+
+fn out_res ((I64 -> I64) I64) =
+  12 + swp call puti
 
 fn main =
-  (I64)[I64]{dup *} bind(sq_lamb)
-  sq_lamb 12 callon
+  [I64: dup *] 12 out_res
+  12 [I64: dug neg 2 * +] call 2 + puti

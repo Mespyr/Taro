@@ -34,7 +34,15 @@ void helloworld() {
 	print((String)temp);
 }
 
-int main() {
+void main_function_temp0() { // push annonymous function
+	void *temp = OCH_stack[--OCH_top]; // POP to temp
+	OCH_stack[OCH_top++] = temp;  // PUSH temp
+	OCH_stack[OCH_top++] = temp;  // PUSH temp
+	temp = OCH_stack[--OCH_top]; // POP to temp
+	void* temp1 = OCH_stack[--OCH_top]; // POP to temp1
+	OCH_stack[OCH_top++] = (void*)((I64)temp1 * (I64)temp);  // PUSH I64 20
+}
+void main() {
     OCH_stack[OCH_top++] = (void*)20;  // PUSH I64 20
     void *temp = OCH_stack[--OCH_top];       // POP to temp
     PUTI((I64)temp);                   // CALL_EXTERNAL PUTI
@@ -68,5 +76,9 @@ int main() {
 	float_temp.pass = OCH_stack[--OCH_top];  // POP to global float pass
     PUTD(float_temp._F32); // CALL_EXTERNAL PUTD
 
-    return 0;
+    OCH_stack[OCH_top++] = (void*)12;  // PUSH I64 20
+    OCH_stack[OCH_top++] = (void*)main_function_temp0; // PUSH anonymous func
+    ((void (*)(void))(OCH_stack[--OCH_top]))(); // CALLFN
+    temp = OCH_stack[--OCH_top];       // POP to temp
+    PUTI((I64)temp);                   // CALL_EXTERNAL PUTI
 }

@@ -3,21 +3,22 @@ expr swp (a b) = b a
 
 extern fn putf64 (F64)
 extern fn puti (I64)
-extern fn sqrt (F64) [F64]  # link with `-lm`
+extern fn sqrt (F64 -> F64)  # link with `-lm`
 
-fn abs<T> (T) [T] = dup 0 les? -1 *
-fn sq<T> (T) [T] = dup *
+fn abs[T] (T -> T) = dup 0 les? -1 *
+fn sq[T]  (T -> T) = dup *
 
-type Vec2<T> =
+type Vec2[T] =
   :x T
   :y T
-fn Vec2<T>.set (T T) =
+
+fn Vec2[T].set (T T) =
   this @y this @x
 
-fn distance (Vec2<F64> Vec2<F64>) [F64] =
+fn distance (^Vec2[F64] ^Vec2[F64] -> F64) =
   bind (P1 P2)
-  P2:x P1:x - sq<F64>
-  P2:y P1:y - sq<F64> + sqrt
+  P2:x P1:x - sq[F64]
+  P2:y P1:y - sq[F64] + sqrt
 
 fn main =
   new(Vec2<F64> Vec2<F64>)
