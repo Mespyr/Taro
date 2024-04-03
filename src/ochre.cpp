@@ -23,6 +23,7 @@ const std::string t_type(Token::Type t) {
     case Token::AT_SIGN: return "ATSIGN";
     case Token::POINTER: return "POINTER";
     case Token::QUESTION_MARK: return "QUESTION MARK";
+    case Token::BACK_SLASH: return "BACK SLASH";
     case Token::EQUALS: return "EQUALS";
     case Token::K_IMPORT: return "K_IMPORT";
     case Token::K_EXPR: return "K_EXPR";
@@ -35,7 +36,6 @@ const std::string t_type(Token::Type t) {
     case Token::K_END: return "K_END";
     case Token::K_NEW: return "K_NEW";
     case Token::K_CALL: return "K_CALL";
-    case Token::K_PUSH: return "K_PUSH";
     case Token::K_EXTERN: return "K_EXTERN";
     case Token::K_BIND: return "K_BIND";
 

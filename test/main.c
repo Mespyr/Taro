@@ -25,7 +25,7 @@ typedef struct {
 extern void PUTI(I64);
 extern void PUTD(F64);
 extern void print(String);
-extern F32 distance(Vec2, Vec2);
+extern F32 distance(Vec2*, Vec2*);
 
 /* ######### functions ############ */
 void helloworld() {
@@ -72,7 +72,7 @@ void main() {
 
 	SP--; temp0 = *SP;                                       // pop to temp0
 	SP--; void* temp1 = *SP;                                 // pop to temp1
-	float_temp0._F32 = distance(*(Vec2*)temp1, *(Vec2*)temp0); // call-external distance(temp1, temp0) to float_temp._F32
+	float_temp0._F32 = distance((Vec2*)temp1, (Vec2*)temp0); // call-external distance(temp1, temp0) to float_temp._F32
 	*SP = float_temp0.pass; SP++;                            // push float_temp.pass
 	SP--; float_temp0.pass = *SP;                            // pop to float_temp0.pass
 	PUTD(float_temp0._F32);                                  // call-external PUTD(float_temp0._F32)

@@ -1,7 +1,7 @@
 fn caller[T] (T (T -> T) -> T) = call
 
 fn sq (I64 -> I64) = dup *
-fn run (I64) = push(sq) caller<I64> dump
+fn run (I64) = \sq caller<I64> dump
 
 fn main =
   0 while (dup 15 les)

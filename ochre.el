@@ -9,7 +9,7 @@
     "const" "end" "type" "expr" "extern" "bind"))
 
 (defconst ochre-builtin
-  '("push" "call" "cast" "new"))
+  '("call" "cast" "new"))
 
 (defconst ochre-types
   '("I64" "I32" "U64" "U32" "U8" "F64" "F32" "String"))

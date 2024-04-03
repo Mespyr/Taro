@@ -8,4 +8,4 @@ fn out_res ((I64 -> I64) I64) =
 
 fn main =
   [I64: dup *] 12 out_res
-  12 [I64: dug neg 2 * +] call 2 + puti
+  []
