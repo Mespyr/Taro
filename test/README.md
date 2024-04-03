@@ -9,9 +9,9 @@ In this directory, I have a `main.c` and `lib.c`. `main.c` is an example of what
   
   - The next section describes a union called the `FloatPasser` which helps push floating point numbers onto the stack. Floating points cannot be cast to a `void*`, so we use the union to read the floating point as an integer and cast that as a `void*`. This allows us to indirectly cast between `void*` and `float/double`.
   
-  - `OCH_stack` is the global stack that the program runs from and is initialized as an array of `void*`. This means that values on the stack have a size limit of 8 bytes, meaning structs have to be pushed onto the stack via pointer. When values are pushed onto the stack, they are cast to `void*` or passed through the `FloatPasser`.
+  - `STACK` is the global stack that the program runs from and is initialized as an array of `void*`. This means that values on the stack have a size limit of 8 bytes, meaning structs have to be pushed onto the stack via pointer. When values are pushed onto the stack, they are cast to `void*` or passed through the `FloatPasser`.
   
-  - `OCH_top` is the index to the top of the stack. It always points 1 ahead from the top value of the stack. When `OCH_top` equals 0, there is nothing on the stack. To push something onto the stack, you first set `OCH_stack[OCH_top]` to a value, and then increment `OCH_top`. This can be simplified down to `OCH_stack[OCH_top++] = ...`, which does everything in one line. To pop off a value from the stack, you first decrement `OCH_top`, and then take the value from `OCH_stack[OCH_top]`. This can be simplified down to `OCH_stack[--OCH_top]` if you are trying to get the value from the top of the stack. If you are just trying to remove the top value without doing anything else with it, just saying `OCH_top--` works.
+  - `SP` is the stack pointer. It always points 1 ahead from the top value of the stack. When `SP` points to the beginning of `STACK`. To push something onto the stack, you first set `*SP` to a value, and then increment `SP`. To pop off a value from the stack, you first decrement `SP`, and then take the value from `*SP`.If you are just trying to remove the top value without doing anything else with it, just saying `SP--` works.
 
 - **Types**: This section describes all the user-defined types in Ochre.
 

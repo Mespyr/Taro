@@ -9,9 +9,9 @@ typedef struct {
 	F32 y;
 } Vec2;
 
-F32 distance(Vec2 *p1, Vec2 *p2) {
-	return sqrt(pow(p2->x - p1->x, 2) +
-				pow(p2->y - p1->y, 2));
+F32 distance(Vec2 p1, Vec2 p2) {
+	return sqrt(pow(p2.x - p1.x, 2) +
+				pow(p2.y - p1.y, 2));
 }
 
 void print(String str) {

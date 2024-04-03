@@ -12,8 +12,8 @@ typedef union {
     F64 _F64;
     void* pass;
 } FloatPasser;
-void* OCH_stack[1024];
-U32 OCH_top = 0;
+void*  STACK[1024];
+void** SP = STACK;
 
 /* ########## types ############### */
 typedef struct {
@@ -25,60 +25,61 @@ typedef struct {
 extern void PUTI(I64);
 extern void PUTD(F64);
 extern void print(String);
-extern F32 distance(Vec2*, Vec2*);
+extern F32 distance(Vec2, Vec2);
 
 /* ######### functions ############ */
 void helloworld() {
-    OCH_stack[OCH_top++] = (void*)"Hello World!\n";  // PUSH String
-	void *temp = OCH_stack[--OCH_top];
-	print((String)temp);
+    *SP = (void*)"Hello World!\n"; SP++; // PUSH String
+	SP--; void* temp0 = *SP;             // pop to temp0
+	print((String)temp0);                // call-external print(temp0)
 }
 
-void main_function_temp0() { // push annonymous function
-	void *temp = OCH_stack[--OCH_top]; // POP to temp
-	OCH_stack[OCH_top++] = temp;  // PUSH temp
-	OCH_stack[OCH_top++] = temp;  // PUSH temp
-	temp = OCH_stack[--OCH_top]; // POP to temp
-	void* temp1 = OCH_stack[--OCH_top]; // POP to temp1
-	OCH_stack[OCH_top++] = (void*)((I64)temp1 * (I64)temp);  // PUSH I64 20
+void main_function_temp0() {  // push annonymous function
+	SP--; void* temp0 = *SP;  // pop to temp0
+	*SP = temp0; SP++;        // push temp0
+	*SP = temp0; SP++;        // push temp0
+	SP--; temp0 = *SP;        // pop to temp0
+	SP--; void* temp1 = *SP;  // pop to temp1
+	*SP = (void*)((I64)temp1 * (I64)temp0); SP++; // temp0 * temp1
 }
+
 void main() {
-    OCH_stack[OCH_top++] = (void*)20;  // PUSH I64 20
-    void *temp = OCH_stack[--OCH_top];       // POP to temp
-    PUTI((I64)temp);                   // CALL_EXTERNAL PUTI
+	*SP = (void*)20; SP++;   // push I64 20
+	SP--; void* temp0 = *SP; // pop to temp0
+	PUTI((I64)temp0);        // call-external PUTU(temp0)
 
-    FloatPasser float_temp;  // PUSH F64 12.3
-	float_temp._F64 = 12.3;
-    OCH_stack[OCH_top++] = float_temp.pass;
-    float_temp.pass = OCH_stack[--OCH_top];  // POP to float temp
-    PUTD(float_temp._F64); // CALL_EXTERNAL PUTD
+	FloatPasser float_temp0;
+	float_temp0._F64 = 12.3;      // set float_temp0 F64 to 12.3
+	*SP = float_temp0.pass; SP++; // push float_temp0.pass
+	SP--; float_temp0.pass = *SP; // pop to float_temp0.pass
+	PUTD(float_temp0._F64);       // call-external PUTD(float_temp0._F64)
 
-    OCH_stack[OCH_top++] = (void*)helloworld; // PUSHFN print
-    ((void (*)(void))(OCH_stack[--OCH_top]))(); // CALLFN
+	*SP = (void*)helloworld; SP++;   // push function helloworld
+	SP--; ((void (*)(void))(*SP))(); // call
 
-	// new Vec2
-	Vec2 Vec2_temp = {1.2, 2.7};
-    OCH_stack[OCH_top++] = (void*)&Vec2_temp;
-	// new Vec2
+	Vec2 Vec2_temp0 = {1.2, 2.7};
+    *SP = (void*)&Vec2_temp0; SP++; // new Vec2 as Vec2_temp0
+
 	Vec2 Vec2_temp1 = {4.2, 6.9};
-    OCH_stack[OCH_top++] = (void*)&Vec2_temp1;
-	// bind p1 p2
-    void *bind_p2 = OCH_stack[--OCH_top];
-    void *bind_p1 = OCH_stack[--OCH_top];
+    *SP = (void*)&Vec2_temp1; SP++; // new Vec2 as Vec2_temp1
 
-    OCH_stack[OCH_top++] = bind_p1; // PUSH p1
-    OCH_stack[OCH_top++] = bind_p2; // PUSH p2
+	// bind (p1 p2)
+	SP--; void* bind_p2 = *SP; // pop to bind_p2
+	SP--; void* bind_p1 = *SP; // pop to bind_p1
 
-    temp = OCH_stack[--OCH_top]; // POP to temp
-    void *temp1 = OCH_stack[--OCH_top]; // POP to temp1
-	float_temp._F32 = distance((Vec2*)temp1, (Vec2*)temp); // CALL-EXTERNAL distance
-    OCH_stack[OCH_top++] = float_temp.pass; // PUSH result
-	float_temp.pass = OCH_stack[--OCH_top];  // POP to global float pass
-    PUTD(float_temp._F32); // CALL_EXTERNAL PUTD
+	*SP = bind_p1; SP++; // push bind_p1
+	*SP = bind_p2; SP++; // push bind_p2
 
-    OCH_stack[OCH_top++] = (void*)12;  // PUSH I64 20
-    OCH_stack[OCH_top++] = (void*)main_function_temp0; // PUSH anonymous func
-    ((void (*)(void))(OCH_stack[--OCH_top]))(); // CALLFN
-    temp = OCH_stack[--OCH_top];       // POP to temp
-    PUTI((I64)temp);                   // CALL_EXTERNAL PUTI
+	SP--; temp0 = *SP;                                       // pop to temp0
+	SP--; void* temp1 = *SP;                                 // pop to temp1
+	float_temp0._F32 = distance(*(Vec2*)temp1, *(Vec2*)temp0); // call-external distance(temp1, temp0) to float_temp._F32
+	*SP = float_temp0.pass; SP++;                            // push float_temp.pass
+	SP--; float_temp0.pass = *SP;                            // pop to float_temp0.pass
+	PUTD(float_temp0._F32);                                  // call-external PUTD(float_temp0._F32)
+
+    *SP = (void*)12; SP++;                  // push I64 12
+    *SP = (void*)main_function_temp0; SP++; // push main_function_temp0
+	SP--; ((void (*)(void))(*SP))();        // call
+    SP--; temp0 = *SP;                      // pop to temp
+    PUTI((I64)temp0);                       // call-external PUTI(temp)
 }
