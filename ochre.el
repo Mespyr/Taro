@@ -5,14 +5,14 @@
     (syntax-table)))
 
 (defconst ochre-keywords
-  '("case" "else" "while" "import" "fn"
-    "const" "end" "type" "expr" "extern" "bind"))
+  '("if" "else" "while" "import" "fn"
+    "const" "type" "expr" "extern" "bind"))
 
 (defconst ochre-builtin
   '("call" "cast" "new"))
 
 (defconst ochre-types
-  '("I64" "I32" "U64" "U32" "U8" "F64" "F32" "String"))
+  '("I64" "I32" "U64" "U32" "U8" "F64" "F32" "Bool" "Any"))
 
 (defconst ochre-highlights
   `(("#.*" . font-lock-comment-face)

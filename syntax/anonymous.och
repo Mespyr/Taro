@@ -1,11 +1,17 @@
-# PLAN: annonymous functions will has strict definitions
-# one in -> one out:
-#    function signature always takes one type in and one type out
-extern fn puti (I64)
+extern print :: ^U8
 
-fn out_res ((I64 -> I64) I64) =
-  12 + swp call puti
+fn cond-or-eq
+:: Any Any (Any Any -> Bool) -> Bool =
+   bind (a b _fn)
+   a b _fn call a b eq or
+
+fn >eq :: Any Any -> Bool =
+   [Any Any: >] cond-or-eq
+
+fn <eq :: Any Any -> Bool =
+   [Any Any: <] cond-or-eq
 
 fn main =
-  [I64: dup *] 12 out_res
-  []
+   12 13 bind (a b)
+   if (a b <eq) [ "a <= b\n" print ] else
+   if (a b >eq) [ "a >= b\n" print ]

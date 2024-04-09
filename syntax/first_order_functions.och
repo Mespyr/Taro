@@ -1,9 +1,8 @@
-fn caller[T] (T (T -> T) -> T) = call
+fn caller[T] :: T (T -> T) -> T = call
 
-fn sq (I64 -> I64) = dup *
-fn run (I64) = \sq caller<I64> dump
+fn sq :: I64 -> I64 = dup *
+fn run :: I64 = \sq caller[I64] dump
 
 fn main =
-  0 while (dup 15 les)
-    dup run 1 +
-  end
+   0 while (dup 15 les)
+      [ dup run 1 + ]

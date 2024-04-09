@@ -9,6 +9,9 @@
 // especially for this usecase??
 const std::string t_type(Token::Type t) {
     switch (t) {
+    case Token::SYM_ARROW: return "SYM_ARROW";
+    case Token::SYM_DOUBLE_COLON: return "SYM_DOUBLE_COLON";
+
     case Token::WORD: return "WORD";
     case Token::NUMBER: return "NUMBER";
     case Token::FLOATING_POINT: return "FLOATING POINT";
@@ -22,7 +25,6 @@ const std::string t_type(Token::Type t) {
     case Token::PERIOD: return "PERIOD";
     case Token::AT_SIGN: return "ATSIGN";
     case Token::POINTER: return "POINTER";
-    case Token::QUESTION_MARK: return "QUESTION MARK";
     case Token::BACK_SLASH: return "BACK SLASH";
     case Token::EQUALS: return "EQUALS";
     case Token::K_IMPORT: return "K_IMPORT";
@@ -31,9 +33,8 @@ const std::string t_type(Token::Type t) {
     case Token::K_FN: return "K_FN";
     case Token::K_THIS: return "K_THIS";
     case Token::K_CAST: return "K_CAST";
-    case Token::K_CASE: return "K_CASE";
+    case Token::K_IF: return "K_IF";
     case Token::K_ELSE: return "K_ELSE";
-    case Token::K_END: return "K_END";
     case Token::K_NEW: return "K_NEW";
     case Token::K_CALL: return "K_CALL";
     case Token::K_EXTERN: return "K_EXTERN";
@@ -42,8 +43,6 @@ const std::string t_type(Token::Type t) {
     case Token::K_EQ: return "K_EQ";
     case Token::K_GRE: return "K_GRE";
     case Token::K_LES: return "K_LES";
-    case Token::K_GRE_EQ: return "K_GRE_EQ";
-    case Token::K_LES_EQ: return "K_LES_EQ";
     case Token::K_NOT_EQ: return "K_NOT_EQ";
     case Token::K_AND: return "K_AND";
     case Token::K_OR: return "K_OR";

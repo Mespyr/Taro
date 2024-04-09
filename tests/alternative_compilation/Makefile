@@ -1,5 +1,5 @@
 CC=gcc
-CCFLAGS=-std=c99
+CCFLAGS=-std=c99 -O3
 LDFLAGS=-lm
 
 SRC_FILES=main.c lib.c
@@ -10,7 +10,7 @@ BIN=test
 all: $(BIN)
 
 $(BIN): $(OBJ_FILES) $(OBJ_DIR)
-	$(CC) $(OBJ_FILES) -o $@ $(LDFLAGS)
+	$(CC) $(OBJ_FILES) -o $@ $(CCFLAGS) $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: %.c $(OBJ_DIR)
 	$(CC) $(CCFLAGS) -c $< -o $@
