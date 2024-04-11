@@ -10,7 +10,7 @@ fn err_to_string :: ErrorType -> ^U8 =
    if (dup SYNTAX eq) "Syntax Error"
    else [
       "Compiler Error: unhandled error type\n" print
-	  1 exit ""
+      1 exit ""
    ]
 
 fn main =

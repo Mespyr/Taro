@@ -1,4 +1,5 @@
 /* ########## boilerplate ########### */
+#define NULL ((void*)0)
 typedef char              U8;
 typedef long int          I64;
 typedef int               I32;
@@ -6,16 +7,22 @@ typedef unsigned long int U64;
 typedef unsigned int      U32;
 typedef double            F64;
 typedef float             F32;
-typedef void (*FUNCTION)(void);
 typedef void* Any;
+typedef void (*Func)(Any*);
 typedef union {
-    F32   _F32;
-    F64   _F64;
-    void* pass;
-} FloatPasser;
-void*  STACK[1024];
-void** SP = STACK;
-
+    F32 _F32;
+    F64 _F64;
+    Any pass;
+} FloatPass;
+FloatPass fp;
+Any f32_pass(F32 n) {
+	fp._F32 = n;
+	return fp.pass;
+}
+Any f64_pass(F64 n) {
+	fp._F64 = n;
+	return fp.pass;
+}
 /* ########## types ############### */
 typedef struct {
     F32 x;
@@ -26,92 +33,56 @@ typedef struct {
 extern void puti(I64);
 extern void putd(F64);
 extern void print(U8*);
-extern F32  distance(Vec2*, Vec2*);
+extern F32  distance(Vec2, Vec2);
 
 /* ######### functions ############ */
-void helloworld() {
-    *SP = (void*)"Hello World!\n";
-    SP++;  // PUSH String
-    SP--;
-    void* temp0 = *SP;     // pop to temp0
-    print((U8*)temp0);  // call-external print(temp0)
+void _mangle_helloworld(Any* stack) {
+    U8* _0 = "Hello World!\n";
+    print(_0);  // call-external print(_0)
 }
 
-void main_function_temp0() {  // push annonymous function
-    SP--;
-    void* temp0 = *SP;  // pop to temp0
-    *SP = temp0;
-    SP++;  // push temp0
-    *SP = temp0;
-    SP++;  // push temp0
-    SP--;
-    temp0 = *SP;  // pop to temp0
-    SP--;
-    void* temp1 = *SP;  // pop to temp1
-    *SP = (void*)((I64)temp1 * (I64)temp0);
-    SP++;  // temp0 * temp1
+void _mangle_main_temp0(Any* stack) {
+	// unpack stack
+    I64 _0 = (I64) stack[0];
+
+	I64 _1 = _0;
+    _0 = _0 * _1;
+
+	// pack stack
+	stack[0] = (Any)_0;
 }
 
-void main() {
-    *SP = (void*)20;
-    SP++;  // push I64 20
-    SP--;
-    void* temp0 = *SP;  // pop to temp0
-    puti((I64)temp0);   // call-external PUTU(temp0)
+void _mangle_main(Any* stack) {
+    I64 _0 = 20;
+    puti(_0);
+	F64 _1 = 12.3;
+    putd(_1);
 
-    FloatPasser float_temp0;
-    float_temp0._F64 = 12.3;  // set float_temp0 F64 to 12.3
-    *SP = float_temp0.pass;
-    SP++;  // push float_temp0.pass
-    SP--;
-    float_temp0.pass = *SP;  // pop to float_temp0.pass
-    putd(float_temp0._F64);  // call-external PUTD(float_temp0._F64)
+    Func _2 = _mangle_helloworld;
+    _2(NULL);
 
-    *SP = (void*)helloworld;
-    SP++;  // push function helloworld
-    SP--;
-    ((FUNCTION)(*SP))();  // call
+	_mangle_helloworld(NULL);
 
-    Vec2 Vec2_temp0 = {1.2, 2.7};
-    *SP = (void*)&Vec2_temp0;
-    SP++;  // new Vec2 as Vec2_temp0
+    Vec2 _3 = {1.2, 2.7};
+    Vec2 _4 = {4.2, 6.9};
+	F32 _5 = distance(_3, _4);
+	putd(_5);
 
-    Vec2 Vec2_temp1 = {4.2, 6.9};
-    *SP = (void*)&Vec2_temp1;
-    SP++;  // new Vec2 as Vec2_temp1
+	I64 _6 = 12;
+    Func _7 = _mangle_main_temp0;
 
-    // bind (p1 p2)
-    SP--;
-    void* bind_p2 = *SP;  // pop to bind_p2
-    SP--;
-    void* bind_p1 = *SP;  // pop to bind_p1
+	// construct stack
+	Any _stk_temp0[1];
+	_stk_temp0[0] = (Any)_6;
+	// call function
+	_7(_stk_temp0);
+	// unpack
+	I64 _8 = (I64) _stk_temp0[0];
 
-    *SP = bind_p1;
-    SP++;  // push bind_p1
-    *SP = bind_p2;
-    SP++;  // push bind_p2
+	puti(_8);
+}
 
-    SP--;
-    temp0 = *SP;  // pop to temp0
-    SP--;
-    void* temp1 = *SP;  // pop to temp1
-    float_temp0._F32 = distance(
-        (Vec2*)temp1,
-        (Vec2*)
-            temp0);  // call-external distance(temp1, temp0) to float_temp._F32
-    *SP = float_temp0.pass;
-    SP++;  // push float_temp.pass
-    SP--;
-    float_temp0.pass = *SP;  // pop to float_temp0.pass
-    putd(float_temp0._F32);  // call-external PUTD(float_temp0._F32)
-
-    *SP = (void*)12;
-    SP++;  // push I64 12
-    *SP = (void*)main_function_temp0;
-    SP++;  // push main_function_temp0
-    SP--;
-    ((FUNCTION)(*SP))();  // call
-    SP--;
-    temp0 = *SP;       // pop to temp
-    puti((I64)temp0);  // call-external PUTI(temp)
+int main() {
+	_mangle_main(NULL);
+	return 0;
 }
