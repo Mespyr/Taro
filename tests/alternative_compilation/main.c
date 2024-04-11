@@ -63,8 +63,13 @@ void _mangle_main(Any* stack) {
 
 	_mangle_helloworld(NULL);
 
-    Vec2 _3 = {1.2, 2.7};
-    Vec2 _4 = {4.2, 6.9};
+    Vec2 _3;
+    Vec2 _4;
+	_3.x = 1.2;
+	_3.y = 2.7;
+	_4.x = 4.2;
+	_4.y = 6.9;
+
 	F32 _5 = distance(_3, _4);
 	putd(_5);
 

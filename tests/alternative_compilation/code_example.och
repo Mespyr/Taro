@@ -11,10 +11,14 @@ fn helloworld =
 fn main =
    20   puti
    12.3 putd
+
    \helloworld call
    helloworld
 
    new(Vec2 Vec2) bind(p1 p2)
+   1.2 p1 @x 2.7 p1 @y
+   4.2 p2 @x 6.9 p2 @y
+
    p1 p2 distance putd
 
    12 [I64: dup *] call puti
