@@ -5,7 +5,7 @@ extern fn putf64 :: F64
 extern fn puti   :: I64
 extern fn sqrt   :: F64 -> F64 # link with `-lm`
 
-fn abs[T] :: T -> T = dup 0 les if [ -1 * ]
+fn abs[T] :: T -> T = dup 0 < if [ -1 * ]
 fn sq[T]  :: T -> T = dup *
 
 type Vec2[T] =
@@ -21,7 +21,7 @@ fn distance :: ^Vec2[F64] ^Vec2[F64] -> F64 =
   P2:y P1:y - sq[F64] + sqrt
 
 fn main =
-  new(Vec2<F64> Vec2<F64>)
+  new(Vec2[F64] Vec2[F64])
   bind (P1 P2)
   1.2 2.7 P1.set
   4.2 6.9 P2.set

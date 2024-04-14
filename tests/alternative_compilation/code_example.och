@@ -1,12 +1,18 @@
-extern puti :: I64
-extern putd :: F64
+extern puti  :: I64
+extern putd  :: F64
 extern print :: ^U8
 
-type Vec2 = :x F32 :y F32
+type Vec2 =
+   :x F32
+   :y F32
 extern distance :: Vec2 Vec2 -> F32
 
 fn helloworld =
    "Hello World!\n" print
+
+fn fib :: U64 -> U64 =
+   if (dup 3 <) [ pop 1 ] else
+   [ dup 1 - fib swp 2 - fib + ]
 
 fn main =
    20   puti
@@ -22,3 +28,5 @@ fn main =
    p1 p2 distance putd
 
    12 [I64: dup *] call puti
+
+   30 fib puti

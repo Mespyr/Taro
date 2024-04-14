@@ -8,6 +8,8 @@ expr pop   :: a ->
 expr under :: a b -> b a b
 expr over  :: a b -> a b a
 
+fn ! :: Bool -> Bool = if false else true
+
 fn factor? :: I64 I64 -> Bool = % 0 eq
 fn fizzbuzz :: I64 =
    if (dup 15 factor?) "FizzBuzz\n" else
@@ -27,7 +29,7 @@ type Range =
 fn Range.eof  :: -> Bool = this:cur this:end eq
 fn Range.next :: -> I64 = this:cur dup 1 + this@cur
 fn Range.iter :: (I64) =
-   while (this.eof!)
+   while (this.eof !)
       [ this.next over call ]
 
 fn range :: I64 I64 -> Range =
