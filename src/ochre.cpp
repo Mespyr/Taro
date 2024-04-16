@@ -31,7 +31,6 @@ const std::string t_type(Token::Type t) {
     case Token::K_EXPR: return "K_EXPR";
     case Token::K_TYPE: return "K_TYPE";
     case Token::K_FN: return "K_FN";
-    case Token::K_THIS: return "K_THIS";
     case Token::K_CAST: return "K_CAST";
     case Token::K_IF: return "K_IF";
     case Token::K_ELSE: return "K_ELSE";
@@ -43,7 +42,6 @@ const std::string t_type(Token::Type t) {
     case Token::K_EQ: return "K_EQ";
     case Token::K_GRE: return "K_GRE";
     case Token::K_LES: return "K_LES";
-    case Token::K_NOT_EQ: return "K_NOT_EQ";
     case Token::K_AND: return "K_AND";
     case Token::K_OR: return "K_OR";
     }

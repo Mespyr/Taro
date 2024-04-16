@@ -8,23 +8,25 @@ extern fn sqrt   :: F64 -> F64 # link with `-lm`
 fn abs[T] :: T -> T = dup 0 < if [ -1 * ]
 fn sq[T]  :: T -> T = dup *
 
-type Vec2[T] =
-  :x T
-  :y T
+# potention use-case for generics w/ interop w/ C
+fn nullptr[T] :: -> ^T = 0 cast(^T)
 
-fn Vec2[T].set :: T T =
-  this @y this @x
+type Vec2[T] =
+   x: T
+   y: T
+fn Vec2_set[T] :: T T ^Vec2[T] -> =
+   bind(this)
+   this :y this :x
 
 fn distance :: ^Vec2[F64] ^Vec2[F64] -> F64 =
-  bind (P1 P2)
-  P2:x P1:x - sq[F64]
-  P2:y P1:y - sq[F64] + sqrt
+   bind (P1 P2)
+   P2:x P1:x - sq[F64]
+   P2:y P1:y - sq[F64] + sqrt
 
 fn main =
-  new(Vec2[F64] Vec2[F64])
-  bind (P1 P2)
-  1.2 2.7 P1.set
-  4.2 6.9 P2.set
-
-  P1 P2 distance putf64
-  -10 abs[I64] puti
+   new(Vec2[F64] Vec2[F64])
+   bind (P1 P2)
+   1.2 2.7 P1 Vec2_set[F64]
+   4.2 6.9 P2 Vec2_set[F64]
+   P1 P2 distance putf64
+   -10 abs[I64] puti

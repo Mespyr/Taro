@@ -43,7 +43,7 @@ void Scanner::tokenize_line(const std::string& line, uint32_t line_num) {
             token_type = Token::single_chars.at(c);
             end_column = start_column + 1;
             // double colon
-            if (token_type == Token::COLON && end_column <= line.length() &&
+            if (token_type == Token::COLON && end_column < line.length() &&
                 line.at(end_column) == ':') {
                 token_type = Token::SYM_DOUBLE_COLON;
                 end_column++;

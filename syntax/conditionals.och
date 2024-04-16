@@ -1,41 +1,11 @@
-extern print :: ^U8
-extern puti  :: I64 
-extern itoa  :: I64 -> ^U8
+extern puti :: I64 
 
-expr swp   :: a b -> b a
-expr dup   :: a -> a a
-expr pop   :: a ->
-expr under :: a b -> b a b
-expr over  :: a b -> a b a
-
-fn ! :: Bool -> Bool = if false else true
-
-fn factor? :: I64 I64 -> Bool = % 0 eq
-fn fizzbuzz :: I64 =
-   if (dup 15 factor?) "FizzBuzz\n" else
-   if (dup 3  factor?) "Fizz\n"     else
-   if (dup 5  factor?) "Buzz\n"
-   else [ dup itoa ]
-   print pop
+expr swp :: a b -> b a
+expr dup :: a -> a a
+expr pop :: a ->
 
 fn fib :: U64 -> U64 =
    if (dup 3 <) [ pop 1 ]
    else [ dup 1 - fib swp 2 - fib + ]
 
-type Range =
-   :cur I64
-   :end I64
-
-fn Range.eof  :: -> Bool = this:cur this:end eq
-fn Range.next :: -> I64 = this:cur dup 1 + this@cur
-fn Range.iter :: (I64) =
-   while (this.eof !)
-      [ this.next over call ]
-
-fn range :: I64 I64 -> Range =
-   new(Range) under @end
-   under @cur
-
-fn main =
-   10 fib puti
-   \fizzbuzz 0 100 range .iter
+fn main = 10 fib puti

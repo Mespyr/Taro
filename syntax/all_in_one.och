@@ -1,0 +1,24 @@
+import "std.och"
+import "string.och"
+import "range.och"
+
+expr super_expr :: a b c d -> d b
+
+type Gender = MALE FEMALE OTHER
+type Person =
+   name: ^U8
+   age: U32
+   gender: Gender
+
+fn fib :: U64 -> U64 =
+   if (dup 3 <) [ pop 1 ]
+   else [ dup 1 - fib swp 2 - fib + ]
+
+fn main =
+   [I64:
+      "fib(%d): " over format_int 
+      swp fib itoa
+      concat println
+   ] 0 40 range iter
+
+   1 2 3 4 super_expr - itoa println

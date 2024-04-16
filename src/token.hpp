@@ -13,7 +13,6 @@ class Token {
         K_EXPR,
         K_TYPE,
         K_FN,
-        K_THIS,
         K_CAST,
         K_IF,
         K_ELSE,
@@ -22,7 +21,6 @@ class Token {
         K_EQ,
         K_GRE,
         K_LES,
-        K_NOT_EQ,
         K_AND,
         K_OR,
         K_EXTERN,
@@ -68,10 +66,10 @@ class Token {
         {"::", SYM_DOUBLE_COLON}, {"->", SYM_ARROW}};
 
     static inline const std::unordered_map<std::string, Type> keywords = {
-        {"import", K_IMPORT}, {"expr", K_EXPR},     {"type", K_TYPE},
-        {"fn", K_FN},         {"this", K_THIS},     {"cast", K_CAST},
-        {"if", K_IF},         {"else", K_ELSE},     {"new", K_NEW},
-        {"call", K_CALL},     {"eq", K_EQ},         {"gre", K_GRE},
-        {"les", K_LES},       {"not-eq", K_NOT_EQ}, {"and", K_AND},
-        {"or", K_OR},         {"extern", K_EXTERN}, {"bind", K_BIND}};
+        {"import", K_IMPORT}, {"expr", K_EXPR}, {"type", K_TYPE},
+        {"fn", K_FN},         {"cast", K_CAST}, {"if", K_IF},
+        {"else", K_ELSE},     {"new", K_NEW},   {"call", K_CALL},
+        {"eq", K_EQ},         {"gre", K_GRE},   {"les", K_LES},
+        {"and", K_AND},       {"or", K_OR},     {"extern", K_EXTERN},
+        {"bind", K_BIND}};
 };

@@ -1,9 +1,7 @@
 extern print :: ^U8
 fn putln = "\n" print
 
-type ErrorType =
-   EOF
-   SYNTAX
+type ErrorType = EOF SYNTAX
 
 fn err_to_string :: ErrorType -> ^U8 =
    if (dup EOF eq) "EOF Error" else

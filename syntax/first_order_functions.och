@@ -3,7 +3,7 @@ extern puti :: I64
 fn caller[T] :: T (T -> T) -> T = call
 
 fn sq :: I64 -> I64 = dup *
-fn run :: I64 = \sq caller[I64] puti
+fn run :: I64 = \sq caller puti
 
 fn main =
    0 while (dup 15 les)
