@@ -2,7 +2,7 @@ import "std.och"
 import "string.och"
 import "range.och"
 
-expr super_expr :: a b c d -> d b
+expr ovrpop :: a b c d -> b d
 
 type Gender = MALE FEMALE OTHER
 type Person =
@@ -21,4 +21,4 @@ fn main =
       concat println
    ] 0 40 range iter
 
-   1 2 3 4 super_expr - itoa println
+   1 2 3 4 ovrpop - itoa println

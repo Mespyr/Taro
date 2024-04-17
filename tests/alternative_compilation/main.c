@@ -93,14 +93,16 @@ void _mangle_main() {
     _2();
 	_mangle_helloworld();
 
-    Vec2 _3;
-    Vec2 _4;
-	_3.x = 1.2;
-	_3.y = 2.7;
-	_4.x = 4.2;
-	_4.y = 6.9;
+    Vec2 vec2_3;
+	Vec2* _3 = &vec2_3;
+    Vec2 vec2_4;
+	Vec2* _4 = &vec2_4;
+	_3->x = 1.2;
+	_3->y = 2.7;
+	_4->x = 4.2;
+	_4->y = 6.9;
 
-	F32 _5 = distance(_3, _4);
+	F32 _5 = distance(*_3, *_4);
 	putd(_5);
 
 	I64 _6 = 12;
