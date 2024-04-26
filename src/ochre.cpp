@@ -37,7 +37,7 @@ const std::string t_type(Token::Type t) {
     case Token::K_NEW: return "K_NEW";
     case Token::K_CALL: return "K_CALL";
     case Token::K_EXTERN: return "K_EXTERN";
-    case Token::K_BIND: return "K_BIND";
+    case Token::K_AS: return "K_AS";
 
     case Token::K_EQ: return "K_EQ";
     case Token::K_GRE: return "K_GRE";

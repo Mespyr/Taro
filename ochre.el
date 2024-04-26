@@ -6,7 +6,7 @@
 
 (defconst ochre-keywords
   '("if" "else" "while" "import" "fn"
-    "const" "type" "expr" "extern" "bind"))
+    "const" "type" "expr" "extern" "as"))
 
 (defconst ochre-builtin
   '("call" "cast" "new"))

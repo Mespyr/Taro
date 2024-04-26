@@ -1,16 +1,17 @@
-extern print :: ^U8
-fn putln = "\n" print
+import "std.och"
+import "io.och"
 
-type ErrorType = EOF SYNTAX
+type ErrorType = { EOF SYNTAX }
 
 fn err_to_string :: ErrorType -> ^U8 =
    if (dup EOF eq) "EOF Error" else
    if (dup SYNTAX eq) "Syntax Error"
-   else [
+   else {
       "Compiler Error: unhandled error type\n" print
       1 exit "" 
-   ]
+   }
 
-fn main =
-   EOF    err_to_string print putnl
-   SYNTAX err_to_string print putnl
+fn main = {
+   EOF    err_to_string println
+   SYNTAX err_to_string println
+}

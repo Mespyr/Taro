@@ -1,24 +1,35 @@
 import "std.och"
 import "string.och"
-import "range.och"
 
-expr ovrpop :: a b c d -> b d
+type Range = {
+   cur:  I64
+   end:  I64
+   step: I64
 
-type Gender = MALE FEMALE OTHER
-type Person =
-   name: ^U8
-   age: U32
-   gender: Gender
+   fn new :: I64 I64 I64 = {
+	  this !step
+	  this !end
+	  this !cur
+   }
+
+   fn eof? -> Bool = { this.cur this.end >eq }
+   fn next -> I64 = {
+      this.cur dup this.step + this!cur
+   }
+
+   fn iter :: (I64) -> (I64) =
+      while (this.eof? not)
+	     { this.next over call }
+}
 
 fn fib :: U64 -> U64 =
-   if (dup 3 <) [ pop 1 ]
-   else [ dup 1 - fib swp 2 - fib + ]
+   if (dup 3 <) { pop 1 }
+   else { dup 1 - fib swp 2 - fib + }
 
-fn main =
-   [I64:
-      "fib(%d): " over format_int 
-      swp fib itoa
-      concat println
-   ] 0 40 range iter
-
-   1 2 3 4 ovrpop - itoa println
+fn main = {
+   (I64) { as num
+      "fib(%d): " num format_int 
+      num fib itoa concat println
+   }
+   0 40 1 new(Range).iter pop
+}

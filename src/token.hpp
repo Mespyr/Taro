@@ -24,7 +24,7 @@ class Token {
         K_AND,
         K_OR,
         K_EXTERN,
-        K_BIND,
+        K_AS,
 
         // literals
         WORD,
@@ -71,5 +71,5 @@ class Token {
         {"else", K_ELSE},     {"new", K_NEW},   {"call", K_CALL},
         {"eq", K_EQ},         {"gre", K_GRE},   {"les", K_LES},
         {"and", K_AND},       {"or", K_OR},     {"extern", K_EXTERN},
-        {"bind", K_BIND}};
+        {"as", K_AS}};
 };

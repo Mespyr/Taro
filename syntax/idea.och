@@ -1,0 +1,25 @@
+import "list.och"
+import "fs.och"
+
+import "token.och"
+import "error.och"
+
+type Scanner = {
+   tokens: List[Token]
+   index: U32
+   cur_file: ^U8
+   error: Error
+
+   fn new :: ^U8 = {
+      0 this!index
+      this.insert
+   }
+
+   # too lazy to implement whole thing
+   # js for a showcase
+   fn insert :: ^U8 = {}
+}
+
+fn main = {
+   "file.och" new(Scanner)
+}
