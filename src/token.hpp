@@ -13,18 +13,22 @@ class Token {
         K_EXPR,
         K_TYPE,
         K_FN,
-        K_CAST,
+        K_EXTERN,
+
         K_IF,
         K_ELSE,
+        K_WHILE,
+
+        K_CAST,
+        K_AS,
         K_NEW,
         K_CALL,
+
         K_EQ,
         K_GRE,
         K_LES,
         K_AND,
         K_OR,
-        K_EXTERN,
-        K_AS,
 
         // literals
         WORD,
@@ -35,19 +39,19 @@ class Token {
 
         // symbol
         SYM_ARROW,
-        SYM_DOUBLE_COLON,
 
         // single char / delimiters
         L_PAREN,
         R_PAREN,
+        L_BRACKET,
+        R_BRACKET,
         L_BRACE,
         R_BRACE,
         COLON,
-        PERIOD,
-        AT_SIGN,
+        ACCESS_MEMBER,
         POINTER,
         EQUALS,
-        BACK_SLASH
+        PUSH_FUNCTION  // '\' (backslash)
     };
 
     Token(std::string value, Type type, Location loc)
@@ -58,18 +62,19 @@ class Token {
     Type        type;
 
     static inline const std::unordered_map<char, Type> single_chars = {
-        {'(', L_PAREN}, {')', R_PAREN},    {'[', L_BRACE}, {']', R_BRACE},
-        {':', COLON},   {'.', PERIOD},     {'@', AT_SIGN}, {'^', POINTER},
-        {'=', EQUALS},  {'\\', BACK_SLASH}};
+        {'(', L_PAREN},   {')', R_PAREN},       {'[', L_BRACKET},
+        {']', R_BRACKET}, {'{', L_BRACE},       {'}', R_BRACE},
+        {':', COLON},     {'.', ACCESS_MEMBER}, {'^', POINTER},
+        {'=', EQUALS},    {'\\', PUSH_FUNCTION}};
 
     static inline const std::unordered_map<std::string, Type> symbols = {
-        {"::", SYM_DOUBLE_COLON}, {"->", SYM_ARROW}};
+        {"->", SYM_ARROW}};
 
     static inline const std::unordered_map<std::string, Type> keywords = {
-        {"import", K_IMPORT}, {"expr", K_EXPR}, {"type", K_TYPE},
-        {"fn", K_FN},         {"cast", K_CAST}, {"if", K_IF},
-        {"else", K_ELSE},     {"new", K_NEW},   {"call", K_CALL},
-        {"eq", K_EQ},         {"gre", K_GRE},   {"les", K_LES},
-        {"and", K_AND},       {"or", K_OR},     {"extern", K_EXTERN},
-        {"as", K_AS}};
+        {"import", K_IMPORT}, {"expr", K_EXPR},     {"type", K_TYPE},
+        {"fn", K_FN},         {"extern", K_EXTERN}, {"if", K_IF},
+        {"else", K_ELSE},     {"while", K_WHILE},   {"cast", K_CAST},
+        {"as", K_AS},         {"new", K_NEW},       {"call", K_CALL},
+        {"eq", K_EQ},         {">", K_GRE},         {"<", K_LES},
+        {"and", K_AND},       {"or", K_OR}};
 };

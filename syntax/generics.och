@@ -1,34 +1,31 @@
-expr dup :: a -> a a
-expr swp :: a b -> b a
+expr dup = (a -> a a)
+expr swp = (a b -> b a)
 
-extern fn putf :: F64
-extern fn puti :: I64
-extern fn sqrt :: F64 -> F64 # link with `-lm`
+extern fn putf: F64
+extern fn puti: I64
+extern fn sqrt: F64 -> F64 # link with `-lm`
 
-fn abs[T] :: T -> T = { dup 0 < if { -1 * } }
-fn sq[T]  :: T -> T = { dup * }
+fn abs[T]: T -> T = if (dup 0 <) { -1 * }
+fn sq[T]: T -> T = { dup * }
 
 # potention use-case for generics
-fn nullptr[T] :: -> ^T = { 0 cast(^T) }
+fn nullptr[T]: -> ^T = { 0 cast(^T) }
 
 type Vec2[T] = {
-   x: T
-   y: T
-
-   fn new :: T T = {
-      this !y this !x
-   }
+  x: T
+  y: T
+  fn new :: T T = { this:y this:x }
 }
 
-fn distance :: Vec2[F64] Vec2[F64] -> F64 = {
-   as (P1 P2)
-   P2.x P1.x - sq[F64]
-   P2.y P1.y - sq[F64] + sqrt
+fn distance: Vec2[F64] Vec2[F64] -> F64 = {
+  as (P1 P2)
+  P2.x P1.x - sq[F64]
+  P2.y P1.y - sq[F64] + sqrt
 }
 
 fn main = {
-   1.2 2.7 new(Vec2[F64]) as P1
-   4.2 6.9 new(Vec2[F64]) as P2
-   P1 P2 distance putf
-   -10 abs[I64] puti
+  1.2 2.7 new(Vec2[F64]) as P1
+  4.2 6.9 new(Vec2[F64]) as P2
+  P1 P2 distance putf
+  -10 abs[I64] puti
 }

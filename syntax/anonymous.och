@@ -1,23 +1,22 @@
 extern print :: ^U8
 
-fn cond-or-eq
-:: Any Any (Any Any -> Bool) -> Bool = {
-   as (a b _fn)
-   a b _fn call a b eq or
+fn cond-or-eq: Any Any (Any Any -> Bool) -> Bool = {
+  as (a b _fn)
+  a b _fn call a b eq or
 }
 
-fn >eq :: Any Any -> Bool = {
-   (Any Any -> Bool) >
-   cond-or-eq
+fn >eq: Any Any -> Bool = {
+  (Any Any -> Bool) >
+  cond-or-eq
 }
 
-fn <eq :: Any Any -> Bool = {
-   (Any Any -> Bool) <
-   cond-or-eq
+fn <eq: Any Any -> Bool = {
+  (Any Any -> Bool) <
+  cond-or-eq
 }
 
 fn main = {
-   12 13 as (a b)
-   if (a b <eq) { "a <= b\n" print } else
-   if (a b >eq) { "a >= b\n" print }
+  12 13 as (a b)
+  if (a b <eq) { "a <= b\n" print } else
+  if (a b >eq) { "a >= b\n" print }
 }

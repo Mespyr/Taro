@@ -1,40 +1,43 @@
-extern puti  :: I64
-extern putd  :: F64
-extern print :: ^U8
+extern puti: I64
+extern putd: F64
+extern print: ^U8
 
-expr dup :: a -> a a
-expr swp :: a b -> b a
+expr dup = (a -> a a)
+expr swp = (a b -> b a)
 
-type Vec2 =
-   :x F32
-   :y F32
-extern distance :: Vec2 Vec2 -> F32
+type Vec2 = {
+  x: F32
+  y: F32
+}
+extern distance: Vec2 Vec2 -> F32
 
-fn helloworld =
-   "Hello World!\n" print
+fn helloworld = { "Hello World!\n" print }
 
-fn what :: -> I64 =
-   17 12 if (dup 13 eq) swp
-   -
+fn what: -> I64 = {
+  17 12
+  if (dup 13 eq) swp
+  -
+}
 
-fn fib :: U64 -> U64 =
-   if (dup 3 <) [ pop 1 ] else
-   [ dup 1 - fib swp 2 - fib + ]
+fn fib: U64 -> U64 =
+  if (dup 3 <) { pop 1 } else
+  { dup 1 - fib swp 2 - fib + }
 
-fn main =
-   20 puti
-   12.3 putd
+fn main = {
+  20 puti
+  12.3 putd
 
-   \helloworld call
-   helloworld
+  \helloworld call
+  helloworld
 
-   new(Vec2 Vec2) bind(p1 p2)
-   1.2 p1 @x 2.7 p1 @y
-   4.2 p2 @x 6.9 p2 @y
+  new(Vec2 Vec2) as (p1 p2)
+  1.2 p1 @x 2.7 p1 @y
+  4.2 p2 @x 6.9 p2 @y
 
-   p1 p2 distance putd
+  p1 p2 distance putd
 
-   12 [I64: dup *] call puti
+  12 (I64 -> I64) {dup *} call puti
 
-   40 fib puti
-   what puti
+  40 fib puti
+  what puti
+}

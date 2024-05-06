@@ -1,19 +1,19 @@
-extern puti :: I64
-extern putd :: F64
-extern print :: ^U8
+extern puti: I64
+extern putd: F64
+extern print: ^U8
 
-type Vec2 = :x F32 :y F32
-extern distance :: ^Vec2 ^Vec2 -> F32
+type Vec2 = { x: F32 y: F32 }
+extern distance: ^Vec2 ^Vec2 -> F32
 
-fn helloworld =
-   "Hello World!\n" print
+fn helloworld = { "Hello World!\n" print }
 
-fn main =
+fn main = {
    20   puti
    12.3 putd
    \helloworld call
 
-   new(Vec2 Vec2) bind(p1 p2)
+   new(Vec2 Vec2) as (p1 p2)
    p1 p2 distance putd
 
-   12 [I64: dup *] call puti
+   12 (I64 -> I64){dup *} call puti
+}

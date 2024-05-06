@@ -1,0 +1,46 @@
+import "io.och"
+import "string.och"
+
+extern sqrt: F64 -> F64 # link with -lm
+fn sq[T]: T -> T = { dup * }
+
+type Rectangle = {
+  width: U64
+  height: U64
+
+  fn new: U64 U64 = { this :height this :width }
+  fn area: -> U64 = { this.width this.height * }
+  fn perimeter: -> U64 = { this.width 2 * this.height 2 * + }
+}
+
+type Point[T] = {
+  x: T
+  y: T
+  fn new: T T = { this :y this :x }
+}
+
+fn distance: Point[F64] Point[F64] -> F64 = {
+  as (p1 p2)
+  p2.x p1.x - sq[F64]
+  p2.y p1.y - sq[F64]
+  + sqrt
+}
+
+fn fib: U64 -> U64 =
+  if (dup 3 <) { pop 1 }
+  else { dup 1 - fib swp 2 - fib + }
+
+fn main = {
+  12 13 new(Rectangle) as rect
+
+  "area: %d" rect.area format_u64 println
+  "perimeter: %d" rect.perimeter format_u64 println
+
+  1.2 3.7 new(Point[F64]) as p1
+  5.8 3.2 new(Point[F64]) as p2
+
+  "distance: %f" p1 p2 distance format_f64 println
+
+  expr thing = (a b -> b b a a)
+  "%d" 12 13 thing + - + format_i64 println # 2
+}

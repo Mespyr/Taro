@@ -4,11 +4,11 @@ import "range.och"
 import "string.och"
 
 fn main = {
-   (I64) { as n
-      if (n 15 factor?) "Fizzbuzz" else
-      if (n 5 factor?)  "Buzz" else
-      if (n 3 factor?)  "Fizz"
-      else { n itoa }
-      println
-   } 1 100 1 range.iter
+  (I64) { as n
+    if (n 15 factor?) "Fizzbuzz" else
+    if (n 5 factor?)  "Buzz" else
+    if (n 3 factor?)  "Fizz"
+    else { n itoa }
+    println
+  } 1 100 1 range.iter
 }

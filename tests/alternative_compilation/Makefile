@@ -1,5 +1,5 @@
 CC=gcc
-CCFLAGS=-std=c99 -O3
+CCFLAGS=-std=c99 -O3 -flto -s -w -finline-functions -funroll-loops -march=native
 LDFLAGS=-lm
 
 SRC_FILES=main.c lib.c

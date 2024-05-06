@@ -25,7 +25,6 @@ void Scanner::insert(const std::string& filename) {
     }
 
     stream_index = temp;
-    file.close();
 }
 
 Token Scanner::peek() { return token_stream.at(stream_index); }

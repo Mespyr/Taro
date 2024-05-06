@@ -10,8 +10,6 @@
 const std::string t_type(Token::Type t) {
     switch (t) {
     case Token::SYM_ARROW: return "SYM_ARROW";
-    case Token::SYM_DOUBLE_COLON: return "SYM_DOUBLE_COLON";
-
     case Token::WORD: return "WORD";
     case Token::NUMBER: return "NUMBER";
     case Token::FLOATING_POINT: return "FLOATING POINT";
@@ -21,11 +19,12 @@ const std::string t_type(Token::Type t) {
     case Token::R_PAREN: return "R_PAREN";
     case Token::L_BRACE: return "L_BRACE";
     case Token::R_BRACE: return "R_BRACE";
+    case Token::L_BRACKET: return "L_BRACKET";
+    case Token::R_BRACKET: return "R_BRACKET";
     case Token::COLON: return "COLON";
-    case Token::PERIOD: return "PERIOD";
-    case Token::AT_SIGN: return "ATSIGN";
+    case Token::ACCESS_MEMBER: return "ACCESS_MEMBER";
     case Token::POINTER: return "POINTER";
-    case Token::BACK_SLASH: return "BACK SLASH";
+    case Token::PUSH_FUNCTION: return "PUSH FUNCTION";
     case Token::EQUALS: return "EQUALS";
     case Token::K_IMPORT: return "K_IMPORT";
     case Token::K_EXPR: return "K_EXPR";
@@ -34,6 +33,7 @@ const std::string t_type(Token::Type t) {
     case Token::K_CAST: return "K_CAST";
     case Token::K_IF: return "K_IF";
     case Token::K_ELSE: return "K_ELSE";
+    case Token::K_WHILE: return "K_WHILE";
     case Token::K_NEW: return "K_NEW";
     case Token::K_CALL: return "K_CALL";
     case Token::K_EXTERN: return "K_EXTERN";

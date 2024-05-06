@@ -1,35 +1,29 @@
 import "std.och"
 import "string.och"
 
+fn fib: U64 -> U64 =
+  if (dup 3 <) { pop 1 }
+  else { dup 1 - fib swp 2 - fib + }
+
 type Range = {
-   cur:  I64
-   end:  I64
-   step: I64
+  cur:  I64
+  end:  I64
+  step: I64
 
-   fn new :: I64 I64 I64 = {
-	  this !step
-	  this !end
-	  this !cur
-   }
+  fn new: I64 I64 I64 = { this:step this:end this:cur }
 
-   fn eof? -> Bool = { this.cur this.end >eq }
-   fn next -> I64 = {
-      this.cur dup this.step + this!cur
-   }
+  fn eof?: -> Bool = { this.cur this.end >eq }
+  fn next: -> I64 = { this.cur dup this.step + this:cur }
 
-   fn iter :: (I64) -> (I64) =
-      while (this.eof? not)
-	     { this.next over call }
+  fn iter: (I64) =
+    while (this.eof? not)
+      { this.next over call }
 }
 
-fn fib :: U64 -> U64 =
-   if (dup 3 <) { pop 1 }
-   else { dup 1 - fib swp 2 - fib + }
-
 fn main = {
-   (I64) { as num
-      "fib(%d): " num format_int 
-      num fib itoa concat println
-   }
-   0 40 1 new(Range).iter pop
+  (I64)
+  { as num "fib(%d): " num format_int
+     num fib itoa concat println }
+
+  0 40 1 new(Range).iter pop
 }

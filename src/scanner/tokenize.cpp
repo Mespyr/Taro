@@ -42,12 +42,6 @@ void Scanner::tokenize_line(const std::string& line, uint32_t line_num) {
         } else if (Token::single_chars.count(c)) {
             token_type = Token::single_chars.at(c);
             end_column = start_column + 1;
-            // double colon
-            if (token_type == Token::COLON && end_column < line.length() &&
-                line.at(end_column) == ':') {
-                token_type = Token::SYM_DOUBLE_COLON;
-                end_column++;
-            }
         } else {
             end_column = find_end_col(line, start_column);
             std::string token_str =
