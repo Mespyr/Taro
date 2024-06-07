@@ -30,11 +30,9 @@ const std::string t_type(Token::Type t) {
     case Token::K_EXPR: return "K_EXPR";
     case Token::K_TYPE: return "K_TYPE";
     case Token::K_FN: return "K_FN";
-    case Token::K_CAST: return "K_CAST";
     case Token::K_IF: return "K_IF";
     case Token::K_ELSE: return "K_ELSE";
     case Token::K_WHILE: return "K_WHILE";
-    case Token::K_NEW: return "K_NEW";
     case Token::K_CALL: return "K_CALL";
     case Token::K_EXTERN: return "K_EXTERN";
     case Token::K_AS: return "K_AS";
@@ -69,6 +67,5 @@ int main(int argc, const char* argv[]) {
         else
             std::cout << "\t\t" << t_type(t.type) << std::endl;
     }
-
     return 0;
 }

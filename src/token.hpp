@@ -19,9 +19,7 @@ class Token {
         K_ELSE,
         K_WHILE,
 
-        K_CAST,
         K_AS,
-        K_NEW,
         K_CALL,
 
         K_EQ,
@@ -73,8 +71,7 @@ class Token {
     static inline const std::unordered_map<std::string, Type> keywords = {
         {"import", K_IMPORT}, {"expr", K_EXPR},     {"type", K_TYPE},
         {"fn", K_FN},         {"extern", K_EXTERN}, {"if", K_IF},
-        {"else", K_ELSE},     {"while", K_WHILE},   {"cast", K_CAST},
-        {"as", K_AS},         {"new", K_NEW},       {"call", K_CALL},
-        {"eq", K_EQ},         {">", K_GRE},         {"<", K_LES},
-        {"and", K_AND},       {"or", K_OR}};
+        {"else", K_ELSE},     {"while", K_WHILE},   {"as", K_AS},
+        {"call", K_CALL},     {"eq", K_EQ},         {">", K_GRE},
+        {"<", K_LES},         {"and", K_AND},       {"or", K_OR}};
 };
