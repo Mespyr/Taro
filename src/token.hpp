@@ -47,7 +47,6 @@ class Token {
         R_BRACE,
         COLON,
         ACCESS_MEMBER,
-        POINTER,
         EQUALS,
         PUSH_FUNCTION  // '\' (backslash)
     };
@@ -60,10 +59,10 @@ class Token {
     Type        type;
 
     static inline const std::unordered_map<char, Type> single_chars = {
-        {'(', L_PAREN},   {')', R_PAREN},       {'[', L_BRACKET},
-        {']', R_BRACKET}, {'{', L_BRACE},       {'}', R_BRACE},
-        {':', COLON},     {'.', ACCESS_MEMBER}, {'^', POINTER},
-        {'=', EQUALS},    {'\\', PUSH_FUNCTION}};
+        {'(', L_PAREN},       {')', R_PAREN},       {'[', L_BRACKET},
+        {']', R_BRACKET},     {'{', L_BRACE},       {'}', R_BRACE},
+        {':', COLON},         {'.', ACCESS_MEMBER}, {'=', EQUALS},
+        {'\\', PUSH_FUNCTION}};
 
     static inline const std::unordered_map<std::string, Type> symbols = {
         {"->", SYM_ARROW}};

@@ -23,7 +23,6 @@ const std::string t_type(Token::Type t) {
     case Token::R_BRACKET: return "R_BRACKET";
     case Token::COLON: return "COLON";
     case Token::ACCESS_MEMBER: return "ACCESS_MEMBER";
-    case Token::POINTER: return "POINTER";
     case Token::PUSH_FUNCTION: return "PUSH FUNCTION";
     case Token::EQUALS: return "EQUALS";
     case Token::K_IMPORT: return "K_IMPORT";

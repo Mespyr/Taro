@@ -1,0 +1,65 @@
+import "std.och"
+import "io.och"
+
+expr dup  (a -> a a)
+expr swp  (a b -> b a)
+expr over (a b -> a b a)
+expr pop  (a ->)
+expr 2pop (a b ->)
+
+fn fib(U64 -> U64) =
+  as n if (n 3 <) 1 else
+  { n dec fib n 2 - fib + }
+
+fn prime(I64 -> Bool) =
+  as num if (num 2 <) false else {
+    true 2 while (dup sq num <eq)
+      if (num over % 0 eq) { 2pop false num }
+	  else inc
+    pop
+  }
+
+type Range = {
+  cur:I64 end:I64 step:I64
+  fn next(-> I64) = { this.cur dup 1 + this:cur }
+  fn eof(-> Bool) = { this.cur this.end >eq }
+  fn iter((I64)) = while (this.eof not)
+    { this.next over call }
+}
+fn iter((I64) I64 I64) = { 1 Range.iter }
+
+type Frame[T] = { data:T next:?Frame[T] }
+type Stack[T] = {
+  top: ?Frame[T]
+  fn push(T) = { this.top Frame[T] this:top }
+  fn pop(-> T) =
+    if (this.top none eq) {
+	  "Can't pop from empty stack!" eputln -1 exit noret
+    } else { this.top unwrap dup.next this:top .data }
+  fn size(-> U32) = {
+    this.top 0
+    while (over none !eq) { inc swp unwrap .next swp }
+  }
+}
+fn stack_new[T](-> Stack[T]) = { none Stack[T] }
+
+fn main = {
+  (I64) { fib to_str putln }
+  0 100 iter 
+
+  (I64) as n if (n prime) { n to_str putln }
+  0 1000 iter 
+
+  stack_new[I32] as xs {
+    12 xs.push
+	13 xs.push
+	14 xs.push
+	xs.pop xs.pop + xs.push
+	xs.pop xs.pop +
+	to_str putln
+  }
+
+  expr local (a b -> b a b b)
+  1 2 local # 2 1 2 2
+  + - + to_str putln
+}
