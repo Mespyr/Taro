@@ -23,8 +23,8 @@ type Range = {
   cur:I64 end:I64 step:I64
   fn next(-> I64) = { this.cur dup 1 + this:cur }
   fn eof(-> Bool) = { this.cur this.end >eq }
-  fn iter((I64)) = while (this.eof not)
-    { this.next over call }
+  fn iter((I64)) =
+    while (this.eof not) { this.next over call }
 }
 fn iter((I64) I64 I64) = { 1 Range.iter }
 

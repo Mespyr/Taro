@@ -1,7 +1,7 @@
 CPP=g++
 CPPFLAGS=-Wall -Wextra -pedantic
 
-SRC_DIRS=src src/scanner src/error
+SRC_DIRS=src src/scanner src/error src/file src/location
 SRC_FILES=$(foreach dir, $(SRC_DIRS), $(wildcard $(dir)/*.cpp))
 HEADERS=$(foreach dir, $(SRC_DIRS), $(wildcard $(dir)/*.hpp))
 

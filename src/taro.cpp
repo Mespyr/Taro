@@ -60,8 +60,8 @@ int main(int argc, const char* argv[]) {
 
     while (!scanner.eof()) {
         Token t = scanner.next();
-        std::cout << "(" << t.loc.line_num << ")\t" << t.value;
-        if (t.loc.end_column - t.loc.start_column >= 8)
+        std::cout << "(" << t.loc.line_number() + 1<< ")\t" << t.value;
+        if (t.loc.end_col() - t.loc.start_col() >= 8)
             std::cout << "\t" << t_type(t.type) << std::endl;
         else
             std::cout << "\t\t" << t_type(t.type) << std::endl;

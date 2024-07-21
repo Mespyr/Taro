@@ -1,8 +1,9 @@
 #include "scanner.hpp"
 
-void Scanner::tokenize_line(const std::string& line, uint32_t line_num) {
-    uint32_t start_column = find_start_col(line, 0);
-    uint32_t end_column;
+void Scanner::tokenize_line(uint32_t line_num, std::shared_ptr<File> file) {
+    const std::string &line = file->at(line_num);
+    uint32_t           start_column = find_start_col(line, 0);
+    uint32_t           end_column;
 
     while (start_column < line.length()) {
         char        c = line.at(start_column);
@@ -15,14 +16,12 @@ void Scanner::tokenize_line(const std::string& line, uint32_t line_num) {
             end_column = find_char_end(line, start_column);
             if (end_column >= line.length()) {
                 error = std::make_unique<LocationError>(
-                    Location(line_num, start_column, end_column, line,
-                             current_file),
+                    Location(file, line_num, start_column, end_column),
                     "unexpected EOL while tokenizing char");
                 return;
             } else if (line.at(end_column) != '\'') {
                 error = std::make_unique<LocationError>(
-                    Location(line_num, start_column, end_column, line,
-                             current_file),
+                    Location(file, line_num, start_column, end_column),
                     "unexpected char found while tokenizing character");
                 return;
             }
@@ -32,8 +31,7 @@ void Scanner::tokenize_line(const std::string& line, uint32_t line_num) {
             end_column = find_string_end(line, start_column);
             if (end_column >= line.length()) {
                 error = std::make_unique<LocationError>(
-                    Location(line_num, start_column, end_column, line,
-                             current_file),
+                    Location(file, line_num, start_column, end_column),
                     "unexpected EOL while tokenizing string");
                 return;
             }
@@ -54,8 +52,7 @@ void Scanner::tokenize_line(const std::string& line, uint32_t line_num) {
                 if (end_column >= line.length() ||
                     std::isspace(line.at(end_column))) {
                     error = std::make_unique<LocationError>(
-                        Location(line_num, start_column, end_column, line,
-                                 current_file),
+                        Location(file, line_num, start_column, end_column),
                         "unexpected '.' found while tokenizing number");
                     return;
                 }
@@ -66,8 +63,8 @@ void Scanner::tokenize_line(const std::string& line, uint32_t line_num) {
                 if (get_token_type(float_decimal_section) != Token::NUMBER ||
                     float_decimal_section.front() == '-') {
                     error = std::make_unique<LocationError>(
-                        Location(line_num, old_end_column - 1, end_column, line,
-                                 current_file),
+                        Location(file, line_num, old_end_column - 1,
+                                 end_column),
                         "unexpected '.' found while tokenizing number");
                     return;
                 }
@@ -79,8 +76,7 @@ void Scanner::tokenize_line(const std::string& line, uint32_t line_num) {
             token_stream.begin() + stream_index,
             Token(line.substr(start_column, end_column - start_column),
                   token_type,
-                  Location(line_num, start_column, end_column, line,
-                           current_file)));
+                  Location(file, line_num, start_column, end_column)));
 
         stream_index++;
         start_column = find_start_col(line, end_column);

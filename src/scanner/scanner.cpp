@@ -1,26 +1,21 @@
 #include "scanner.hpp"
 
-#include <fstream>
-
 Scanner::Scanner(const std::string& filename) { insert(filename); }
 
 void Scanner::insert(const std::string& filename) {
-    current_file = filename;
+    std::shared_ptr<File> file = std::make_unique<File>(filename);
 
-    std::ifstream file(filename);
-    if (!file.is_open()) {
+    if (!file->is_open()) {
         error = std::make_unique<Error>("couldn't open file '" + filename +
                                         "': " + strerror(errno));
         return;
     }
 
-    size_t      temp = stream_index;
-    std::string buf;
-    uint32_t    line_num = 1;
+    size_t   temp = stream_index;
+    uint32_t line_num = 0;
 
-    while (!file.eof()) {
-        std::getline(file, buf);
-        tokenize_line(buf, line_num++);
+    while (line_num < file->line_count()) {
+        tokenize_line(line_num++, file);
         if (error) return;
     }
 

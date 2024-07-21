@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "location.hpp"
+#include "location/location.hpp"
 
 class Token {
   public:
@@ -51,12 +51,12 @@ class Token {
         PUSH_FUNCTION  // '\' (backslash)
     };
 
-    Token(std::string value, Type type, Location loc)
-        : loc(loc), value(value), type(type) {}
+    Token(const std::string &value, Type type, const Location &loc)
+        : value(value), type(type), loc(loc) {}
 
-    Location    loc;
     std::string value;
     Type        type;
+    Location    loc;
 
     static inline const std::unordered_map<char, Type> single_chars = {
         {'(', L_PAREN},       {')', R_PAREN},       {'[', L_BRACKET},
