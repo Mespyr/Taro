@@ -70,7 +70,7 @@ void Scanner::tokenize_line(uint32_t line_num, std::shared_ptr<File> file) {
                 }
                 token_type = Token::FLOATING_POINT;
             }
-        }
+		}
 
         token_stream.insert(
             token_stream.begin() + stream_index,

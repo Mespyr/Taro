@@ -7,7 +7,7 @@
 // arent large switch statements just so pretty
 // and totally not an eyesore
 // especially for this usecase??
-const std::string t_type(Token::Type t) {
+const std::string token_type(Token::Type t) {
     switch (t) {
     case Token::SYM_ARROW: return "SYM_ARROW";
     case Token::WORD: return "WORD";
@@ -25,7 +25,7 @@ const std::string t_type(Token::Type t) {
     case Token::ACCESS_MEMBER: return "ACCESS_MEMBER";
     case Token::PUSH_FUNCTION: return "PUSH FUNCTION";
     case Token::EQUALS: return "EQUALS";
-    case Token::K_IMPORT: return "K_IMPORT";
+    case Token::K_USE: return "K_USE";
     case Token::K_EXPR: return "K_EXPR";
     case Token::K_TYPE: return "K_TYPE";
     case Token::K_FN: return "K_FN";
@@ -33,6 +33,7 @@ const std::string t_type(Token::Type t) {
     case Token::K_ELSE: return "K_ELSE";
     case Token::K_WHILE: return "K_WHILE";
     case Token::K_CALL: return "K_CALL";
+	case Token::K_UNWRAP: return "K_UNWRAP";
     case Token::K_EXTERN: return "K_EXTERN";
     case Token::K_AS: return "K_AS";
 
@@ -60,11 +61,12 @@ int main(int argc, const char* argv[]) {
 
     while (!scanner.eof()) {
         Token t = scanner.next();
-        std::cout << "(" << t.loc.line_number() + 1<< ")\t" << t.value;
+        std::cout << "(" << t.loc.line_number() + 1 << ")\t" << t.value;
         if (t.loc.end_col() - t.loc.start_col() >= 8)
-            std::cout << "\t" << t_type(t.type) << std::endl;
+            std::cout << "\t" << token_type(t.type) << std::endl;
         else
-            std::cout << "\t\t" << t_type(t.type) << std::endl;
+            std::cout << "\t\t" << token_type(t.type) << std::endl;
     }
-    return 0;
+
+	return 0;
 }

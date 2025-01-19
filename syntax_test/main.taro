@@ -1,0 +1,21 @@
+use "std.taro"
+
+fn fib (u64 -> u64) = if (dup 1 >)
+  { dec dup fib swp dec fib + }
+
+fn prime (i64 -> bool) =
+  as n if (n 2 <) false else {
+    true 2 while (dup sq n <eq)
+      if (n over % 0 eq)
+        { 2pop false n }
+      else inc
+    pop
+  }
+
+fn main = {
+  (i64) { fib putln } 0 40 iter
+
+  (i64) if (dup prime) putln
+        else pop
+  0 1000 iter
+}

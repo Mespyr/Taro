@@ -9,7 +9,7 @@ class Token {
   public:
     enum Type {
         // keywords
-        K_IMPORT,
+        K_USE,
         K_EXPR,
         K_TYPE,
         K_FN,
@@ -18,9 +18,10 @@ class Token {
         K_IF,
         K_ELSE,
         K_WHILE,
-
         K_AS,
+
         K_CALL,
+        K_UNWRAP,
 
         K_EQ,
         K_GRE,
@@ -64,13 +65,11 @@ class Token {
         {':', COLON},         {'.', ACCESS_MEMBER}, {'=', EQUALS},
         {'\\', PUSH_FUNCTION}};
 
-    static inline const std::unordered_map<std::string, Type> symbols = {
-        {"->", SYM_ARROW}};
-
-    static inline const std::unordered_map<std::string, Type> keywords = {
-        {"import", K_IMPORT}, {"expr", K_EXPR},     {"type", K_TYPE},
-        {"fn", K_FN},         {"extern", K_EXTERN}, {"if", K_IF},
-        {"else", K_ELSE},     {"while", K_WHILE},   {"as", K_AS},
-        {"call", K_CALL},     {"eq", K_EQ},         {">", K_GRE},
-        {"<", K_LES},         {"and", K_AND},       {"or", K_OR}};
+    static inline const std::unordered_map<std::string, Type> symbols_map = {
+        {"use", K_USE},   {"expr", K_EXPR},     {"type", K_TYPE},
+        {"fn", K_FN},     {"extern", K_EXTERN}, {"if", K_IF},
+        {"else", K_ELSE}, {"while", K_WHILE},   {"as", K_AS},
+        {"call", K_CALL}, {"unwrap", K_UNWRAP}, {"eq", K_EQ},
+        {">", K_GRE},     {"<", K_LES},         {"and", K_AND},
+        {"or", K_OR},     {"->", SYM_ARROW}};
 };

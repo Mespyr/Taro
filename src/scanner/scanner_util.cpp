@@ -11,7 +11,6 @@ bool Scanner::is_number(std::string str) {
 
 Token::Type Scanner::get_token_type(const std::string& token) {
     if (is_number(token)) return Token::NUMBER;
-    if (Token::keywords.count(token)) return Token::keywords.at(token);
-    if (Token::symbols.count(token)) return Token::symbols.at(token);
+    if (Token::symbols_map.count(token)) return Token::symbols_map.at(token);
     return Token::WORD;
 }

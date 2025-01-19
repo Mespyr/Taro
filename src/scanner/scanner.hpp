@@ -6,7 +6,6 @@
 #include <fstream>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "../error/error.hpp"
 #include "../file/file.hpp"

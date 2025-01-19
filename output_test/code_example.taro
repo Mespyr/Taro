@@ -1,0 +1,22 @@
+# type string = list[u8]
+
+extern puts (string)
+extern puti (i64)
+extern putf (f64)
+fn dotnl = { "\n" puts }
+fn putln (string) = { puts dotnl }
+
+type vec2 = {
+  x: f64
+  y: f64
+}
+extern distance (vec2 vec2) f64
+
+fn main = {
+  "Hello World!" putln
+  12 13 + puti dotnl
+
+  1.2 3.8 vec2
+  2.6 3.9 vec2
+  distance putf dotnl
+}
